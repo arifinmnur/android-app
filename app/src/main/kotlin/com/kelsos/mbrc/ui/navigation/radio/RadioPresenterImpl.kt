@@ -15,22 +15,26 @@ constructor(
 ) : BasePresenter<RadioView>(), RadioPresenter {
 
   override fun load() {
+    view?.showLoading()
     scope.launch {
       try {
         view?.update(radioRepository.getAndSaveRemote())
       } catch (e: Exception) {
         view?.error(e)
       }
+      view?.hideLoading()
     }
   }
 
   override fun refresh() {
+    view?.showLoading()
     scope.launch {
       try {
         view?.update(radioRepository.getAndSaveRemote())
       } catch (e: Exception) {
         view?.error(e)
       }
+      view?.hideLoading()
     }
   }
 
