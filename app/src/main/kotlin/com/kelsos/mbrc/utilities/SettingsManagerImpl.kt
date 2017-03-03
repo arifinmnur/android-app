@@ -8,7 +8,8 @@ import com.kelsos.mbrc.logging.FileLoggingTree
 import com.kelsos.mbrc.utilities.RemoteUtils.getVersionCode
 import com.kelsos.mbrc.utilities.SettingsManager.Companion.NONE
 import timber.log.Timber
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,8 +17,8 @@ import javax.inject.Singleton
 class SettingsManagerImpl
 @Inject
 constructor(
-  private val context: Application,
-  private val preferences: SharedPreferences
+    private val context: Application,
+    private val preferences: SharedPreferences
 ) : SettingsManager {
 
   init {
@@ -32,6 +33,17 @@ constructor(
       val fileLoggingTree = Timber.forest().find { it is FileLoggingTree }
       fileLoggingTree?.let { Timber.uproot(it) }
     }
+  }
+
+  override fun getClientId(): String {
+    var clientId = preferences.getString(CLIENT_ID, "")
+
+    if (clientId.isNullOrBlank()) {
+      clientId = UUID.randomUUID().toString()
+      preferences.edit().putString(CLIENT_ID, clientId).apply()
+    }
+
+    return clientId
   }
 
   private fun loggingEnabled(): Boolean {
@@ -82,6 +94,9 @@ constructor(
 
   private fun getKey(settingsKey: Int) = context.getString(settingsKey)
 
+  companion object {
+    const val CLIENT_ID = "com.kelsos.mbrc.CLIENT_ID"
+  }
 }
 
 interface SettingsManager {
@@ -106,4 +121,5 @@ interface SettingsManager {
   fun isPluginUpdateCheckEnabled(): Boolean
   fun getLastUpdated(): Date
   fun setLastUpdated(lastChecked: Date)
+  fun getClientId(): String
 }
