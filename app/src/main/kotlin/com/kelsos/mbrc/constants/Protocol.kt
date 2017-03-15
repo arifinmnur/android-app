@@ -55,7 +55,7 @@ object Protocol {
   const val VerifyConnection = "verifyconnection"
   const val RadioStations = "radiostations"
 
-  const val ProtocolVersionNumber = 4
+  const val ProtocolVersionNumber = 5
 
   const val PlayerOutput = "playeroutput"
   const val PlayerOutputSwitch = "playeroutputswitch"
