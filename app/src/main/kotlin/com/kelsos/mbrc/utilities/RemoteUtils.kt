@@ -5,8 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.content.pm.PackageInfoCompat
-import rx.Emitter
-import rx.Observable
+import io.reactivex.Observable
 import java.io.File
 
 object RemoteUtils {
@@ -22,14 +21,14 @@ object RemoteUtils {
   }
 
   fun bitmapFromFile(path: String): Observable<Bitmap> {
-    return Observable.fromEmitter<Bitmap>({
+    return Observable.create<Bitmap>({
       try {
         val options = BitmapFactory.Options()
         options.inPreferredConfig = Bitmap.Config.RGB_565
         val bitmap = BitmapFactory.decodeFile(path, options)
         if (bitmap != null) {
           it.onNext(bitmap)
-          it.onCompleted()
+          it.onComplete()
         } else {
           it.onError(RuntimeException("Unable to decode the image"))
         }
@@ -37,7 +36,7 @@ object RemoteUtils {
       } catch (e: Exception) {
         it.onError(e)
       }
-    }, Emitter.BackpressureMode.LATEST)
+    })
   }
 
   fun coverBitmap(coverPath: String): Observable<Bitmap> {
@@ -47,7 +46,7 @@ object RemoteUtils {
 
   fun coverBitmapSync(coverPath: String): Bitmap? {
     return try {
-      RemoteUtils.coverBitmap(coverPath).toBlocking().first()
+      RemoteUtils.coverBitmap(coverPath).blockingLast()
     } catch (e: Exception) {
       null
     }

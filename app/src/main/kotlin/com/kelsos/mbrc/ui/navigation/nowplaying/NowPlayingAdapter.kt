@@ -15,13 +15,11 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.data.NowPlaying
-import com.kelsos.mbrc.rx.MapWithIndex
 import com.kelsos.mbrc.ui.drag.ItemTouchHelperAdapter
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.TouchHelperViewHolder
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import com.raizlabs.android.dbflow.list.FlowCursorList.OnCursorRefreshListener
-import rx.Observable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,10 +53,11 @@ class NowPlayingAdapter
     }
 
     this.currentTrack = path
-    Observable.from(cursor).compose(MapWithIndex.instance<NowPlaying>()).filter {
-      val info = it.value()
-      info.path.equals(path)
-    }.subscribe({ setPlayingTrack(it.index().toInt()) }) { Timber.v(it, "Failed") }
+    cursor?.forEachIndexed { index, (_, _, itemPath) ->
+      if (itemPath.equals(path)) {
+        setPlayingTrack(index)
+      }
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackHolder {
@@ -103,14 +102,10 @@ class NowPlayingAdapter
 
   override fun onItemMove(from: Int, to: Int): Boolean {
     swapPositions(from, to)
-
-    if (listener != null) {
-      listener!!.onMove(from, to)
-    }
-
+    listener?.onMove(from, to)
     notifyItemMoved(from, to)
 
-    if (!TextUtils.isEmpty(currentTrack)) {
+    if (!currentTrack.isNullOrBlank()) {
       setPlayingTrack(currentTrack)
     }
 
@@ -172,7 +167,6 @@ class NowPlayingAdapter
     fun onPress(position: Int)
     fun onMove(from: Int, to: Int)
     fun onDismiss(position: Int)
-
   }
 
   class TrackHolder(itemView: View) : RecyclerView.ViewHolder(itemView), TouchHelperViewHolder {

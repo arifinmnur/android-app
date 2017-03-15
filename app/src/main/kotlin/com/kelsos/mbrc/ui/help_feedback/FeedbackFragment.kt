@@ -18,20 +18,16 @@ import butterknife.OnClick
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.logging.LogHelper
 import com.kelsos.mbrc.utilities.RemoteUtils.getVersion
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 
 class FeedbackFragment : Fragment() {
 
-  @BindView(R.id.feedback_content)
-  lateinit var feedbackEditText: EditText
-  @BindView(R.id.include_device_info)
-  lateinit var deviceInfo: CheckBox
-  @BindView(R.id.include_log_info)
-  lateinit var logInfo: CheckBox
-  @BindView(R.id.feedback_button)
-  lateinit var feedbackButton: Button
+  @BindView(R.id.feedback_content) lateinit var feedbackEditText: EditText
+  @BindView(R.id.include_device_info) lateinit var deviceInfo: CheckBox
+  @BindView(R.id.include_log_info) lateinit var logInfo: CheckBox
+  @BindView(R.id.feedback_button) lateinit var feedbackButton: Button
 
   override fun onCreateView(
     inflater: LayoutInflater,

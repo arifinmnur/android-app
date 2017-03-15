@@ -42,9 +42,9 @@ import com.kelsos.mbrc.utilities.SettingsManager
 import com.kelsos.mbrc.utilities.SettingsManagerImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
-import rx.Scheduler
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import toothpick.config.Module
 import java.util.concurrent.Executors
 

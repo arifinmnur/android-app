@@ -7,14 +7,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
-import rx.Subscription
-import rx.subscriptions.CompositeSubscription
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   var view: T? = null
     private set
 
-  private val compositeSubscription = CompositeSubscription()
+  private val compositeDisposable = CompositeDisposable()
   private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
   private val job = SupervisorJob()
@@ -33,12 +33,12 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   override fun detach() {
     lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     this.view = null
-    compositeSubscription.clear()
+    compositeDisposable.clear()
     coroutineContext.cancelChildren()
   }
 
-  protected fun addSubscription(subscription: Subscription) {
-    this.compositeSubscription.add(subscription)
+  protected fun addDisposable(disposable: Disposable) {
+    this.compositeDisposable.add(disposable)
   }
 
   fun checkIfAttached() {
