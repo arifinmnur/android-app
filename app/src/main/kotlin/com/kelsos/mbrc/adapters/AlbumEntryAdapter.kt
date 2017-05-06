@@ -1,7 +1,6 @@
 package com.kelsos.mbrc.adapters
 
 import android.app.Activity
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +14,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.data.library.Album
+import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
 
   private val inflater: LayoutInflater = LayoutInflater.from(context)
   private var data: FlowCursorList<Album>? = null
-  private var mListener: MenuItemSelectedListener? = null
+  private var listener: MenuItemSelectedListener? = null
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
@@ -33,22 +33,33 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
       val popupMenu = PopupMenu(it.context, it)
       popupMenu.inflate(R.menu.popup_album)
       popupMenu.setOnMenuItemClickListener {
-        mListener?.onMenuItemSelected(it, data!!.getItem(holder.adapterPosition.toLong()))
+        val position = holder.adapterPosition.toLong()
+        ifNotNull(listener, data?.getItem(position)) { listener, album ->
+          listener.onMenuItemSelected(it, album)
+        }
         true
       }
       popupMenu.show()
     }
 
     holder.itemView.setOnClickListener {
-      mListener!!.onItemClicked(data!!.getItem(holder.adapterPosition.toLong()))
+      val position = holder.adapterPosition.toLong()
+      val album = data?.getItem(position)
+
+      ifNotNull(listener, album) { listener, album ->
+        listener.onItemClicked(album)
+      }
     }
     return holder
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val entry = data!!.getItem(position.toLong())
-    holder.album.text = if (TextUtils.isEmpty(entry.album)) holder.emptyAlbum else entry.album
-    holder.artist.text = if (TextUtils.isEmpty(entry.artist)) holder.unknownArtist else entry.artist
+    val album = data?.getItem(position.toLong())
+    album?.let { (artist, title) ->
+      holder.album.text = if (title.isNullOrBlank()) holder.emptyAlbum else title
+      holder.artist.text = if (artist.isNullOrBlank()) holder.unknownArtist else artist
+    }
+
   }
 
   fun refresh() {
@@ -57,11 +68,11 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
   }
 
   override fun getItemCount(): Int {
-    return data?.count ?: 0
+    return data?.count?.toInt() ?: 0
   }
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
-    mListener = listener
+    this.listener = listener
   }
 
   interface MenuItemSelectedListener {
