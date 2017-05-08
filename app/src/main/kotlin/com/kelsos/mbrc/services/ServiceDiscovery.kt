@@ -27,11 +27,11 @@ import javax.inject.Inject
 class ServiceDiscovery
 @Inject
 internal constructor(
-  private val manager: WifiManager,
-  private val connectivityManager: ConnectivityManager,
-  private val mapper: ObjectMapper,
-  private val bus: RxBus,
-  private val connectionRepository: ConnectionRepository
+    private val manager: WifiManager,
+    private val connectivityManager: ConnectivityManager,
+    private val mapper: ObjectMapper,
+    private val bus: RxBus,
+    private val connectionRepository: ConnectionRepository
 ) {
   private var job = SupervisorJob()
   private var scope = CoroutineScope(job + Dispatchers.IO)
