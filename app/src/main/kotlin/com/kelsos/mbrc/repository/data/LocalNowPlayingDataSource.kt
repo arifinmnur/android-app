@@ -5,6 +5,7 @@ import com.kelsos.mbrc.data.NowPlaying_Table
 import com.kelsos.mbrc.data.NowPlaying_Table.artist
 import com.kelsos.mbrc.data.NowPlaying_Table.title
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.data.db.RemoteDatabase
 import com.kelsos.mbrc.extensions.escapeLike
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
@@ -34,7 +35,7 @@ class LocalNowPlayingDataSource
       .addAll(list)
       .build()
 
-    database<NowPlaying>().executeTransaction(transaction)
+    database<RemoteDatabase>().executeTransaction(transaction)
   }
 
   override suspend fun loadAllCursor(): FlowCursorList<NowPlaying> = withContext(dispatchers.db) {
