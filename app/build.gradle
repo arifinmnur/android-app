@@ -5,7 +5,8 @@ plugins {
   id 'com.android.application'
   id 'kotlin-android'
   id 'kotlin-kapt'
-  id 'idea'
+  id 'kotlin-kapt'
+apply plugin: 'idea'
   id 'jacoco'
   id 'com.github.kt3k.coveralls'
 }
@@ -172,9 +173,9 @@ ext {
   runner_version = "0.5"
   espresso_version = "2.2.2"
   junit_version = "4.12"
-  mockito_version = "2.7.1"
-  robolectric_version = "3.2.2"
-  truth_version = "0.31"
+  mockito_version = "2.8.9"
+  robolectric_version = "3.3.2"
+  truth_version = "0.32"
   leakcanary_version = "2.5"
 }
 
@@ -328,7 +329,6 @@ repositories {
 }
 
 kapt {
-  generateStubs = true
   arguments {
     arg('toothpick_registry_package_name', 'com.kelsos.mbrc')
   }
