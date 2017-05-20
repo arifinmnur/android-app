@@ -33,8 +33,8 @@ class RemoteSessionManager
 @Inject
 constructor(
   context: Application,
-  volumeProvider: RemoteVolumeProvider,
-  private val bus: RxBus,
+            volumeProvider: RemoteVolumeProvider,
+            private val bus: RxBus,
   private val manager: AudioManager
 ) : AudioManager.OnAudioFocusChangeListener {
   private val mediaSession: MediaSessionCompat?

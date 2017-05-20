@@ -35,7 +35,5 @@ class ConnectionVerifierImpl
       return@withContext false
     }
   }
-
-
   class NoValidPluginConnection : Exception()
 }
