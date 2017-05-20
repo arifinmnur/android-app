@@ -45,7 +45,9 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import toothpick.config.Binding
 import toothpick.config.Module
+import kotlin.reflect.KClass
 import java.util.concurrent.Executors
 
 class RemoteModule : Module() {
@@ -95,3 +97,7 @@ class RemoteModule : Module() {
     bind(RadioRepository::class.java).to(RadioRepositoryImpl::class.java).singletonInScope()
   }
 }
+
+fun <T : Any> Module.bind(clazz: KClass<T>): Binding<T> = bind(clazz.java)
+
+fun <T: Any, K : T> Binding<T>.to(clazz: KClass<K>): Binding<T>.BoundStateForClassBinding = this.to(clazz.java)
