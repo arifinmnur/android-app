@@ -8,7 +8,7 @@ import com.kelsos.mbrc.constants.Protocol
 import com.kelsos.mbrc.constants.ProtocolEventType
 import com.kelsos.mbrc.events.MessageEvent
 import com.kelsos.mbrc.events.bus.RxBus
-import com.kelsos.mbrc.events.ui.NotifyUser
+import com.kelsos.mbrc.events.NotifyUser
 import com.kelsos.mbrc.model.MainDataModel
 import timber.log.Timber
 import java.util.*

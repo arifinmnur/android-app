@@ -28,10 +28,10 @@ import com.kelsos.mbrc.annotations.Repeat.Mode
 import com.kelsos.mbrc.changelog.ChangelogDialog
 import com.kelsos.mbrc.domain.TrackInfo
 import com.kelsos.mbrc.enums.LfmStatus
-import com.kelsos.mbrc.events.ui.OnMainFragmentOptionsInflated
-import com.kelsos.mbrc.events.ui.ShuffleChange
-import com.kelsos.mbrc.events.ui.ShuffleChange.ShuffleState
-import com.kelsos.mbrc.events.ui.UpdateDuration
+import com.kelsos.mbrc.events.OnMainFragmentOptionsInflated
+import com.kelsos.mbrc.events.ShuffleChange
+import com.kelsos.mbrc.events.ShuffleChange.ShuffleState
+import com.kelsos.mbrc.events.UpdatePosition
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.helper.ProgressSeekerHelper
 import com.kelsos.mbrc.helper.ProgressSeekerHelper.ProgressUpdate
@@ -54,7 +54,6 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
   // Injects
   @Inject
   lateinit var presenter: MainViewPresenter
-
   @Inject
   lateinit var progressHelper: ProgressSeekerHelper
 
@@ -346,8 +345,8 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
    * current progress of playback
    */
 
-  override fun updateProgress(duration: UpdateDuration) {
-    updateProgress(duration.position, duration.duration)
+  override fun updateProgress(duration: UpdatePosition) {
+    updateProgress(duration.current, duration.total)
   }
 
   private fun updateProgress(
@@ -376,10 +375,6 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
     progressBar.progress = current
 
     trackProgressAnimation(current, total)
-  }
-
-  override fun updateDuration(position: Int, duration: Int) {
-    updateProgress(position, duration)
   }
 
   override fun updateScrobbleStatus(active: Boolean) {
@@ -442,7 +437,7 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
     private const val STOPPED = "Stopped"
     private const val PLAYING = "Playing"
 
-    fun tag(@PlayerState.State state: String): String = when(state) {
+    fun tag(@PlayerState.State state: String): String = when (state) {
       PlayerState.PLAYING -> PLAYING
       PlayerState.PAUSED -> PAUSED
       else -> STOPPED
