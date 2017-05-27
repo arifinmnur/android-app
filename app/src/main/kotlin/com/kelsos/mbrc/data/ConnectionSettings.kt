@@ -12,18 +12,17 @@ import com.raizlabs.android.dbflow.annotation.UniqueGroup
 @Table(
   name = "settings",
   database = RemoteDatabase::class,
-  uniqueColumnGroups = [UniqueGroup(groupNumber = 1, uniqueConflict = ConflictAction.IGNORE)]
-)
+  uniqueColumnGroups = [UniqueGroup(groupNumber = 1, uniqueConflict = ConflictAction.IGNORE)])
 data class ConnectionSettings(
-  @Column(name = "address")
-  @Unique(unique = false, uniqueGroups = [1])
-  var address: String? = null,
-  @Unique(unique = false, uniqueGroups = [1])
-  @Column(name = "port")
-  var port: Int = 0,
-  @Column(name = "name")
-  var name: String? = null,
-  @PrimaryKey(autoincrement = true)
-  @Column(name = "id")
-  var id: Long = 0
+    @Column(name = "address")
+    @Unique(unique = false, uniqueGroups = [1])
+    var address: String? = null,
+    @Unique(unique = false, uniqueGroups = [1])
+    @Column(name = "port")
+    var port: Int = 0,
+    @Column(name = "name")
+    var name: String? = null,
+    @PrimaryKey(autoincrement = true)
+    @Column(name = "id")
+    var id: Long = 0
 )
