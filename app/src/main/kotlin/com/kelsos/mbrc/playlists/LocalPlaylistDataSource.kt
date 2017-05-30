@@ -3,6 +3,7 @@ package com.kelsos.mbrc.playlists
 import com.kelsos.mbrc.data.db.RemoteDatabase
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.playlists.Playlist_Table.name
 import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
