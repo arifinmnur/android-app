@@ -1,14 +1,11 @@
-package com.kelsos.mbrc.repository.data
-
+package com.kelsos.mbrc.library.albums
 
 import com.kelsos.mbrc.data.db.RemoteDatabase
-import com.kelsos.mbrc.data.library.Album
-import com.kelsos.mbrc.data.library.Album_Table
-import com.kelsos.mbrc.data.library.Album_Table.album
-import com.kelsos.mbrc.data.library.Track
-import com.kelsos.mbrc.data.library.Track_Table
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.library.tracks.Track
+import com.kelsos.mbrc.library.tracks.Track_Table
+import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -46,14 +43,13 @@ constructor(
   override suspend fun loadAllCursor(): FlowCursorList<Album> = withContext(dispatchers.db) {
     val query = (select from Album::class)
       .orderBy(Album_Table.artist, true)
-      .orderBy(album, true)
+      .orderBy(Album_Table.album, true)
     return@withContext FlowCursorList.Builder(Album::class.java).modelQueriable(query).build()
   }
 
   suspend fun getAlbumsByArtist(artist: String): FlowCursorList<Album> =
     withContext(dispatchers.db) {
-      val selectAlbum =
-        SQLite.select(Album_Table.album.withTable(), Album_Table.artist.withTable()).distinct()
+      val selectAlbum = SQLite.select(Album_Table.album.withTable(), Album_Table.artist.withTable()).distinct()
       val artistOrAlbumArtist = clause(Track_Table.artist.withTable().`is`(artist))
         .or(Track_Table.album_artist.withTable().`is`(artist))
       val columns = clause(Track_Table.album.withTable().eq(Album_Table.album.withTable()))
@@ -63,12 +59,12 @@ constructor(
           on columns
           where artistOrAlbumArtist)
         .orderBy(Album_Table.artist.withTable(), true)
-        .orderBy(album.withTable(), true)
+        .orderBy(Album_Table.album.withTable(), true)
       return@withContext FlowCursorList.Builder(Album::class.java).modelQueriable(query).build()
     }
 
   override suspend fun search(term: String): FlowCursorList<Album> = withContext(dispatchers.db) {
-    val query = (select from Album::class where album.like("%${term.escapeLike()}%"))
+    val query = (select from Album::class where Album_Table.album.like("%${term.escapeLike()}%"))
     return@withContext FlowCursorList.Builder(Album::class.java).modelQueriable(query).build()
   }
 

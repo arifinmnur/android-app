@@ -11,8 +11,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.adapters.AlbumEntryAdapter
 import com.kelsos.mbrc.annotations.Queue
-import com.kelsos.mbrc.data.library.Album
 import com.kelsos.mbrc.helper.PopupActionHandler
+import com.kelsos.mbrc.library.albums.Album
 import com.kelsos.mbrc.ui.activities.FontActivity
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
@@ -25,23 +25,13 @@ class ArtistAlbumsActivity : FontActivity(),
   ArtistAlbumsView,
   AlbumEntryAdapter.MenuItemSelectedListener {
 
-  @BindView(R.id.album_recycler)
-  lateinit var recyclerView: EmptyRecyclerView
+  @BindView(R.id.album_recycler) lateinit var recyclerView: EmptyRecyclerView
+  @BindView(R.id.toolbar) lateinit var toolbar: MaterialToolbar
+  @BindView(R.id.empty_view) lateinit var emptyView: ConstraintLayout
 
-  @BindView(R.id.toolbar)
-  lateinit var toolbar: MaterialToolbar
-
-  @BindView(R.id.empty_view)
-  lateinit var emptyView: ConstraintLayout
-
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var adapter: AlbumEntryAdapter
-
-  @Inject
-  lateinit var presenter: ArtistAlbumsPresenter
+  @Inject lateinit var actionHandler: PopupActionHandler
+  @Inject lateinit var adapter: AlbumEntryAdapter
+  @Inject lateinit var presenter: ArtistAlbumsPresenter
 
   private var artist: String? = null
   private var scope: Scope? = null
@@ -77,8 +67,7 @@ class ArtistAlbumsActivity : FontActivity(),
     }
 
     adapter.setMenuItemSelectedListener(this)
-    recyclerView.layoutManager =
-      LinearLayoutManager(this)
+    recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = adapter
     recyclerView.emptyView = emptyView
     presenter.attach(this)

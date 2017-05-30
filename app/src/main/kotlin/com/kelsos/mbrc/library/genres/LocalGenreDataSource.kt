@@ -1,11 +1,9 @@
-package com.kelsos.mbrc.repository.data
+package com.kelsos.mbrc.library.genres
 
 import com.kelsos.mbrc.data.db.RemoteDatabase
-import com.kelsos.mbrc.data.library.Genre
-import com.kelsos.mbrc.data.library.Genre_Table
-import com.kelsos.mbrc.data.library.Genre_Table.genre
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -41,7 +39,7 @@ class LocalGenreDataSource
   }
 
   override suspend fun search(term: String): FlowCursorList<Genre> = withContext(dispatchers.db) {
-    val query = (select from Genre::class where genre.like("%${term.escapeLike()}%"))
+    val query = (select from Genre::class where Genre_Table.genre.like("%${term.escapeLike()}%"))
       .orderBy(Genre_Table.genre, true)
     return@withContext FlowCursorList.Builder(Genre::class.java).modelQueriable(query).build()
   }

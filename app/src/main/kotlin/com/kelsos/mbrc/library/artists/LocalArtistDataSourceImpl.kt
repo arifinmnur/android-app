@@ -1,12 +1,10 @@
-package com.kelsos.mbrc.repository.data
+package com.kelsos.mbrc.library.artists
 
 import com.kelsos.mbrc.data.db.RemoteDatabase
-import com.kelsos.mbrc.data.library.Artist
-import com.kelsos.mbrc.data.library.Artist_Table.artist
-import com.kelsos.mbrc.data.library.Track
-import com.kelsos.mbrc.data.library.Track_Table
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.library.tracks.Track
+import com.kelsos.mbrc.library.tracks.Track_Table
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -37,7 +35,7 @@ class LocalArtistDataSourceImpl
   }
 
   override suspend fun loadAllCursor(): FlowCursorList<Artist> = withContext(dispatchers.db) {
-    val query = (select from Artist::class).orderBy(artist, true)
+    val query = (select from Artist::class).orderBy(Artist_Table.artist, true)
     return@withContext FlowCursorList.Builder(Artist::class.java).modelQueriable(query).build()
   }
 
@@ -47,16 +45,16 @@ class LocalArtistDataSourceImpl
         .from(Artist::class.java)
         .innerJoin(Track::class.java)
         .on(
-          artist.withTable()
+          Artist_Table.artist.withTable()
             .eq(Track_Table.artist.withTable())
         )
         .where(Track_Table.genre.`is`(genre))
-        .orderBy(artist.withTable(), true).groupBy(artist.withTable())
+        .orderBy(Artist_Table.artist.withTable(), true).groupBy(Artist_Table.artist.withTable())
       return@withContext FlowCursorList.Builder(Artist::class.java).modelQueriable(query).build()
     }
 
   override suspend fun search(term: String): FlowCursorList<Artist> = withContext(dispatchers.db) {
-    val query = (select from Artist::class where artist.like("%${term.escapeLike()}%"))
+    val query = (select from Artist::class where Artist_Table.artist.like("%${term.escapeLike()}%"))
     return@withContext FlowCursorList.Builder(Artist::class.java).modelQueriable(query).build()
   }
 
@@ -64,9 +62,9 @@ class LocalArtistDataSourceImpl
     val query = SQLite.select().distinct()
       .from(Artist::class.java)
       .innerJoin(Track::class.java)
-      .on(artist.withTable().eq(Track_Table.artist.withTable()))
-      .where(artist.withTable().`in`(Track_Table.album_artist.withTable()))
-      .orderBy(artist.withTable(), true).groupBy(artist.withTable())
+      .on(Artist_Table.artist.withTable().eq(Track_Table.artist.withTable()))
+      .where(Artist_Table.artist.withTable().`in`(Track_Table.album_artist.withTable()))
+      .orderBy(Artist_Table.artist.withTable(), true).groupBy(Artist_Table.artist.withTable())
     return@withContext FlowCursorList.Builder(Artist::class.java).modelQueriable(query).build()
   }
 

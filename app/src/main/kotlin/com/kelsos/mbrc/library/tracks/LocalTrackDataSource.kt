@@ -1,12 +1,9 @@
-package com.kelsos.mbrc.repository.data
-
+package com.kelsos.mbrc.library.tracks
 
 import com.kelsos.mbrc.data.db.RemoteDatabase
-import com.kelsos.mbrc.data.library.Track
-import com.kelsos.mbrc.data.library.Track_Table
-import com.kelsos.mbrc.data.library.Track_Table.title
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.and
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
@@ -75,7 +72,7 @@ class LocalTrackDataSource
     }
 
   override suspend fun search(term: String): FlowCursorList<Track> = withContext(dispatchers.db) {
-    val query = (select from Track::class where title.like("%${term.escapeLike()}%"))
+    val query = (select from Track::class where Track_Table.title.like("%${term.escapeLike()}%"))
     return@withContext FlowCursorList.Builder(Track::class.java).modelQueriable(query)
       .build()
   }
