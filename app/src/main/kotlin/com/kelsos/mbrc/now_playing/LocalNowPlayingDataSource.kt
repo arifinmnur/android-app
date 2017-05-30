@@ -1,12 +1,9 @@
-package com.kelsos.mbrc.repository.data
+package com.kelsos.mbrc.now_playing
 
-import com.kelsos.mbrc.data.NowPlaying
-import com.kelsos.mbrc.data.NowPlaying_Table
-import com.kelsos.mbrc.data.NowPlaying_Table.artist
-import com.kelsos.mbrc.data.NowPlaying_Table.title
-import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.data.db.RemoteDatabase
+import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -48,7 +45,9 @@ class LocalNowPlayingDataSource
     withContext(dispatchers.db) {
       val searchTerm = "%${term.escapeLike()}%"
       val query =
-        (select from NowPlaying::class where title.like(searchTerm) or artist.like(searchTerm))
+        (select from NowPlaying::class where NowPlaying_Table.title.like(searchTerm) or NowPlaying_Table.artist.like(
+          searchTerm
+        ))
       return@withContext FlowCursorList.Builder(NowPlaying::class.java).modelQueriable(query)
         .build()
     }

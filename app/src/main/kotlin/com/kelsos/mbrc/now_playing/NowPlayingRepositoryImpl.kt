@@ -1,23 +1,20 @@
-package com.kelsos.mbrc.repository
+package com.kelsos.mbrc.now_playing
 
-import com.kelsos.mbrc.data.Playlist
 import com.kelsos.mbrc.di.modules.AppDispatchers
-import com.kelsos.mbrc.repository.data.LocalPlaylistDataSource
-import com.kelsos.mbrc.repository.data.RemotePlaylistDataSource
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class PlaylistRepositoryImpl
+class NowPlayingRepositoryImpl
 @Inject constructor(
-  private val localDataSource: LocalPlaylistDataSource,
-  private val remoteDataSource: RemotePlaylistDataSource,
+  private val remoteDataSource: RemoteNowPlayingDataSource,
+  private val localDataSource: LocalNowPlayingDataSource,
   private val dispatchers: AppDispatchers
-) : PlaylistRepository {
-  override suspend fun getAllCursor(): FlowCursorList<Playlist> = localDataSource.loadAllCursor()
+) : NowPlayingRepository {
+  override suspend fun getAllCursor(): FlowCursorList<NowPlaying> = localDataSource.loadAllCursor()
 
-  override suspend fun getAndSaveRemote(): FlowCursorList<Playlist> {
+  override suspend fun getAndSaveRemote(): FlowCursorList<NowPlaying> {
     getRemote()
     return localDataSource.loadAllCursor()
   }
@@ -31,7 +28,8 @@ class PlaylistRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): FlowCursorList<Playlist> = localDataSource.search(term)
+  override suspend fun search(term: String): FlowCursorList<NowPlaying> =
+    localDataSource.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
 

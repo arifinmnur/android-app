@@ -1,10 +1,9 @@
-package com.kelsos.mbrc.repository.data
+package com.kelsos.mbrc.playlists
 
-import com.kelsos.mbrc.data.Playlist
-import com.kelsos.mbrc.data.Playlist_Table.name
-import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.data.db.RemoteDatabase
+import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
+import com.kelsos.mbrc.repository.data.LocalDataSource
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -40,7 +39,7 @@ class LocalPlaylistDataSource
 
   override suspend fun search(term: String): FlowCursorList<Playlist> =
     withContext(dispatchers.db) {
-      val query = (select from Playlist::class where name.like("%${term.escapeLike()}%"))
+      val query = (select from Playlist::class where Playlist_Table.name.like("%${term.escapeLike()}%"))
       return@withContext FlowCursorList.Builder(Playlist::class.java).modelQueriable(query).build()
     }
 
