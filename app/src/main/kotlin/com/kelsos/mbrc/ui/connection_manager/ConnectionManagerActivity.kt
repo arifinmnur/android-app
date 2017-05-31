@@ -133,6 +133,7 @@ class ConnectionManagerActivity : FontActivity(),
         presenter.load()
         getString(R.string.con_man_success)
       }
+      else -> throw IllegalArgumentException(event.reason.toString())
     }
 
     Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_SHORT).show()
