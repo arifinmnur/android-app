@@ -1,4 +1,3 @@
-
 package com.kelsos.mbrc.platform.media_session
 
 import android.app.Application
@@ -11,16 +10,16 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
 import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
 import android.support.v4.media.session.PlaybackStateCompat
-import com.kelsos.mbrc.annotations.Connection
-import com.kelsos.mbrc.annotations.PlayerState
 import com.kelsos.mbrc.constants.Protocol
 import com.kelsos.mbrc.constants.ProtocolEventType
+import com.kelsos.mbrc.content.active_status.PlayerState
 import com.kelsos.mbrc.events.ConnectionStatusChangeEvent
 import com.kelsos.mbrc.events.MessageEvent
 import com.kelsos.mbrc.events.PlayStateChange
 import com.kelsos.mbrc.events.RemoteClientMetaData
 import com.kelsos.mbrc.events.UserAction
 import com.kelsos.mbrc.events.bus.RxBus
+import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.utilities.RemoteUtils
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,8 +30,8 @@ class RemoteSessionManager
 @Inject
 constructor(
   context: Application,
-            volumeProvider: RemoteVolumeProvider,
-            private val bus: RxBus,
+  volumeProvider: RemoteVolumeProvider,
+  private val bus: RxBus,
   private val manager: AudioManager
 ) : AudioManager.OnAudioFocusChangeListener {
   private val mediaSession: MediaSessionCompat?
@@ -180,11 +179,11 @@ constructor(
   companion object {
     private const val PLAYBACK_ACTIONS =
       PlaybackStateCompat.ACTION_PAUSE or
-      PlaybackStateCompat.ACTION_PLAY_PAUSE or
-      PlaybackStateCompat.ACTION_PLAY or
-      PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-      PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
-      PlaybackStateCompat.ACTION_STOP or
-      PlaybackStateCompat.ACTION_SEEK_TO
+          PlaybackStateCompat.ACTION_PLAY_PAUSE or
+          PlaybackStateCompat.ACTION_PLAY or
+          PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+          PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+          PlaybackStateCompat.ACTION_STOP or
+          PlaybackStateCompat.ACTION_SEEK_TO
   }
 }

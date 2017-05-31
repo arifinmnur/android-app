@@ -20,11 +20,10 @@ import androidx.core.view.MenuItemCompat
 import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.annotations.Connection
-import com.kelsos.mbrc.annotations.PlayerState
-import com.kelsos.mbrc.annotations.PlayerState.State
-import com.kelsos.mbrc.annotations.Repeat
-import com.kelsos.mbrc.annotations.Repeat.Mode
+import com.kelsos.mbrc.content.active_status.PlayerState
+import com.kelsos.mbrc.content.active_status.PlayerState.State
+import com.kelsos.mbrc.content.active_status.Repeat
+import com.kelsos.mbrc.content.active_status.Repeat.Mode
 import com.kelsos.mbrc.changelog.ChangelogDialog
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
 import com.kelsos.mbrc.events.OnMainFragmentOptionsInflated
@@ -32,6 +31,7 @@ import com.kelsos.mbrc.events.ShuffleChange
 import com.kelsos.mbrc.events.ShuffleChange.ShuffleState
 import com.kelsos.mbrc.events.UpdatePosition
 import com.kelsos.mbrc.extensions.getDimens
+import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.dialogs.RatingDialogFragment
 import com.kelsos.mbrc.ui.navigation.main.LfmRating.Rating

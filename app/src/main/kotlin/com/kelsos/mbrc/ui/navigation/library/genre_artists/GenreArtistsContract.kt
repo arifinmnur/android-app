@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.ui.navigation.library.genre_artists
 
-import com.kelsos.mbrc.annotations.Queue
+import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.artists.Artist
 import com.kelsos.mbrc.mvp.BaseView
 import com.kelsos.mbrc.mvp.Presenter
