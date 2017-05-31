@@ -8,4 +8,5 @@ object ProtocolEventType {
   const val InformClientPluginOutOfDate = "InformClientPluginOutOfDate"
   const val UserAction = "UserAction"
   const val PluginVersionCheck = "PluginVersionCheck"
+  const val TerminateService = "TerminateService"
 }
