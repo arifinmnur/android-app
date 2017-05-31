@@ -110,20 +110,20 @@
     </activity>
 
     <activity
-      android:label="@string/title_activity_radios"
       android:name=".ui.navigation.radio.RadioActivity"
+      android:label="@string/title_activity_radios"
       android:parentActivityName="com.kelsos.mbrc.ui.navigation.main.MainActivity">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.kelsos.mbrc.ui.navigation.main.MainActivity"/>
     </activity>
 
-    <receiver android:name=".utilities.MediaButtonReceiver">
+    <receiver android:name=".platform.media_session.MediaButtonReceiver">
       <intent-filter>
         <action android:name="android.intent.action.MEDIA_BUTTON" />
       </intent-filter>
     </receiver>
-    <receiver android:name=".widgets.WidgetSmall">
+    <receiver android:name="com.kelsos.mbrc.platform.widgets.WidgetSmall">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
       </intent-filter>
@@ -132,7 +132,7 @@
           android:name="android.appwidget.provider"
           android:resource="@xml/remote_widget_small" />
     </receiver>
-    <receiver android:name=".widgets.WidgetNormal">
+    <receiver android:name="com.kelsos.mbrc.platform.widgets.WidgetNormal">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
       </intent-filter>
@@ -143,7 +143,7 @@
     </receiver>
 
     <service
-        android:name=".controller.RemoteService"
+        android:name=".platform.RemoteService"
         android:description="@string/info_service_description"
       android:exported="false">
       <intent-filter>

@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
@@ -16,11 +16,10 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.adapters.TrackEntryAdapter
-import com.kelsos.mbrc.adapters.TrackEntryAdapter.MenuItemSelectedListener
-import com.kelsos.mbrc.library.tracks.Track
-import com.kelsos.mbrc.helper.PopupActionHandler
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
+import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
+import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import toothpick.Toothpick

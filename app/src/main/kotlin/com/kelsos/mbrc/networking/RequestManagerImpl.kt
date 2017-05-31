@@ -3,12 +3,11 @@ package com.kelsos.mbrc.networking
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.kelsos.mbrc.constants.Protocol
-import com.kelsos.mbrc.data.ProtocolPayload
-import com.kelsos.mbrc.data.SocketMessage
 import com.kelsos.mbrc.di.modules.AppDispatchers
-import com.kelsos.mbrc.mappers.InetAddressMapper
-import com.kelsos.mbrc.repository.ConnectionRepository
-import com.kelsos.mbrc.utilities.SettingsManager
+import com.kelsos.mbrc.networking.connections.ConnectionRepository
+import com.kelsos.mbrc.networking.connections.InetAddressMapper
+import com.kelsos.mbrc.networking.protocol.ProtocolPayload
+import com.kelsos.mbrc.preferences.SettingsManager
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.IOException
@@ -27,35 +26,35 @@ constructor(
 
   override suspend fun openConnection(handshake: Boolean): ActiveConnection =
     withContext(dispatchers.io) {
-       val firstMessage = if (handshake) SocketMessage.create(Protocol.Player, "Android") else null
-       val socket = connect(firstMessage)
+      val firstMessage = if (handshake) SocketMessage.create(Protocol.Player, "Android") else null
+      val socket = connect(firstMessage)
 
-       val inputStream = socket.getInputStream()
-       val bufferedReader = inputStream.bufferedReader(Charset.defaultCharset())
+      val inputStream = socket.getInputStream()
+      val bufferedReader = inputStream.bufferedReader(Charset.defaultCharset())
 
-       while (handshake) {
-         val line = bufferedReader.readLine()
-         if (line.isNullOrEmpty()) {
-           break
-         }
+      while (handshake) {
+        val line = bufferedReader.readLine()
+        if (line.isNullOrEmpty()) {
+          break
+        }
 
-         val message = mapper.readValue<SocketMessage>(line)
-
-
-         val context = message.context
-         Timber.v("incoming context => $context")
-         if (Protocol.Player == context) {
-           val payload = getProtocolPayload()
-           socket.send(SocketMessage.create(Protocol.ProtocolTag, payload))
-         } else if (Protocol.ProtocolTag == context) {
-           Timber.v("socket handshake complete")
-           break
-         }
-       }
+        val message = mapper.readValue<SocketMessage>(line)
 
 
-       return@withContext ActiveConnection(socket, bufferedReader, handshake)
-     }
+        val context = message.context
+        Timber.v("incoming context => $context")
+        if (Protocol.Player == context) {
+          val payload = getProtocolPayload()
+          socket.send(SocketMessage.create(Protocol.ProtocolTag, payload))
+        } else if (Protocol.ProtocolTag == context) {
+          Timber.v("socket handshake complete")
+          break
+        }
+      }
+
+
+      return@withContext ActiveConnection(socket, bufferedReader, handshake)
+    }
 
   private fun getProtocolPayload(): ProtocolPayload {
     return ProtocolPayload(
@@ -101,11 +100,8 @@ constructor(
     return (mapper.writeValueAsString(this) + "\r\n").toByteArray()
   }
 
-
   private fun Socket.send(socketMessage: SocketMessage) {
     this.outputStream.write(socketMessage.getBytes())
   }
-
-
 }
 

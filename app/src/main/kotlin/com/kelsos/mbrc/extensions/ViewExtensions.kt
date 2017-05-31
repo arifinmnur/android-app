@@ -12,5 +12,3 @@ fun View?.hide() {
 fun View?.show() {
   this?.visibility = VISIBLE
 }
-
-fun View?.isInvisible(): Boolean = this?.visibility == INVISIBLE
