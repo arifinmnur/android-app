@@ -22,7 +22,6 @@ import com.kelsos.mbrc.networking.SocketMessage
 import com.kelsos.mbrc.networking.connections.ConnectionStatusModel
 import com.kelsos.mbrc.networking.protocol.ProtocolPayload
 import com.kelsos.mbrc.platform.RemoteService
-import com.kelsos.mbrc.platform.media_session.SessionNotificationManager
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.utilities.RemoteUtils.getVersion
 import timber.log.Timber
@@ -31,22 +30,6 @@ import java.net.URL
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
-
-class CancelNotificationCommand
-@Inject constructor(private val sessionNotificationManager: SessionNotificationManager) : ICommand {
-
-  override fun execute(e: IEvent) {
-    sessionNotificationManager.cancelNotification(SessionNotificationManager.NOW_PLAYING_PLACEHOLDER)
-  }
-}
-
-class InitiateConnectionCommand
-@Inject constructor(private val socketClient: SocketClient) : ICommand {
-
-  override fun execute(e: IEvent) {
-    socketClient.socketManager(SocketAction.START)
-  }
-}
 
 class KeyVolumeDownCommand
 @Inject constructor(
@@ -146,14 +129,6 @@ class ReduceVolumeOnRingCommand
       return
     }
     client.sendData(SocketMessage.create(Protocol.PlayerVolume, (model.volume * 0.2).toInt()))
-  }
-}
-
-class RestartConnectionCommand
-@Inject constructor(private val socket: SocketClient) : ICommand {
-
-  override fun execute(e: IEvent) {
-    socket.socketManager(SocketAction.RESET)
   }
 }
 
