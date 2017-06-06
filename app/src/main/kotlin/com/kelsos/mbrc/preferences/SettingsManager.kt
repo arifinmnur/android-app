@@ -29,5 +29,4 @@ interface SettingsManager {
   fun isPluginUpdateCheckEnabled(): Boolean
   fun getLastUpdated(): Date
   fun setLastUpdated(lastChecked: Date)
-  fun getClientId(): String
 }

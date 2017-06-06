@@ -1,12 +1,11 @@
 package com.kelsos.mbrc.ui.navigation.lyrics
 
-import com.kelsos.mbrc.constants.Const
 import com.kelsos.mbrc.content.lyrics.LyricsModel
 import com.kelsos.mbrc.content.lyrics.LyricsPayload
 import com.kelsos.mbrc.events.LyricsUpdatedEvent
 import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
-import java.util.*
+import java.util.ArrayList
 import javax.inject.Inject
 
 class LyricsPresenterImpl
@@ -37,18 +36,22 @@ class LyricsPresenterImpl
 
   }
 
-  fun updateLyrics(text: String) {
+  private fun updateLyrics(text: String) {
     if (!isAttached) {
       return
     }
     val lyrics = ArrayList(
-      Arrays.asList<String>(
-        *text.split(Const.LYRICS_NEWLINE.toRegex())
+      listOf(
+        *text.split(LYRICS_NEWLINE.toRegex())
           .dropLastWhile(String::isEmpty)
           .toTypedArray()
       )
     )
     view?.updateLyrics(lyrics)
+  }
+
+  companion object {
+    const val LYRICS_NEWLINE = "\r\n|\n"
   }
 }
 
