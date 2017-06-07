@@ -13,12 +13,12 @@ class ProgressSeekerHelper
   private var progressUpdate: ProgressUpdate? = null
   private var disposable: Disposable? = null
 
-  fun start(duration: Int) {
+  fun start(duration: Long) {
     stop()
     disposable = Observable.interval(1, TimeUnit.SECONDS).takeWhile {
       it <= duration
     }.subscribe({
-      progressUpdate?.progress(it.toInt(), duration)
+      progressUpdate?.progress(it, duration)
     }) { onError(it) }
   }
 
@@ -26,14 +26,14 @@ class ProgressSeekerHelper
     Timber.v(throwable, "Error on progress observable")
   }
 
-  fun update(position: Int, duration: Int) {
+  fun update(position: Long, duration: Long) {
     stop()
     disposable = Observable.interval(1, TimeUnit.SECONDS).map {
       position + it
     }.takeWhile {
       it <= duration
     }.observeOn(scheduler).subscribe({
-      progressUpdate?.progress(it.toInt(), duration)
+      progressUpdate?.progress(it, duration)
     }) { onError(it) }
   }
 
@@ -46,7 +46,7 @@ class ProgressSeekerHelper
   }
 
   interface ProgressUpdate {
-    fun progress(position: Int, duration: Int)
+    fun progress(position: Long, duration: Long)
   }
 
 }

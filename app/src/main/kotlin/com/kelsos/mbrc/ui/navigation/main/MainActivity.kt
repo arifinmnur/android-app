@@ -20,16 +20,16 @@ import androidx.core.view.MenuItemCompat
 import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
+import com.kelsos.mbrc.changelog.ChangelogDialog
 import com.kelsos.mbrc.content.active_status.PlayerState
 import com.kelsos.mbrc.content.active_status.PlayerState.State
 import com.kelsos.mbrc.content.active_status.Repeat
 import com.kelsos.mbrc.content.active_status.Repeat.Mode
-import com.kelsos.mbrc.changelog.ChangelogDialog
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
 import com.kelsos.mbrc.events.OnMainFragmentOptionsInflated
 import com.kelsos.mbrc.events.ShuffleChange
 import com.kelsos.mbrc.events.ShuffleChange.ShuffleState
-import com.kelsos.mbrc.events.UpdatePosition
+import com.kelsos.mbrc.events.UpdatePositionEvent
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.ui.activities.BaseActivity
@@ -275,7 +275,7 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
       PlayerState.PLAYING -> {
         /* Start the animation if the track is playing*/
         presenter.requestNowPlayingPosition()
-        trackProgressAnimation(progressBar.progress, progressBar.max)
+        trackProgressAnimation(progressBar.progress.toLong(), progressBar.max.toLong())
         R.drawable.ic_pause_circle_filled_black_24dp
       }
       PlayerState.PAUSED -> {
@@ -302,7 +302,7 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
   /**
    * Starts the progress animation when called. If It was previously running then it restarts it.
    */
-  private fun trackProgressAnimation(current: Int, total: Int) {
+  private fun trackProgressAnimation(current: Long, total: Long) {
     progressHelper.stop()
 
     val tag = playPauseButton.tag
@@ -343,13 +343,13 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
    * current progress of playback
    */
 
-  override fun updateProgress(duration: UpdatePosition) {
+  override fun updateProgress(duration: UpdatePositionEvent) {
     updateProgress(duration.current, duration.total)
   }
 
   private fun updateProgress(
-    current: Int,
-    total: Int,
+    current: Long,
+    total: Long,
   ) {
     var currentSeconds = current / 1000
     var totalSeconds = total / 1000
@@ -369,8 +369,8 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
       finalCurrentSeconds
     )
 
-    progressBar.max = total
-    progressBar.progress = current
+    progressBar.max = total.toInt()
+    progressBar.progress = current.toInt()
 
     trackProgressAnimation(current, total)
   }
@@ -400,7 +400,7 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
     return R.id.nav_home
   }
 
-  override fun progress(position: Int, duration: Int) {
+  override fun progress(position: Long, duration: Long) {
     val currentProgress = progressBar.progress / 1000
     val currentMinutes = currentProgress / 60
     val currentSeconds = currentProgress % 60
