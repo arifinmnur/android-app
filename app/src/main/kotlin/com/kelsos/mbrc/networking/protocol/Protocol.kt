@@ -30,7 +30,6 @@ object Protocol {
   const val NowPlayingListPlay = "nowplayinglistplay"
   const val NowPlayingListRemove = "nowplayinglistremove"
   const val NowPlayingListMove = "nowplayinglistmove"
-  const val NowPlayingListSearch = "nowplayinglistsearch"
   const val NowPlayingQueue = "nowplayingqueue"
 
   const val PING = "ping"
@@ -101,7 +100,6 @@ object Protocol {
       NowPlayingListPlay,
       NowPlayingListRemove,
       NowPlayingListMove,
-      NowPlayingListSearch,
       NowPlayingQueue,
       PING,
       PONG,
@@ -118,7 +116,9 @@ object Protocol {
       DISCOVERY,
       VerifyConnection,
       RadioStations,
-      CommandUnavailable)
+      CommandUnavailable,
+      PlayerOutput,
+      PlayerOutputSwitch)
   @Retention(AnnotationRetention.SOURCE)
   annotation class Context
 }

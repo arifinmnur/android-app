@@ -47,11 +47,7 @@ constructor(
   }
 
   override fun search(query: String) {
-    bus.post(
-      UserAction(
-        Protocol.NowPlayingListSearch,
-        query.trim { it <= ' ' })
-    )
+    // todo: drop and upgrade to do this locally, bus.post(
   }
 
   override fun moveTrack(from: Int, to: Int) {
