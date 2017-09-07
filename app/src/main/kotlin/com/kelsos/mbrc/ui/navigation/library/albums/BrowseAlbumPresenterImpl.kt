@@ -41,7 +41,7 @@ constructor(
   }
 
   private suspend fun getData(term: String) =
-    if (term.isNotEmpty()) repository.search(term) else repository.getAllCursor()
+    if (term.isNotEmpty()) repository.search(term) else repository.getAlbumsSorted()
 
   override fun attach(view: BrowseAlbumView) {
     super.attach(view)

@@ -13,6 +13,7 @@ constructor(
   private val remoteDataSource: RemoteAlbumDataSource,
   private val dispatchers: AppDispatchers
 ) : AlbumRepository {
+
   override suspend fun getAlbumsByArtist(artist: String): FlowCursorList<Album> =
     localDataSource.getAlbumsByArtist(artist)
 
@@ -37,4 +38,8 @@ constructor(
   override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
 
   override suspend fun count(): Long = localDataSource.count()
+
+  override suspend fun getAlbumsSorted(@Sorting.Order order: Long, ascending: Boolean): FlowCursorList<Album> {
+    return localDataSource.getAlbumsSorted(order, ascending)
+  }
 }

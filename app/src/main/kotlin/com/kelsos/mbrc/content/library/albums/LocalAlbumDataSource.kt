@@ -6,6 +6,7 @@ import com.kelsos.mbrc.content.library.tracks.Track_Table
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
 import com.kelsos.mbrc.interfaces.data.LocalDataSource
+import com.raizlabs.android.dbflow.kotlinextensions.and
 import com.raizlabs.android.dbflow.kotlinextensions.database
 import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.from
@@ -49,7 +50,8 @@ constructor(
 
   suspend fun getAlbumsByArtist(artist: String): FlowCursorList<Album> =
     withContext(dispatchers.db) {
-      val selectAlbum = SQLite.select(Album_Table.album.withTable(), Album_Table.artist.withTable()).distinct()
+      val selectAlbum =
+        SQLite.select(Album_Table.album.withTable(), Album_Table.artist.withTable()).distinct()
       val artistOrAlbumArtist = clause(Track_Table.artist.withTable().`is`(artist))
         .or(Track_Table.album_artist.withTable().`is`(artist))
       val columns = clause(Track_Table.album.withTable().eq(Album_Table.album.withTable()))
@@ -74,5 +76,55 @@ constructor(
 
   override suspend fun count(): Long = withContext(dispatchers.db) {
     return@withContext SQLite.selectCountOf().from(Album::class.java).count()
+  }
+
+  suspend fun getAlbumsSorted(
+    @Sorting.Order order: Long,
+    ascending: Boolean
+  ): FlowCursorList<Album> = withContext(dispatchers.db) {
+    val join = SQLite.select().from(Album::class)
+      .innerJoin(Track::class)
+      .on(
+        Album_Table.album.withTable().eq(Track_Table.album.withTable())
+          .and(Album_Table.artist.withTable().eq(Track_Table.album_artist.withTable()))
+      )
+
+    val sorted = when (order) {
+      Sorting.ALBUM -> {
+        join.orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.ALBUM_ARTIST__ALBUM -> {
+        join.orderBy(Album_Table.artist.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.ALBUM_ARTIST__YEAR__ALBUM -> {
+        join.orderBy(Album_Table.artist.withTable(), ascending)
+          .orderBy(Track_Table.year.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.ARTIST__ALBUM -> {
+        join.orderBy(Track_Table.artist.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.GENRE__ALBUM_ARTIST__ALBUM -> {
+        join.orderBy(Track_Table.genre.withTable(), ascending)
+          .orderBy(Album_Table.artist.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.YEAR__ALBUM -> {
+        join.orderBy(Track_Table.year.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      Sorting.YEAR__ALBUM_ARTIST__ALBUM -> {
+        join.orderBy(Track_Table.year.withTable(), ascending)
+          .orderBy(Album_Table.artist.withTable(), ascending)
+          .orderBy(Album_Table.album.withTable(), ascending)
+      }
+      else -> throw IllegalArgumentException("no such option")
+    }
+
+    return@withContext FlowCursorList.Builder(Album::class.java)
+      .modelQueriable(sorted.groupBy(Album_Table.album.withTable(), Album_Table.artist.withTable()))
+      .build()
   }
 }
