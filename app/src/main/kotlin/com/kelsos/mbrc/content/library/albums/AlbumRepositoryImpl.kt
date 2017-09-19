@@ -39,7 +39,7 @@ constructor(
 
   override suspend fun count(): Long = localDataSource.count()
 
-  override suspend fun getAlbumsSorted(@Sorting.Order order: Long, ascending: Boolean): FlowCursorList<Album> {
+  override suspend fun getAlbumsSorted(@Sorting.Fields order: Int, ascending: Boolean): FlowCursorList<Album> {
     return localDataSource.getAlbumsSorted(order, ascending)
   }
 }

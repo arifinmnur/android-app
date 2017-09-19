@@ -39,6 +39,8 @@ import com.kelsos.mbrc.networking.protocol.VolumeInteractor
 import com.kelsos.mbrc.networking.protocol.VolumeInteractorImpl
 import com.kelsos.mbrc.platform.ServiceChecker
 import com.kelsos.mbrc.platform.ServiceCheckerImpl
+import com.kelsos.mbrc.preferences.AlbumSortingStore
+import com.kelsos.mbrc.preferences.AlbumSortingStoreImpl
 import com.kelsos.mbrc.preferences.ClientInformationStore
 import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.kelsos.mbrc.preferences.SettingsManager
@@ -99,6 +101,8 @@ class RemoteModule : Module() {
     bind(RadioRepository::class.java).to(RadioRepositoryImpl::class.java).singletonInScope()
     bind(ClientInformationStore::class).to(ClientInformationStoreImpl::class).singletonInScope()
     bind(VolumeInteractor::class).to(VolumeInteractorImpl::class).singletonInScope()
+    bind(OutputApi::class).to(OutputApiImpl::class).singletonInScope()
+    bind(AlbumSortingStore::class).to(AlbumSortingStoreImpl::class)
   }
 }
 

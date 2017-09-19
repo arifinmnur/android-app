@@ -10,7 +10,7 @@ interface AlbumRepository : Repository<Album> {
    * Retrieves the albums ordered by
    */
   suspend fun getAlbumsSorted(
-      @Sorting.Order order: Long = Sorting.ALBUM_ARTIST__ALBUM,
+      @Sorting.Fields order: Int = Sorting.ALBUM_ARTIST__ALBUM,
       ascending: Boolean = true
   ): FlowCursorList<Album>
 }

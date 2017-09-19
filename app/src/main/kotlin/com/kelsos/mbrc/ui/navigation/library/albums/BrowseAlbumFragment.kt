@@ -2,6 +2,8 @@ package com.kelsos.mbrc.ui.navigation.library.albums
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +16,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
@@ -78,6 +81,7 @@ class BrowseAlbumFragment : Fragment(),
     return view
   }
 
+
   override fun onStart() {
     super.onStart()
     presenter.attach(this)
@@ -95,6 +99,20 @@ class BrowseAlbumFragment : Fragment(),
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     presenter.attach(this)
+    setHasOptionsMenu(true)
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.browse_album__menu, menu)
+    super.onCreateOptionsMenu(menu, inflater)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == R.id.browse_album__sort_albums) {
+      showSortingDialog()
+      return true
+    }
+    return super.onOptionsItemSelected(item)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -155,5 +173,16 @@ class BrowseAlbumFragment : Fragment(),
   override fun onDestroy() {
     Toothpick.closeScope(this)
     super.onDestroy()
+  }
+
+  private fun showSortingDialog() {
+    MaterialAlertDialogBuilder(requireContext())
+      .setItems(R.array.album_sorting__options) { dialog, which ->
+        dialog.dismiss()
+      }
+      .setTitle(R.string.album_sorting__dialog_title)
+      .setPositiveButton(R.string.album_sorting__positive_button) { dialog, which -> }
+      .setNegativeButton(android.R.string.cancel) { dialog, which -> }
+      .show()
   }
 }

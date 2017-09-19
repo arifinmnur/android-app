@@ -79,7 +79,7 @@ constructor(
   }
 
   suspend fun getAlbumsSorted(
-    @Sorting.Order order: Long,
+    @Sorting.Fields order: Int,
     ascending: Boolean
   ): FlowCursorList<Album> = withContext(dispatchers.db) {
     val join = SQLite.select().from(Album::class)
