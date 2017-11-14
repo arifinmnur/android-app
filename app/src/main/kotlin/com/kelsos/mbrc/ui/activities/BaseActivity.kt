@@ -25,6 +25,7 @@ import com.kelsos.mbrc.events.ConnectionStatusChangeEvent
 import com.kelsos.mbrc.events.NotifyUser
 import com.kelsos.mbrc.events.RequestConnectionStateEvent
 import com.kelsos.mbrc.events.bus.RxBus
+import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.networking.ChangeConnectionStateEvent
 import com.kelsos.mbrc.networking.SocketAction
 import com.kelsos.mbrc.networking.connections.Connection
@@ -170,7 +171,7 @@ abstract class BaseActivity : FontActivity(), NavigationView.OnNavigationItemSel
     }
 
     if (itemId == R.id.nav_home) {
-      val upIntent = NavUtils.getParentActivityIntent(this) ?: throw Exception("invalid intent")
+      val upIntent = NavUtils.getParentActivityIntent(this) ?: fail("couldn't get intent")
       if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
         createBackStack(Intent(this, MainActivity::class.java))
       } else {

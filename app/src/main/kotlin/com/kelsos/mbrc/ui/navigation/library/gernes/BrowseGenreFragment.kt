@@ -18,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.genres.Genre
+import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.gernes.GenreEntryAdapter.MenuItemSelectedListener
@@ -75,9 +76,10 @@ class BrowseGenreFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    val activity = activity ?: fail("null activity")
     val scope = Toothpick.openScopes(requireActivity().application, LIBRARY_SCOPE, activity, this)
     scope.installModules(BrowseGenreModule())
+    super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     presenter.attach(this)
   }

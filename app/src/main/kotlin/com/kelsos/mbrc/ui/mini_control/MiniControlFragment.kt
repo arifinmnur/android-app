@@ -18,6 +18,7 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.active_status.PlayerState
 import com.kelsos.mbrc.content.active_status.PlayerState.State
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
+import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.ui.navigation.main.MainActivity
 import com.squareup.picasso.Picasso
@@ -39,6 +40,7 @@ class MiniControlFragment : Fragment(), MiniControlView {
 
   @OnClick(R.id.mini_control)
   internal fun onControlClick() {
+    val context = context ?: fail("null context")
     val builder = TaskStackBuilder.create(requireContext())
     builder.addNextIntentWithParentStack(Intent(context, MainActivity::class.java))
     builder.startActivities()
@@ -60,6 +62,7 @@ class MiniControlFragment : Fragment(), MiniControlView {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    val context = activity ?: fail("null context")
     Toothpick.openScope(PRESENTER_SCOPE).installModules(MiniControlModule())
     val scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
     super.onCreate(savedInstanceState)
@@ -88,13 +91,11 @@ class MiniControlFragment : Fragment(), MiniControlView {
   }
 
   override fun updateCover(path: String) {
-    if (activity == null) {
-      return
-    }
-
+    val context = context ?: return
     val file = File(path)
 
     if (file.exists()) {
+
       val dimens = requireContext().getDimens()
       Picasso.get()
         .load(file)

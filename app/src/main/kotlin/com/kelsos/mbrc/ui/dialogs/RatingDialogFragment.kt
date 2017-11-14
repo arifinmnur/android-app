@@ -10,6 +10,7 @@ import com.kelsos.mbrc.content.active_status.MainDataModel
 import com.kelsos.mbrc.events.RatingChanged
 import com.kelsos.mbrc.events.UserAction
 import com.kelsos.mbrc.events.bus.RxBus
+import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.networking.protocol.Protocol
 import toothpick.Scope
 import toothpick.Toothpick
@@ -26,6 +27,8 @@ class RatingDialogFragment : DialogFragment() {
   private var scope: Scope? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    val context = activity ?: fail("context was null")
+    scope = Toothpick.openScopes(context.application, this)
     super.onCreate(savedInstanceState)
     scope = Toothpick.openScopes(requireActivity().application, this)
     Toothpick.inject(this, scope)

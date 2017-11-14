@@ -86,7 +86,6 @@ class ConnectionRepositoryImpl
       .from(ConnectionSettings::class.java)
       .where(ConnectionSettings_Table.id.`is`(defaultId))
       .querySingle()
-
   }
 
   override var defaultId: Long

@@ -2,7 +2,6 @@ package com.kelsos.mbrc.ui.navigation.nowplaying
 
 import android.app.Activity
 import android.graphics.Color
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.View
@@ -110,7 +109,7 @@ class NowPlayingAdapter
     listener?.onMove(from, to)
     notifyItemMoved(from, to)
 
-    if (!currentTrack.isNullOrBlank()) {
+    if (!currentTrack.isBlank()) {
       setPlayingTrack(currentTrack)
     }
 

@@ -16,8 +16,8 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.artists.Artist
+import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter.MenuItemSelectedListener
@@ -62,7 +62,7 @@ class BrowseArtistFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(requireActivity().application, LIBRARY_SCOPE, activity, this)
+    scope = Toothpick.openScopes(requireActivity().application, LIBRARY_SCOPE, requireActivity(), this)
     scope?.installModules(BrowseArtistModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)

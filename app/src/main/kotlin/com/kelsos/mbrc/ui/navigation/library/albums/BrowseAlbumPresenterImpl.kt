@@ -2,11 +2,13 @@ package com.kelsos.mbrc.ui.navigation.library.albums
 
 import com.kelsos.mbrc.content.library.albums.Album
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
+import com.kelsos.mbrc.content.library.albums.Sorting
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
 import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
 import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.preferences.AlbumSortingStore
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -17,6 +19,7 @@ class BrowseAlbumPresenterImpl
 constructor(
   private val bus: RxBus,
   private val repository: AlbumRepository,
+  private val albumSortingStore: AlbumSortingStore,
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queueHandler: QueueHandler,
   private val searchModel: LibrarySearchModel
@@ -55,6 +58,36 @@ constructor(
 
   override fun load() {
     updateUi(searchModel.term.value ?: "")
+  }
+
+  override fun showSorting() {
+    view?.showSorting(albumSortingStore.getSortingOrder(), albumSortingStore.getSortingSelection())
+  }
+
+  override fun order(@Sorting.Order order: Int) {
+    albumSortingStore.setSortingOrder(order)
+
+    val ascending = order == Sorting.ORDER_ASCENDING
+    val sortingSelection = albumSortingStore.getSortingSelection()
+    loadSorted(sortingSelection, ascending)
+  }
+
+  private fun loadSorted(sortingSelection: Int, ascending: Boolean) {
+    scope.launch {
+      view?.showLoading()
+      try {
+        view?.update(repository.getAlbumsSorted(sortingSelection, ascending))
+      } catch (e: Exception) {
+        Timber.e(e)
+      }
+      view?.hideLoading()
+    }
+  }
+
+  override fun sortBy(@Sorting.Fields selection: Int) {
+    albumSortingStore.setSortingSelection(selection)
+    val ascending = albumSortingStore.getSortingOrder() == Sorting.ORDER_ASCENDING
+    loadSorted(selection, ascending)
   }
 
   override fun sync() {
