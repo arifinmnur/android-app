@@ -1,15 +1,19 @@
 package com.kelsos.mbrc.content.library.tracks
 
+import com.kelsos.mbrc.content.library.UpdatedDataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
+import org.threeten.bp.Instant
 import javax.inject.Inject
 
 class TrackRepositoryImpl
 @Inject constructor(
   private val localDataSource: LocalTrackDataSource,
   private val remoteDataSource: RemoteTrackDataSource,
+  private val updatedDataSource: UpdatedDataSource,
   private val dispatchers: AppDispatchers
 ) : TrackRepository {
 
@@ -27,10 +31,17 @@ class TrackRepositoryImpl
   }
 
   override suspend fun getRemote() {
+    val epoch = Instant.now().epochSecond
+
     localDataSource.deleteAll()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch().collect {
-        localDataSource.saveAll(it)
+      remoteDataSource.fetch().onCompletion {
+        val paths = updatedDataSource.getPathInsertedAtEpoch(epoch)
+        localDataSource.deletePaths(paths)
+        updatedDataSource.deleteAll()
+      }.collect { items ->
+        localDataSource.saveAll(items)
+        updatedDataSource.addUpdated(items.mapNotNull { it.src }, epoch)
       }
     }
   }

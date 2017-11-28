@@ -62,7 +62,6 @@ class MiniControlFragment : Fragment(), MiniControlView {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val context = activity ?: fail("null context")
     Toothpick.openScope(PRESENTER_SCOPE).installModules(MiniControlModule())
     val scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
     super.onCreate(savedInstanceState)
@@ -91,7 +90,6 @@ class MiniControlFragment : Fragment(), MiniControlView {
   }
 
   override fun updateCover(path: String) {
-    val context = context ?: return
     val file = File(path)
 
     if (file.exists()) {

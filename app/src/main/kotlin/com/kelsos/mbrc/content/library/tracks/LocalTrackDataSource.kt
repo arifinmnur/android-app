@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.content.library.tracks
 
 import com.kelsos.mbrc.RemoteDatabase
+import com.kelsos.mbrc.content.library.tracks.Track_Table.src
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.extensions.escapeLike
 import com.kelsos.mbrc.interfaces.data.LocalDataSource
@@ -15,6 +16,7 @@ import com.raizlabs.android.dbflow.list.FlowCursorList
 import com.raizlabs.android.dbflow.sql.language.SQLite
 import com.raizlabs.android.dbflow.structure.database.transaction.FastStoreModelTransaction
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class LocalTrackDataSource
@@ -125,5 +127,13 @@ class LocalTrackDataSource
 
   override suspend fun count(): Long  = withContext(dispatchers.db) {
     return@withContext SQLite.selectCountOf().from(Track::class.java).count()
+  }
+
+  suspend fun deletePaths(paths: List<String>) = withContext(dispatchers.db) {
+    val deleted = SQLite.delete()
+        .from(Track::class.java)
+        .where(src.notIn(paths))
+        .executeUpdateDelete()
+    Timber.v("$deleted entries deleted from tracks")
   }
 }

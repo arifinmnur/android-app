@@ -45,6 +45,8 @@ import com.kelsos.mbrc.preferences.ClientInformationStore
 import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.preferences.SettingsManagerImpl
+import com.kelsos.mbrc.utilities.SchedulerProvider
+import com.kelsos.mbrc.utilities.SchedulerProviderImpl
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -68,6 +70,7 @@ class RemoteModule : Module() {
     bind(Scheduler::class.java).withName("main")
       .toProviderInstance { AndroidSchedulers.mainThread() }
     bind(Scheduler::class.java).withName("io").toProviderInstance { Schedulers.io() }
+    bind(SchedulerProvider::class.java).to(SchedulerProviderImpl::class.java).singletonInScope()
 
     bind(TrackRepository::class.java).to(TrackRepositoryImpl::class.java)
     bind(AlbumRepository::class.java).to(AlbumRepositoryImpl::class.java)
