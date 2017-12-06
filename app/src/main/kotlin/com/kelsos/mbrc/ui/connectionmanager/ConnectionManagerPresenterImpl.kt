@@ -1,19 +1,48 @@
 package com.kelsos.mbrc.ui.connectionmanager
 
+import com.kelsos.mbrc.events.ConnectionSettingsChanged
+import com.kelsos.mbrc.events.DiscoveryStopped
+import com.kelsos.mbrc.events.NotifyUser
+import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.networking.StartServiceDiscoveryEvent
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionSettings
+import com.kelsos.mbrc.preferences.DefaultSettingsChangedEvent
+import com.kelsos.mbrc.utilities.SchedulerProvider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-
 class ConnectionManagerPresenterImpl
 @Inject
 constructor(
-  private val repository: ConnectionRepository
-) : BasePresenter<ConnectionManagerView>(),
-  ConnectionManagerPresenter {
+    private val repository: ConnectionRepository,
+    private val schedulerProvider: SchedulerProvider,
+    private val bus: RxBus
+) : BasePresenter<ConnectionManagerView>(), ConnectionManagerPresenter {
+
+  override fun attach(view: ConnectionManagerView) {
+    super.attach(view)
+    addDisposable(bus.observe(ConnectionSettingsChanged::class)
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.main())
+        .subscribe { view().onConnectionSettingsChange(it) })
+
+    addDisposable(bus.observe(DiscoveryStopped::class)
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.main())
+        .subscribe { view().onDiscoveryStopped(it) })
+
+    addDisposable(bus.observe(NotifyUser::class)
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.main())
+        .subscribe { view().onUserNotification(it) })
+  }
+
+  override fun startDiscovery() {
+    bus.post(StartServiceDiscoveryEvent())
+  }
 
   override fun load() {
     checkIfAttached()
@@ -31,7 +60,7 @@ constructor(
     checkIfAttached()
     scope.launch {
       repository.setDefault(settings)
-      view?.defaultChanged()
+      bus.post(DefaultSettingsChangedEvent())
       view?.dataUpdated()
     }
   }
@@ -47,7 +76,7 @@ constructor(
         }
 
         if (settings.id == repository.defaultId) {
-          view?.defaultChanged()
+          bus.post(DefaultSettingsChangedEvent())
         }
 
         view?.dataUpdated()
@@ -62,7 +91,7 @@ constructor(
       checkIfAttached()
       repository.delete(settings)
       if (settings.id == repository.defaultId) {
-        view?.defaultChanged()
+        bus.post(DefaultSettingsChangedEvent())
       }
 
       view?.dataUpdated()

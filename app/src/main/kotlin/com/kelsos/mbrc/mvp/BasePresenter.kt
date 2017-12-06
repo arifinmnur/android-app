@@ -41,6 +41,10 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
     this.compositeDisposable.add(disposable)
   }
 
+  fun view(): T {
+    return view ?: throw ViewNotAttachedException()
+  }
+
   fun checkIfAttached() {
     if (!isAttached) {
       throw ViewNotAttachedException()
