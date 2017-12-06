@@ -130,16 +130,6 @@ class NowPlayingActivity : BaseNavigationActivity(),
     presenter.reload(scrollToTrack)
   }
 
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
-  }
-
   override fun onPress(position: Int) {
     presenter.play(position + 1)
   }
@@ -157,6 +147,7 @@ class NowPlayingActivity : BaseNavigationActivity(),
   }
 
   override fun onDestroy() {
+    presenter.detach()
     Toothpick.closeScope(this)
     super.onDestroy()
   }
