@@ -20,10 +20,10 @@ import androidx.core.view.MenuItemCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.changelog.ChangelogDialog
-import com.kelsos.mbrc.content.active_status.PlayerState
-import com.kelsos.mbrc.content.active_status.PlayerState.State
-import com.kelsos.mbrc.content.active_status.Repeat
-import com.kelsos.mbrc.content.active_status.Repeat.Mode
+import com.kelsos.mbrc.content.activestatus.PlayerState
+import com.kelsos.mbrc.content.activestatus.PlayerState.State
+import com.kelsos.mbrc.content.activestatus.Repeat
+import com.kelsos.mbrc.content.activestatus.Repeat.Mode
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
 import com.kelsos.mbrc.events.OnMainFragmentOptionsInflated
 import com.kelsos.mbrc.events.ShuffleChange

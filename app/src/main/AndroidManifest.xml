@@ -36,9 +36,9 @@
           android:name="android.support.PARENT_ACTIVITY"
           android:value=".ui.navigation.main.MainActivity" />
     </activity>
-    <activity android:name=".ui.navigation.library.album_tracks.AlbumTracksActivity"/>
-    <activity android:name=".ui.navigation.library.artist_albums.ArtistAlbumsActivity"/>
-    <activity android:name=".ui.navigation.library.genre_artists.GenreArtistsActivity"/>
+    <activity android:name=".ui.navigation.library.albumtracks.AlbumTracksActivity" />
+    <activity android:name=".ui.navigation.library.artistalbums.ArtistAlbumsActivity" />
+    <activity android:name=".ui.navigation.library.genreartists.GenreArtistsActivity" />
     <activity
         android:name=".ui.navigation.lyrics.LyricsActivity"
         android:label="@string/nav_lyrics"
@@ -79,7 +79,7 @@
           android:value=".ui.navigation.main.MainActivity" />
     </activity>
     <activity
-        android:name=".ui.connection_manager.ConnectionManagerActivity"
+        android:name=".ui.connectionmanager.ConnectionManagerActivity"
         android:parentActivityName=".ui.preferences.SettingsActivity"
         android:windowSoftInputMode="adjustNothing">
 
@@ -89,36 +89,20 @@
           android:value=".ui.preferences.SettingsActivity" />
     </activity>
 
-    <activity
-        android:name=".ui.help_feedback.HelpFeedbackActivity"
-        android:label="@string/title_activity_help_feedback"
-      android:windowSoftInputMode="adjustNothing"
-      android:parentActivityName=".ui.navigation.main.MainActivity">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.kelsos.mbrc.ui.navigation.main.MainActivity" />
-    </activity>
-
-    <activity
-        android:name=".ui.activities.SplashActivity"
-      android:noHistory="true">
+    <service
+      android:name=".platform.RemoteService"
+      android:description="@string/info_service_description"
+      android:exported="false">
       <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-
-        <category android:name="android.intent.category.LAUNCHER" />
+        <action android:name="android.net.wifi.STATE_CHANGE" />
+        <action android:name="com.kelsos.mbrc.notification.play" />
+        <action android:name="com.kelsos.mbrc.notification.next" />
+        <action android:name="com.kelsos.mbrc.notification.close" />
+        <action android:name="com.kelsos.mbrc.notification.previous" />
       </intent-filter>
-    </activity>
+    </service>
 
-    <activity
-      android:name=".ui.navigation.radio.RadioActivity"
-      android:label="@string/title_activity_radios"
-      android:parentActivityName="com.kelsos.mbrc.ui.navigation.main.MainActivity">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.kelsos.mbrc.ui.navigation.main.MainActivity"/>
-    </activity>
-
-    <receiver android:name=".platform.media_session.MediaButtonReceiver">
+    <receiver android:name=".platform.mediasession.MediaButtonReceiver">
       <intent-filter>
         <action android:name="android.intent.action.MEDIA_BUTTON" />
       </intent-filter>
@@ -142,18 +126,34 @@
           android:resource="@xml/remote_widget_normal" />
     </receiver>
 
-    <service
-        android:name=".platform.RemoteService"
-        android:description="@string/info_service_description"
-      android:exported="false">
+    <activity
+      android:name=".ui.help_feedback.HelpFeedbackActivity"
+      android:label="@string/title_activity_help_feedback"
+      android:windowSoftInputMode="adjustNothing"
+      android:parentActivityName=".ui.navigation.main.MainActivity">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.kelsos.mbrc.ui.navigation.main.MainActivity" />
+    </activity>
+
+    <activity
+      android:name=".ui.activities.SplashActivity"
+      android:noHistory="true">
       <intent-filter>
-        <action android:name="android.net.wifi.STATE_CHANGE" />
-        <action android:name="com.kelsos.mbrc.notification.play" />
-        <action android:name="com.kelsos.mbrc.notification.next" />
-        <action android:name="com.kelsos.mbrc.notification.close" />
-        <action android:name="com.kelsos.mbrc.notification.previous" />
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-    </service>
+    </activity>
+
+    <activity
+      android:name=".ui.navigation.radio.RadioActivity"
+      android:label="@string/title_activity_radios"
+      android:parentActivityName="com.kelsos.mbrc.ui.navigation.main.MainActivity">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.kelsos.mbrc.ui.navigation.main.MainActivity"/>
+    </activity>
 
     <service
         android:name=".platform.LibrarySyncService"
