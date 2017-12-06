@@ -27,8 +27,6 @@ class PlaylistActivity : BaseNavigationActivity(),
   OnPlaylistPressedListener,
   OnRefreshListener {
 
-  private val PRESENTER_SCOPE: Class<*> = Presenter::class.java
-
   private val swipeLayout: MultiSwipeRefreshLayout by bindView(R.id.swipe_layout)
   private val playlistList: EmptyRecyclerView by bindView(R.id.playlist_list)
   private val emptyView: View by bindView(R.id.empty_view)
@@ -45,7 +43,6 @@ class PlaylistActivity : BaseNavigationActivity(),
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_playlists)
 
-
     scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
     scope.installTestModules(SmoothieActivityModule(this), PlaylistModule())
     Toothpick.inject(this, scope)
@@ -59,17 +56,8 @@ class PlaylistActivity : BaseNavigationActivity(),
     playlistList.adapter = adapter
     swipeLayout.setOnRefreshListener(this)
     emptyViewTitle.setText(R.string.playlists_list_empty)
-    presenter.load()
-  }
-
-  public override fun onStart() {
-    super.onStart()
     presenter.attach(this)
-  }
-
-  public override fun onStop() {
-    super.onStop()
-    presenter.detach()
+    presenter.load()
   }
 
   override fun playlistPressed(path: String) {
@@ -81,6 +69,7 @@ class PlaylistActivity : BaseNavigationActivity(),
   }
 
   override fun onDestroy() {
+    presenter.detach()
     Toothpick.closeScope(this)
 
     if (isFinishing) {
@@ -130,4 +119,8 @@ class PlaylistActivity : BaseNavigationActivity(),
   @Target(AnnotationTarget.TYPE)
   @Retention(AnnotationRetention.RUNTIME)
   annotation class Presenter
+
+  companion object {
+    private val PRESENTER_SCOPE: Class<*> = Presenter::class.java
+  }
 }
