@@ -16,7 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
 import com.kelsos.mbrc.content.now_playing.NowPlaying
-import com.kelsos.mbrc.ui.activities.BaseActivity
+import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
 import com.kelsos.mbrc.ui.navigation.nowplaying.NowPlayingAdapter.NowPlayingListener
@@ -29,7 +29,7 @@ import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class NowPlayingActivity : BaseActivity(),
+class NowPlayingActivity : BaseNavigationActivity(),
   NowPlayingView,
   OnQueryTextListener,
   OnStartDragListener,

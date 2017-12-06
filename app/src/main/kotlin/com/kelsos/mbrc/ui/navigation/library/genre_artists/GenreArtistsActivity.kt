@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.Artist
 import com.kelsos.mbrc.content.now_playing.queue.Queue
-import com.kelsos.mbrc.extensions.enableHome
-import com.kelsos.mbrc.ui.activities.FontActivity
+import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter.MenuItemSelectedListener
@@ -22,12 +20,11 @@ import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class GenreArtistsActivity : FontActivity(),
+class GenreArtistsActivity : BaseActivity(),
   GenreArtistsView,
   MenuItemSelectedListener {
 
   private val recyclerView: EmptyRecyclerView by bindView(R.id.genre_artists_recycler)
-  private val toolbar: MaterialToolbar by bindView(R.id.toolbar)
   private val emptyView: ConstraintLayout by bindView(R.id.empty_view)
 
   @Inject
@@ -40,13 +37,13 @@ class GenreArtistsActivity : FontActivity(),
   lateinit var presenter: GenreArtistsPresenter
 
   private var genre: String? = null
-  private var scope: Scope? = null
+  private lateinit var scope: Scope
 
   public override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_genre_artists)
     scope = Toothpick.openScopes(application, this)
-    scope!!.installModules(
+    scope.installModules(
       SmoothieActivityModule(this),
       GenreArtistsModule()
     )
@@ -59,11 +56,9 @@ class GenreArtistsActivity : FontActivity(),
       return
     }
 
-    setSupportActionBar(toolbar)
-    supportActionBar?.enableHome(genre)
-    if (genre.isNullOrEmpty()) {
-      supportActionBar?.setTitle(R.string.empty)
-    }
+    val title = genre ?: getString(R.string.empty)
+    setupToolbar(title)
+
     adapter.setMenuItemSelectedListener(this)
     recyclerView.adapter = adapter
     recyclerView.emptyView = emptyView
@@ -109,19 +104,10 @@ class GenreArtistsActivity : FontActivity(),
       .show()
   }
 
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
-  }
-
   override fun onDestroy() {
-    super.onDestroy()
+    presenter.detach()
     Toothpick.closeScope(this)
+    super.onDestroy()
   }
 
   override fun onBackPressed() {

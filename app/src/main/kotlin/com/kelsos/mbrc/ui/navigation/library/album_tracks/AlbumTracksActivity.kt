@@ -10,7 +10,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.Track
-import com.kelsos.mbrc.ui.activities.FontActivity
+import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
@@ -21,13 +21,12 @@ import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class AlbumTracksActivity : FontActivity(),
+class AlbumTracksActivity : BaseActivity(),
   AlbumTracksView,
   TrackEntryAdapter.MenuItemSelectedListener {
 
   private val listTracks: EmptyRecyclerView by bindView(R.id.list_tracks)
   private val emptyView: LinearLayout by bindView(R.id.empty_view)
-  private val playAlbum: FloatingActionButton by bindView(R.id.play_album)
 
   @Inject
   lateinit var adapter: TrackEntryAdapter
@@ -39,12 +38,11 @@ class AlbumTracksActivity : FontActivity(),
   lateinit var presenter: AlbumTracksPresenter
 
   private var album: AlbumInfo? = null
-  private var scope: Scope? = null
-  private lateinit var recyclerView: EmptyRecyclerView
+  private lateinit var scope: Scope
 
   public override fun onCreate(savedInstanceState: Bundle?) {
     scope = Toothpick.openScopes(application, this)
-    scope!!.installModules(
+    scope.installModules(
       SmoothieActivityModule(this),
       AlbumTracksModule()
     )
@@ -63,30 +61,28 @@ class AlbumTracksActivity : FontActivity(),
       return
     }
 
-    setSupportActionBar(findViewById(R.id.toolbar))
-    val supportActionBar = supportActionBar ?: error("Actionbar should not be null")
-    supportActionBar.setDisplayHomeAsUpEnabled(true)
-    supportActionBar.setDisplayShowHomeEnabled(true)
-
-    if (selectedAlbum.album.isEmpty()) {
-      supportActionBar.setTitle(R.string.non_album_tracks)
+    val albumTitle = album?.album ?: ""
+    val title = if (albumTitle.isBlank()) {
+      getString(R.string.non_album_tracks)
     } else {
-      supportActionBar.title = selectedAlbum.album
+      albumTitle
     }
-    supportActionBar.subtitle = selectedAlbum.artist
 
-    presenter.attach(this)
-    presenter.load(selectedAlbum)
+    setupToolbar(title, subtitle = selectedAlbum.artist)
+
     adapter.setMenuItemSelectedListener(this)
-    recyclerView = findViewById(R.id.list_tracks)
-    recyclerView.layoutManager = LinearLayoutManager(baseContext)
-    recyclerView.adapter = adapter
-    recyclerView.emptyView = findViewById(R.id.empty_view)
+    listTracks.layoutManager = LinearLayoutManager(baseContext)
+    listTracks.adapter = adapter
+    listTracks.emptyView = emptyView
+
     val fab = findViewById<FloatingActionButton>(R.id.play_album)
     fab.isVisible = true
     fab.setOnClickListener {
       presenter.queueAlbum(selectedAlbum.artist, selectedAlbum.album)
     }
+
+    presenter.attach(this)
+    presenter.load(album!!)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -118,24 +114,15 @@ class AlbumTracksActivity : FontActivity(),
     } else {
       getString(R.string.queue_result__failure)
     }
-    Snackbar.make(recyclerView, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
+    Snackbar.make(listTracks, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
   }
 
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
-  }
-
   override fun onDestroy() {
-    super.onDestroy()
+    presenter.detach()
     Toothpick.closeScope(this)
+    super.onDestroy()
   }
 
   override fun onBackPressed() {

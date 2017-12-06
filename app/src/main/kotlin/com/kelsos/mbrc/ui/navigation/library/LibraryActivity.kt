@@ -14,14 +14,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.ui.activities.BaseActivity
+import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class LibraryActivity : BaseActivity(),
+class LibraryActivity : BaseNavigationActivity(),
   LibraryView,
   OnQueryTextListener {
 
@@ -33,8 +33,8 @@ class LibraryActivity : BaseActivity(),
   private var albumArtistOnly: MenuItem? = null
   private var searchClear: MenuItem? = null
   private var pagerAdapter: LibraryPagerAdapter? = null
-  private var scope: Scope? = null
 
+  private lateinit var scope: Scope
   @Inject
   lateinit var presenter: LibraryPresenter
 
@@ -73,7 +73,7 @@ class LibraryActivity : BaseActivity(),
   public override fun onCreate(savedInstanceState: Bundle?) {
     Toothpick.openScope(LIBRARY_SCOPE).installModules(LibraryModule())
     scope = Toothpick.openScopes(application, LIBRARY_SCOPE, this)
-    scope!!.installModules(SmoothieActivityModule(this))
+    scope.installModules(SmoothieActivityModule(this))
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setContentView(R.layout.activity_library)
@@ -93,6 +93,7 @@ class LibraryActivity : BaseActivity(),
         else -> throw IllegalArgumentException("invalid position")
       }
     }.attach()
+    presenter.attach(this)
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -167,6 +168,8 @@ class LibraryActivity : BaseActivity(),
   }
 
   public override fun onDestroy() {
+    presenter.detach()
+    pagerAdapter = null
     Toothpick.closeScope(this)
     super.onDestroy()
     pagerAdapter = null

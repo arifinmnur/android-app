@@ -10,7 +10,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioStation
-import com.kelsos.mbrc.ui.activities.BaseActivity
+import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter.OnRadioPressedListener
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.kelsos.mbrc.ui.widgets.MultiSwipeRefreshLayout
@@ -21,7 +21,7 @@ import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class RadioActivity : BaseActivity(),
+class RadioActivity : BaseNavigationActivity(),
   RadioView,
   SwipeRefreshLayout.OnRefreshListener,
   OnRadioPressedListener {
