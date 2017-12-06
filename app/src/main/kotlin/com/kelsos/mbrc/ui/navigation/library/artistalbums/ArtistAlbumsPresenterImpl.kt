@@ -1,8 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.artistalbums
 
 import com.kelsos.mbrc.content.library.albums.Album
-import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
+import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -18,7 +18,7 @@ constructor(
   override fun load(artist: String) {
     scope.launch {
       try {
-        view?.update(repository.getAlbumsByArtist(artist))
+        view().update(repository.getAlbumsByArtist(artist))
       } catch (e: Exception) {
         Timber.v(e)
       }
@@ -30,7 +30,7 @@ constructor(
       val artist = album.artist ?: throw IllegalArgumentException("artist is null")
       val albumName = album.album ?: throw java.lang.IllegalArgumentException("album is null")
       val (success, tracks) = queue.queueAlbum(action, albumName, artist)
-      view?.queue(success, tracks)
+      view().queue(success, tracks)
     }
   }
 }

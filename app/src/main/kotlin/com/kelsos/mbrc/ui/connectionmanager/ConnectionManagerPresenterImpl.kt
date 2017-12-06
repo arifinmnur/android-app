@@ -49,7 +49,7 @@ constructor(
     scope.launch {
       try {
         val settings = repository.getAll()
-        view?.updateModel(ConnectionModel(repository.defaultId, settings))
+        view().updateModel(ConnectionModel(repository.defaultId, settings))
       } catch (e: Exception) {
         Timber.v(e, "Failure")
       }
@@ -61,7 +61,7 @@ constructor(
     scope.launch {
       repository.setDefault(settings)
       bus.post(DefaultSettingsChangedEvent())
-      view?.dataUpdated()
+      view().dataUpdated()
     }
   }
 
@@ -79,7 +79,7 @@ constructor(
           bus.post(DefaultSettingsChangedEvent())
         }
 
-        view?.dataUpdated()
+        view().dataUpdated()
       } catch (e: Exception) {
         Timber.v(e)
       }
@@ -94,7 +94,7 @@ constructor(
         bus.post(DefaultSettingsChangedEvent())
       }
 
-      view?.dataUpdated()
+      view().dataUpdated()
     }
   }
 }

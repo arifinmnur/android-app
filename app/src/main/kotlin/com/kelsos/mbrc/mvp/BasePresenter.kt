@@ -11,8 +11,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
 open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
-  var view: T? = null
-    private set
+  private var view: T? = null
 
   private val compositeDisposable = CompositeDisposable()
   private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
