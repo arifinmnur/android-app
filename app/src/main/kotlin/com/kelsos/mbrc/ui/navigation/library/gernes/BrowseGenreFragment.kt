@@ -12,18 +12,17 @@ import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.genres.Genre
+import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.gernes.GenreEntryAdapter.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
+import kotterknife.bindView
 import toothpick.Toothpick
 import javax.inject.Inject
 
@@ -31,17 +30,20 @@ class BrowseGenreFragment : Fragment(),
   BrowseGenreView,
   MenuItemSelectedListener {
 
-  @BindView(R.id.library_data_list) lateinit var recycler: EmptyRecyclerView
+  private val recycler: EmptyRecyclerView by bindView(R.id.library_data_list)
 
-  @BindView(R.id.empty_view) lateinit var emptyView: View
-  @BindView(R.id.list_empty_title) lateinit var emptyViewTitle: TextView
-  @BindView(R.id.list_empty_icon) lateinit var emptyViewIcon: ImageView
-  @BindView(R.id.list_empty_subtitle) lateinit var emptyViewSubTitle: TextView
-  @BindView(R.id.empty_view_progress_bar) lateinit var emptyViewProgress: ProgressBar
+  private val emptyView: View by bindView(R.id.empty_view)
+  private val emptyViewTitle: TextView by bindView(R.id.list_empty_title)
+  private val emptyViewIcon: ImageView by bindView(R.id.list_empty_icon)
+  private val emptyViewSubTitle: TextView by bindView(R.id.list_empty_subtitle)
+  private val emptyViewProgress: ProgressBar by bindView(R.id.empty_view_progress_bar)
 
-  @Inject lateinit var adapter: GenreEntryAdapter
-  @Inject lateinit var actionHandler: PopupActionHandler
-  @Inject lateinit var presenter: BrowseGenrePresenter
+  @Inject
+  lateinit var adapter: GenreEntryAdapter
+  @Inject
+  lateinit var actionHandler: PopupActionHandler
+  @Inject
+  lateinit var presenter: BrowseGenrePresenter
 
   private lateinit var syncButton: Button
 
@@ -50,14 +52,7 @@ class BrowseGenreFragment : Fragment(),
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    val view = inflater.inflate(R.layout.fragment_browse, container, false)
-    ButterKnife.bind(this, view)
-    emptyViewTitle.setText(R.string.genres_list_empty)
-    syncButton = view.findViewById(R.id.list_empty_sync)
-    syncButton.setOnClickListener {
-      presenter.sync()
-    }
-    return view
+    return inflater.inflate(R.layout.fragment_browse, container, false)
   }
 
   override fun search(term: String) {
@@ -81,17 +76,10 @@ class BrowseGenreFragment : Fragment(),
     scope.installModules(BrowseGenreModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
-    presenter.attach(this)
   }
 
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-    adapter.refresh()
-  }
-
-  override fun onStop() {
-    super.onStop()
+  override fun onDestroyView() {
+    super.onDestroyView()
     presenter.detach()
   }
 
@@ -101,11 +89,17 @@ class BrowseGenreFragment : Fragment(),
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    emptyViewTitle.setText(R.string.genres_list_empty)
+    syncButton = view.findViewById(R.id.list_empty_sync)
+    syncButton.setOnClickListener {
+      presenter.sync()
+    }
     recycler.adapter = adapter
     recycler.emptyView = emptyView
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
+    presenter.attach(this)
     presenter.load()
   }
 

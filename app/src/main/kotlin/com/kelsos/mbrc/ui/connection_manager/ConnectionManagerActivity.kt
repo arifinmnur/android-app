@@ -1,13 +1,12 @@
 package com.kelsos.mbrc.ui.connection_manager
 
+
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Button
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -22,6 +21,7 @@ import com.kelsos.mbrc.networking.connections.ConnectionSettings
 import com.kelsos.mbrc.preferences.DefaultSettingsChangedEvent
 import com.kelsos.mbrc.ui.activities.FontActivity
 import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
+import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
@@ -37,22 +37,21 @@ class ConnectionManagerActivity : FontActivity(),
   @Inject
   lateinit var presenter: ConnectionManagerPresenter
 
-  @BindView(R.id.connection_list)
-  lateinit var mRecyclerView: RecyclerView
+  val mRecyclerView: RecyclerView by bindView(R.id.connection_list)
+  val mToolbar: MaterialToolbar by bindView(R.id.toolbar)
 
-  @BindView(R.id.toolbar)
-  lateinit var mToolbar: MaterialToolbar
   private var adapter: ConnectionAdapter? = null
   private var scope: Scope? = null
 
-  @OnClick(R.id.connection_add)
-  internal fun onAddButtonClick() {
+  private val addButton: Button by bindView(R.id.connection_add)
+  private val scanButton: Button by bindView(R.id.connection_scan)
+
+  private fun onAddButtonClick() {
     val settingsDialog = SettingsDialogFragment()
     settingsDialog.show(supportFragmentManager, "settings_dialog")
   }
 
-  @OnClick(R.id.connection_scan)
-  internal fun onScanButtonClick() {
+  private fun onScanButtonClick() {
     findViewById<ProgressIndicator>(R.id.connection_manager__progress).isGone = false
     bus.post(StartServiceDiscoveryEvent())
   }
@@ -63,7 +62,9 @@ class ConnectionManagerActivity : FontActivity(),
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setContentView(R.layout.ui_activity_connection_manager)
-    ButterKnife.bind(this)
+    addButton.setOnClickListener { onAddButtonClick() }
+    scanButton.setOnClickListener { onScanButtonClick() }
+
     setSupportActionBar(mToolbar)
     mRecyclerView.setHasFixedSize(true)
     val mLayoutManager = LinearLayoutManager(this)

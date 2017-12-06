@@ -16,7 +16,6 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import butterknife.BindView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -41,6 +40,7 @@ import com.kelsos.mbrc.ui.navigation.nowplaying.NowPlayingActivity
 import com.kelsos.mbrc.ui.navigation.playlists.PlaylistActivity
 import com.kelsos.mbrc.ui.navigation.radio.RadioActivity
 import com.kelsos.mbrc.ui.preferences.SettingsActivity
+import kotterknife.bindView
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,16 +51,12 @@ abstract class BaseActivity : FontActivity(), NavigationView.OnNavigationItemSel
   @Inject
   lateinit var serviceChecker: ServiceChecker
 
-  @Inject lateinit var volumeInteractor: VolumeInteractor
+  @Inject
+  lateinit var volumeInteractor: VolumeInteractor
 
-  @BindView(R.id.toolbar)
-  lateinit var toolbar: MaterialToolbar
-
-  @BindView(R.id.drawer_layout)
-  lateinit var drawer: DrawerLayout
-
-  @BindView(R.id.nav_view)
-  lateinit var navigationView: NavigationView
+  private val toolbar: MaterialToolbar by bindView(R.id.toolbar)
+  private val drawer: DrawerLayout by bindView(R.id.drawer_layout)
+  private val navigationView: NavigationView by bindView(R.id.nav_view)
 
   private var connectText: TextView? = null
   private var toggle: ActionBarDrawerToggle? = null
@@ -223,7 +219,7 @@ abstract class BaseActivity : FontActivity(), NavigationView.OnNavigationItemSel
   }
 
   /**
-   * Should be called after injections and Butterknife bindings.
+   * Should be called after injections and
    */
   fun setup() {
     Timber.v("Initializing base activity")

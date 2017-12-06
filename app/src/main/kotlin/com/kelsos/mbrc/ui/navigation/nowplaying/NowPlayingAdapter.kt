@@ -10,8 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.now_playing.NowPlaying
 import com.kelsos.mbrc.ui.drag.ItemTouchHelperAdapter
@@ -22,6 +20,7 @@ import com.raizlabs.android.dbflow.kotlinextensions.delete
 import com.raizlabs.android.dbflow.kotlinextensions.save
 import com.raizlabs.android.dbflow.list.FlowCursorList
 import com.raizlabs.android.dbflow.list.FlowCursorList.OnCursorRefreshListener
+import kotterknife.bindView
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -178,24 +177,11 @@ class NowPlayingAdapter
 
   class TrackHolder(itemView: View) : RecyclerView.ViewHolder(itemView), TouchHelperViewHolder {
 
-    @BindView(R.id.track_title)
-    lateinit var title: TextView
-
-    @BindView(R.id.track_artist)
-    lateinit var artist: TextView
-
-    @BindView(R.id.track_indicator_view)
-    lateinit var trackPlaying: ImageView
-
-    @BindView(R.id.track_container)
-    lateinit var container: ConstraintLayout
-
-    @BindView(R.id.drag_handle)
-    lateinit var dragHandle: View
-
-    init {
-      ButterKnife.bind(this, itemView)
-    }
+    val title: TextView by bindView(R.id.track_title)
+    val artist: TextView by bindView(R.id.track_artist)
+    val trackPlaying: ImageView by bindView(R.id.track_indicator_view)
+    val container: ConstraintLayout by bindView(R.id.track_container)
+    val dragHandle: View by bindView(R.id.drag_handle)
 
     override fun onItemSelected() {
       this.itemView.setBackgroundColor(Color.DKGRAY)

@@ -8,8 +8,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.view.isGone
 import androidx.viewpager2.widget.ViewPager2
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.snackbar.Snackbar
@@ -17,6 +15,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.ui.activities.BaseActivity
+import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
@@ -26,11 +25,8 @@ class LibraryActivity : BaseActivity(),
   LibraryView,
   OnQueryTextListener {
 
-  @BindView(R.id.search_pager)
-  lateinit var pager: ViewPager2
-
-  @BindView(R.id.pager_tab_strip)
-  lateinit var tabs: TabLayout
+  private val pager: ViewPager2 by bindView(R.id.search_pager)
+  private val tabs: TabLayout by bindView(R.id.pager_tab_strip)
 
   private var searchView: SearchView? = null
   private var searchMenuItem: MenuItem? = null
@@ -81,7 +77,7 @@ class LibraryActivity : BaseActivity(),
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setContentView(R.layout.activity_library)
-    ButterKnife.bind(this)
+
     super.setup()
     pagerAdapter = LibraryPagerAdapter(this)
     pager.apply {

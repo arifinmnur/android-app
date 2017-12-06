@@ -12,9 +12,9 @@ import com.kelsos.mbrc.networking.connections.ConnectionSettings
 
 class SettingsDialogFragment : DialogFragment() {
 
-  lateinit var hostEdit: EditText
-  lateinit var nameEdit: EditText
-  lateinit var portEdit: EditText
+  private lateinit var hostEdit: EditText
+  private lateinit var nameEdit: EditText
+  private lateinit var portEdit: EditText
 
   private var mListener: SettingsSaveListener? = null
   private lateinit var settings: ConnectionSettings
@@ -35,7 +35,7 @@ class SettingsDialogFragment : DialogFragment() {
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-     val dialog = MaterialAlertDialogBuilder(requireActivity())
+    val dialog = MaterialAlertDialogBuilder(requireActivity())
       .setView(R.layout.ui_dialog_settings)
       .setTitle(if (edit) R.string.settings_dialog_edit else R.string.settings_dialog_add)
       .setPositiveButton(if (edit) R.string.settings_dialog_save else R.string.settings_dialog_add) { dialog, _ ->
@@ -58,12 +58,12 @@ class SettingsDialogFragment : DialogFragment() {
           dialog.dismiss()
         }
       }.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-       .show()
+      .show()
 
 
     hostEdit = dialog.findViewById(R.id.settings_dialog_host) ?: error("not found")
     nameEdit = dialog.findViewById(R.id.settings_dialog_name) ?: error("not found")
-    portEdit = dialog.findViewById(R.id.settings_dialog_port)  ?: error("not found")
+    portEdit = dialog.findViewById(R.id.settings_dialog_port) ?: error("not found")
     return dialog
   }
 

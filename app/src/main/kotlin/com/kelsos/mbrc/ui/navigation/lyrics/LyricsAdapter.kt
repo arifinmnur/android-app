@@ -5,9 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.kelsos.mbrc.R
+import kotterknife.bindView
 
 class LyricsAdapter(private var data: List<String> = emptyList()) :
   RecyclerView.Adapter<LyricsAdapter.ViewHolder>() {
@@ -82,12 +81,7 @@ class LyricsAdapter(private var data: List<String> = emptyList()) :
   }
 
   class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    @BindView(android.R.id.text1)
-    lateinit var title: TextView
-
-    init {
-      ButterKnife.bind(this, itemView)
-    }
+    val title: TextView by bindView(android.R.id.text1)
   }
 
   fun clear() {

@@ -4,18 +4,17 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.now_playing.queue.Queue
 import com.kelsos.mbrc.ui.activities.FontActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
+import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
@@ -25,9 +24,9 @@ class ArtistAlbumsActivity : FontActivity(),
   ArtistAlbumsView,
   AlbumEntryAdapter.MenuItemSelectedListener {
 
-  @BindView(R.id.album_recycler) lateinit var recyclerView: EmptyRecyclerView
-  @BindView(R.id.toolbar) lateinit var toolbar: MaterialToolbar
-  @BindView(R.id.empty_view) lateinit var emptyView: ConstraintLayout
+  private val recyclerView: EmptyRecyclerView by bindView(R.id.album_recycler)
+  private val toolbar: MaterialToolbar by bindView(R.id.toolbar)
+  private val emptyView: ConstraintLayout by bindView(R.id.empty_view)
 
   @Inject lateinit var actionHandler: PopupActionHandler
   @Inject lateinit var adapter: AlbumEntryAdapter
@@ -45,7 +44,7 @@ class ArtistAlbumsActivity : FontActivity(),
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setContentView(R.layout.activity_artist_albums)
-    ButterKnife.bind(this)
+
 
     val extras = intent.extras
     if (extras != null) {

@@ -14,8 +14,6 @@ import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.Album
@@ -26,6 +24,7 @@ import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_S
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
+import kotterknife.bindView
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
@@ -34,23 +33,13 @@ class BrowseAlbumFragment : Fragment(),
   BrowseAlbumView,
   AlbumEntryAdapter.MenuItemSelectedListener {
 
-  @BindView(R.id.library_data_list)
-  lateinit var recycler: EmptyRecyclerView
+  private val recycler: EmptyRecyclerView by bindView(R.id.library_data_list)
 
-  @BindView(R.id.empty_view)
-  lateinit var emptyView: View
-
-  @BindView(R.id.list_empty_title)
-  lateinit var emptyViewTitle: TextView
-
-  @BindView(R.id.list_empty_icon)
-  lateinit var emptyViewIcon: ImageView
-
-  @BindView(R.id.list_empty_subtitle)
-  lateinit var emptyViewSubTitle: TextView
-
-  @BindView(R.id.empty_view_progress_bar)
-  lateinit var emptyViewProgress: ProgressBar
+  private val emptyView: View by bindView(R.id.empty_view)
+  private val emptyViewTitle: TextView by bindView(R.id.list_empty_title)
+  private val emptyViewIcon: ImageView by bindView(R.id.list_empty_icon)
+  private val emptyViewSubTitle: TextView by bindView(R.id.list_empty_subtitle)
+  private val emptyViewProgress: ProgressBar by bindView(R.id.empty_view_progress_bar)
 
   @Inject
   lateinit var adapter: AlbumEntryAdapter
@@ -73,7 +62,6 @@ class BrowseAlbumFragment : Fragment(),
     savedInstanceState: Bundle?
   ): View {
     val view = inflater.inflate(R.layout.fragment_browse, container, false)
-    ButterKnife.bind(this, view)
     emptyViewTitle.setText(R.string.albums_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync);
     syncButton.setOnClickListener {
@@ -128,11 +116,13 @@ class BrowseAlbumFragment : Fragment(),
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    emptyViewTitle.setText(R.string.albums_list_empty)
     recycler.adapter = adapter
     recycler.emptyView = emptyView
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
+    presenter.attach(this)
     presenter.load()
   }
 
@@ -149,7 +139,7 @@ class BrowseAlbumFragment : Fragment(),
 
   override fun onStop() {
     super.onStop()
-    presenter.detach()
+
   }
 
   override fun update(cursor: FlowCursorList<Album>) {
@@ -179,6 +169,11 @@ class BrowseAlbumFragment : Fragment(),
     emptyViewIcon.visibility = View.VISIBLE
     emptyViewTitle.visibility = View.VISIBLE
     emptyViewSubTitle.visibility = View.VISIBLE
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    presenter.detach()
   }
 
   override fun onDestroy() {

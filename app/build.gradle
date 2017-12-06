@@ -170,8 +170,6 @@ ext {
   dbflow_version = "4.1.2"
   toothpick_version = "1.1.1"
   jackson_version = "2.11.3"
-  butterknife_version = "10.2.3"
-  material_dialogs_version = "0.9.5.0"
   runner_version = "1.0.1"
   espresso_version = "3.0.1"
   junit_version = "4.12"
@@ -235,13 +233,11 @@ dependencies {
   implementation "com.fasterxml.jackson.core:jackson-core:${jackson_version}"
   implementation "com.fasterxml.jackson.core:jackson-databind:${jackson_version}"
   implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${jackson_version}"
-  implementation "com.jakewharton:butterknife:${butterknife_version}"
 
   implementation "com.github.stephanenicolas.toothpick:toothpick-runtime:${toothpick_version}"
   implementation "com.github.stephanenicolas.toothpick:smoothie:${toothpick_version}"
   kapt "com.github.stephanenicolas.toothpick:toothpick-compiler:${toothpick_version}"
 
-  kapt "com.jakewharton:butterknife-compiler:${butterknife_version}"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'

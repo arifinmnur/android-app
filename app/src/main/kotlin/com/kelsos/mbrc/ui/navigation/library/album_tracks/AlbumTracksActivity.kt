@@ -2,6 +2,7 @@ package com.kelsos.mbrc.ui.navigation.library.album_tracks
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -14,6 +15,7 @@ import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import com.raizlabs.android.dbflow.list.FlowCursorList
+import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
@@ -22,6 +24,10 @@ import javax.inject.Inject
 class AlbumTracksActivity : FontActivity(),
   AlbumTracksView,
   TrackEntryAdapter.MenuItemSelectedListener {
+
+  private val listTracks: EmptyRecyclerView by bindView(R.id.list_tracks)
+  private val emptyView: LinearLayout by bindView(R.id.empty_view)
+  private val playAlbum: FloatingActionButton by bindView(R.id.play_album)
 
   @Inject
   lateinit var adapter: TrackEntryAdapter

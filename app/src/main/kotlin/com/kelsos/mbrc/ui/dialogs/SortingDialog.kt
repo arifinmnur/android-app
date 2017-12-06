@@ -20,17 +20,19 @@ import com.kelsos.mbrc.content.library.albums.Sorting.Order
 import com.kelsos.mbrc.extensions.fail
 
 class SortingDialog : DialogFragment() {
-
-  lateinit var orderButton: Button
-  lateinit var sortingOption: RadioGroup
+  private lateinit var orderButton: Button
+  private lateinit var sortingOption: RadioGroup
 
   private lateinit var dialog: AlertDialog
   private lateinit var fm: FragmentManager
   private lateinit var orderChange: (order: Int) -> Unit
   private lateinit var sortingChange: (sorting: Int) -> Unit
 
-  @Fields private var sorting: Int = Sorting.ALBUM_ARTIST__ALBUM
-  @Order private var order: Int = Sorting.ORDER_ASCENDING
+  @Fields
+  private var sorting: Int = Sorting.ALBUM_ARTIST__ALBUM
+
+  @Order
+  private var order: Int = Sorting.ORDER_ASCENDING
 
   private fun setOrder(@Order order: Int) {
 
@@ -44,7 +46,10 @@ class SortingDialog : DialogFragment() {
 
     when (order) {
       Sorting.ORDER_ASCENDING -> {
-        orderButton.set(R.string.sorting_dialog__descending, R.drawable.ic_arrow_drop_down_black_24dp)
+        orderButton.set(
+          R.string.sorting_dialog__descending,
+          R.drawable.ic_arrow_drop_down_black_24dp
+        )
       }
       Sorting.ORDER_DESCENDING -> {
         orderButton.set(R.string.sorting_dialog__ascending, R.drawable.ic_arrow_drop_up_black_24dp)
@@ -54,14 +59,15 @@ class SortingDialog : DialogFragment() {
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     dialog = MaterialAlertDialogBuilder(requireContext())
-        .setTitle(R.string.album_sorting__dialog_title)
-        .setView(R.layout.dialog__sorting)
-        .setPositiveButton(android.R.string.ok) { _,_ -> }
-        .setNegativeButton(android.R.string.cancel) { _,_ -> }
-        .show()
+      .setTitle(R.string.album_sorting__dialog_title)
+      .setView(R.layout.dialog__sorting)
+      .setPositiveButton(android.R.string.ok) { _, _ -> }
+      .setNegativeButton(android.R.string.cancel) { _, _ -> }
+      .show()
 
     orderButton = dialog.findViewById(R.id.sorting_dialog__order) ?: fail("invalid view")
-    sortingOption = dialog.findViewById(R.id.sorting_dialog__sorting_options) ?: fail("invalid view")
+    sortingOption =
+      dialog.findViewById(R.id.sorting_dialog__sorting_options) ?: fail("invalid view")
     orderButton.setOnClickListener {
       this.order = when (order) {
         Sorting.ORDER_DESCENDING -> Sorting.ORDER_ASCENDING

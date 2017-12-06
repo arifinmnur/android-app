@@ -17,7 +17,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
-import butterknife.ButterKnife
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.changelog.ChangelogDialog
@@ -52,6 +51,7 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
   // Injects
   @Inject
   lateinit var presenter: MainViewPresenter
+
   @Inject
   lateinit var progressHelper: ProgressSeekerHelper
 
@@ -108,7 +108,6 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
     findViewById<ImageButton>(R.id.main_button_next).setOnClickListener { presenter.next() }
     findViewById<View>(R.id.track_info_area).setOnClickListener { navigate(R.id.nav_now_playing) }
 
-    ButterKnife.bind(this)
     super.setup()
     presenter.attach(this)
   }
@@ -241,15 +240,9 @@ class MainActivity : BaseActivity(), MainView, ProgressUpdate {
 
     //noinspection StatementWithEmptyBody
     when {
-      Repeat.ALL.equals(mode, ignoreCase = true) -> {
-        // Do nothing already set above
-      }
-      Repeat.ONE.equals(mode, ignoreCase = true) -> {
-        resId = R.drawable.ic_repeat_one_black_24dp
-      }
-      else -> {
-        colorId = R.color.button_dark
-      }
+      Repeat.ALL.equals(mode, ignoreCase = true) -> Unit
+      Repeat.ONE.equals(mode, ignoreCase = true) -> resId = R.drawable.ic_repeat_one_black_24dp
+      else -> colorId = R.color.button_dark
     }
 
     val color = ContextCompat.getColor(this, colorId)

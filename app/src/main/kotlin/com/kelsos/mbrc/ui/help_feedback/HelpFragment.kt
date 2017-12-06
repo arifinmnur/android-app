@@ -14,7 +14,7 @@ import timber.log.Timber
 
 class HelpFragment : Fragment() {
 
-  lateinit var helpView: WebView
+  private lateinit var helpView: WebView
 
   override fun onStart() {
     super.onStart()
