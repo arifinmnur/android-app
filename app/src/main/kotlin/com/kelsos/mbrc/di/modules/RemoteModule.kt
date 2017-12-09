@@ -1,6 +1,5 @@
 package com.kelsos.mbrc.di.modules
 
-import androidx.core.app.NotificationManagerCompat
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.kelsos.mbrc.content.activestatus.ModelCache
@@ -26,7 +25,6 @@ import com.kelsos.mbrc.content.radios.RadioRepository
 import com.kelsos.mbrc.content.radios.RadioRepositoryImpl
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractorImpl
-import com.kelsos.mbrc.di.providers.NotificationManagerCompatProvider
 import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.events.bus.RxBusImpl
 import com.kelsos.mbrc.helper.QueueHandler
@@ -39,7 +37,12 @@ import com.kelsos.mbrc.networking.protocol.VolumeInteractor
 import com.kelsos.mbrc.networking.protocol.VolumeInteractorImpl
 import com.kelsos.mbrc.platform.ServiceChecker
 import com.kelsos.mbrc.platform.ServiceCheckerImpl
-import com.kelsos.mbrc.preferences.*
+import com.kelsos.mbrc.preferences.AlbumSortingStore
+import com.kelsos.mbrc.preferences.AlbumSortingStoreImpl
+import com.kelsos.mbrc.preferences.ClientInformationStore
+import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
+import com.kelsos.mbrc.preferences.SettingsManager
+import com.kelsos.mbrc.preferences.SettingsManagerImpl
 import com.kelsos.mbrc.utilities.SchedulerProvider
 import com.kelsos.mbrc.utilities.SchedulerProviderImpl
 import io.reactivex.Scheduler
@@ -60,7 +63,6 @@ class RemoteModule : Module() {
     bind(RxBus::class.java).to(RxBusImpl::class.java).singletonInScope()
     bind(ObjectMapper::class.java).toInstance(mapper)
 
-    bind(NotificationManagerCompat::class.java).toProvider(NotificationManagerCompatProvider::class.java)
     bind(ConnectionRepository::class.java).to(ConnectionRepositoryImpl::class.java)
     bind(Scheduler::class.java).withName("main")
       .toProviderInstance { AndroidSchedulers.mainThread() }

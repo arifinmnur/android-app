@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Action
-import androidx.core.app.NotificationManagerCompat
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.events.ConnectionStatusChangeEvent
@@ -32,11 +31,11 @@ import javax.inject.Singleton
 class SessionNotificationManager
 @Inject
 constructor(
-  bus: RxBus,
-  private val context: Application,
-  private val sessionManager: RemoteSessionManager,
-  private val model: SessionStatusModel,
-  private val notificationManager: NotificationManagerCompat
+    bus: RxBus,
+    private val context: Application,
+    private val sessionManager: RemoteSessionManager,
+    private val  model: SessionStatusModel,
+    private val notificationManager: NotificationManager
 ) {
   private var notification: Notification? = null
   private val previous: String
@@ -51,15 +50,8 @@ constructor(
     previous = context.getString(R.string.notification_action_previous)
     play = context.getString(R.string.notification_action_play)
     next = context.getString(R.string.notification_action_next)
-    createNotificationChannels()
-  }
 
-  private fun createNotificationChannels() {
-    val channel = channel()
-    if (channel === null) {
-      return
-    }
-    notificationManager.createNotificationChannel(channel)
+    createNotificationChannels()
   }
 
   private fun handleTrackInfo(event: TrackInfoChangeEvent) {
@@ -104,13 +96,25 @@ constructor(
     }
   }
 
+  private fun createNotificationChannels() {
+    val channel = channel()
+    if (channel === null) {
+      return
+    }
+    notificationManager.createNotificationChannel(channel)
+  }
+
   private fun createBuilder(): NotificationCompat.Builder {
     val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
     mediaStyle.setMediaSession(sessionManager.mediaSessionToken)
 
     val builder = NotificationCompat.Builder(context, CHANNEL_ID)
     val resId =
-      if (model.playState == PlayerState.PLAYING) R.drawable.ic_action_pause else R.drawable.ic_action_play
+      if (model.playState == PlayerState.PLAYING) {
+      R.drawable.ic_action_pause
+    } else {
+      R.drawable.ic_action_play
+    }
 
     builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
       .setSmallIcon(R.drawable.ic_mbrc_status)
