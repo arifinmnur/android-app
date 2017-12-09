@@ -11,9 +11,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.Artist
-import com.kelsos.mbrc.extensions.count
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import javax.inject.Inject
 
@@ -21,7 +19,7 @@ class ArtistEntryAdapter
 @Inject constructor(context: Activity) : RecyclerView.Adapter<ArtistEntryAdapter.ViewHolder>() {
 
   private val inflater: LayoutInflater = LayoutInflater.from(context)
-  private var data: FlowCursorList<Artist>? = null
+  private var data: List<Artist>? = null
   private var mListener: MenuItemSelectedListener? = null
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
@@ -61,8 +59,8 @@ class ArtistEntryAdapter
       val popupMenu = PopupMenu(it.context, it)
       popupMenu.inflate(R.menu.popup_artist)
       popupMenu.setOnMenuItemClickListener {
-        val position = holder.adapterPosition.toLong()
-        ifNotNull(mListener, data?.getItem(position)) { listener, artist ->
+        val position = holder.adapterPosition
+        ifNotNull(mListener, data?.get(position)) { listener, artist ->
           listener.onMenuItemSelected(it, artist)
         }
         true
@@ -71,9 +69,9 @@ class ArtistEntryAdapter
     }
 
     holder.itemView.setOnClickListener {
-      val position = holder.adapterPosition.toLong()
+      val position = holder.adapterPosition
 
-      ifNotNull(mListener, data?.getItem(position)) { listener, artist ->
+      ifNotNull(mListener, data?.get(position)) { listener, artist ->
         listener.onItemClicked(artist)
       }
 
@@ -101,7 +99,7 @@ class ArtistEntryAdapter
    * @param position The position of the item within the adapter's data set.
    */
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val artist = data?.getItem(position.toLong())
+    val artist = data?.get(holder.adapterPosition)
 
     artist?.let {
       holder.title.text = if (it.artist.isNullOrBlank()) {
@@ -117,12 +115,7 @@ class ArtistEntryAdapter
 
    * @return The total number of items in this adapter.
    */
-  override fun getItemCount(): Int = data.count()
-
-  fun refresh() {
-    data?.refresh()
-    notifyDataSetChanged()
-  }
+  override fun getItemCount(): Int = data?.size ?: 0
 
   interface MenuItemSelectedListener {
     fun onMenuItemSelected(menuItem: MenuItem, artist: Artist)
@@ -136,7 +129,7 @@ class ArtistEntryAdapter
     val empty: String = itemView.context.getString(R.string.empty)
   }
 
-  fun update(data: FlowCursorList<Artist>) {
+  fun update(data: List<Artist>) {
     this.data = data
     notifyDataSetChanged()
   }

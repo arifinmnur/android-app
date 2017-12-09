@@ -19,7 +19,6 @@ import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_S
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import toothpick.Toothpick
 import javax.inject.Inject
@@ -97,7 +96,7 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(it: FlowCursorList<Track>) {
+  override fun update(it: List<Track>) {
     adapter.update(it)
   }
 

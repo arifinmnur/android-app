@@ -11,17 +11,15 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.Track
-import com.kelsos.mbrc.extensions.count
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import javax.inject.Inject
 
 class TrackEntryAdapter
 @Inject
 constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHolder>() {
-  private var data: FlowCursorList<Track>? = null
+  private var data: List<Track>? = null
   private var mListener: MenuItemSelectedListener? = null
   private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -60,8 +58,8 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
     holder.indicator.setOnClickListener { createPopup(it, holder) }
 
     holder.itemView.setOnClickListener {
-      val position = holder.adapterPosition.toLong()
-      ifNotNull(mListener, data?.getItem(position)) { listener, track ->
+      val position = holder.adapterPosition
+      ifNotNull(mListener, data?.get(position)) { listener, track ->
         listener.onItemClicked(track)
       }
 
@@ -73,8 +71,8 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
     val popupMenu = PopupMenu(it.context, it)
     popupMenu.inflate(R.menu.popup_track)
     popupMenu.setOnMenuItemClickListener { menuItem ->
-      val position = holder.adapterPosition.toLong()
-      ifNotNull(mListener, data?.getItem(position)) { listener, track ->
+      val position = holder.adapterPosition
+      ifNotNull(mListener, data?.get(position)) { listener, track ->
         listener.onMenuItemSelected(menuItem, track)
       }
       true
@@ -102,7 +100,7 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
    * @param position The position of the item within the adapter's data set.
    */
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val entry = data?.getItem(position.toLong())
+    val entry = data?.get(holder.adapterPosition)
     entry?.let { (artist, title) ->
       holder.title.text = title
       holder.artist.text = if (artist.isNullOrBlank()) holder.unknownArtist else artist
@@ -115,12 +113,7 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
 
    * @return The total number of items in this adapter.
    */
-  override fun getItemCount(): Int = data.count()
-
-  fun refresh() {
-    data?.refresh()
-    notifyDataSetChanged()
-  }
+  override fun getItemCount(): Int = data?.size ?: 0
 
   interface MenuItemSelectedListener {
     fun onMenuItemSelected(menuItem: MenuItem, track: Track)
@@ -135,7 +128,7 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
     val unknownArtist: String by lazy { string(R.string.unknown_artist) }
   }
 
-  fun update(cursor: FlowCursorList<Track>) {
+  fun update(cursor: List<Track>) {
     data = cursor
     notifyDataSetChanged()
   }

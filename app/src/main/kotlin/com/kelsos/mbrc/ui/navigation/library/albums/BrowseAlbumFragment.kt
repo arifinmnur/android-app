@@ -23,7 +23,6 @@ import com.kelsos.mbrc.ui.dialogs.SortingDialog
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import toothpick.Toothpick
 import toothpick.smoothie.module.SmoothieActivityModule
@@ -61,25 +60,7 @@ class BrowseAlbumFragment : Fragment(),
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val view = inflater.inflate(R.layout.fragment_browse, container, false)
-    emptyViewTitle.setText(R.string.albums_list_empty)
-    syncButton = view.findViewById(R.id.list_empty_sync);
-    syncButton.setOnClickListener {
-      presenter.sync()
-    }
-    return view
-  }
-
-
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-    adapter.refresh()
-  }
-
-  override fun onResume() {
-    super.onResume()
-    adapter.refresh()
+    return inflater.inflate(R.layout.fragment_browse, container, false)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,6 +98,10 @@ class BrowseAlbumFragment : Fragment(),
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     emptyViewTitle.setText(R.string.albums_list_empty)
+    syncButton = view.findViewById(R.id.list_empty_sync);
+    syncButton.setOnClickListener {
+      presenter.sync()
+    }
     recycler.adapter = adapter
     recycler.emptyView = emptyView
     recycler.layoutManager = LinearLayoutManager(recycler.context)
@@ -137,12 +122,7 @@ class BrowseAlbumFragment : Fragment(),
     actionHandler.albumSelected(album, requireActivity())
   }
 
-  override fun onStop() {
-    super.onStop()
-
-  }
-
-  override fun update(cursor: FlowCursorList<Album>) {
+  override fun update(cursor: List<Album>) {
     adapter.update(cursor)
   }
 

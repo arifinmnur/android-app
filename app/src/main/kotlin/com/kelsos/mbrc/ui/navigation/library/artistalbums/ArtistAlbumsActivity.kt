@@ -12,7 +12,6 @@ import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
@@ -86,7 +85,7 @@ class ArtistAlbumsActivity : BaseActivity(),
     actionHandler.albumSelected(album, this)
   }
 
-  override fun update(albums: FlowCursorList<Album>) {
+  override fun update(albums: List<Album>) {
     adapter.update(albums)
   }
 

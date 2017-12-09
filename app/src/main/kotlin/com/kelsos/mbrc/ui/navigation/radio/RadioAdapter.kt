@@ -1,6 +1,5 @@
 package com.kelsos.mbrc.ui.navigation.radio
 
-
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioStation
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotterknife.bindView
 import javax.inject.Inject
 
@@ -18,7 +16,7 @@ class RadioAdapter
 @Inject constructor(context: Activity) : RecyclerView.Adapter<RadioAdapter.ViewHolder>() {
 
   private val inflater: LayoutInflater = LayoutInflater.from(context)
-  private var data: FlowCursorList<RadioStation>? = null
+  private var data: List<RadioStation>? = null
   private var radioPressedListener: OnRadioPressedListener? = null
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,7 +24,7 @@ class RadioAdapter
     val viewHolder = ViewHolder(view)
 
     viewHolder.itemView.setOnClickListener {
-      val path = data?.getItem(viewHolder.adapterPosition.toLong())?.url
+      val path = data?.get(viewHolder.adapterPosition)?.url
       path?.let {
         radioPressedListener?.onRadioPressed(it)
       }
@@ -36,7 +34,7 @@ class RadioAdapter
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val radio = data?.getItem(holder.adapterPosition.toLong())
+    val radio = data?.get(holder.adapterPosition)
     radio?.let {
       holder.name.text = radio.name
     }
@@ -45,10 +43,10 @@ class RadioAdapter
   }
 
   override fun getItemCount(): Int {
-    return data?.count() ?: 0
+    return data?.size ?: 0
   }
 
-  fun update(cursor: FlowCursorList<RadioStation>) {
+  fun update(cursor: List<RadioStation>) {
     this.data = cursor
     notifyDataSetChanged()
   }

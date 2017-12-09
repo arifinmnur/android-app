@@ -2,7 +2,6 @@ package com.kelsos.mbrc.content.library.tracks
 
 import com.kelsos.mbrc.content.library.UpdatedDataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
@@ -17,15 +16,15 @@ class TrackRepositoryImpl
   private val dispatchers: AppDispatchers
 ) : TrackRepository {
 
-  override suspend fun getAllCursor(): FlowCursorList<Track> = localDataSource.loadAllCursor()
+  override suspend fun getAllCursor(): List<Track> = localDataSource.loadAllCursor()
 
-  override suspend fun getAlbumTracks(album: String, artist: String): FlowCursorList<Track> =
+  override suspend fun getAlbumTracks(album: String, artist: String): List<Track> =
     localDataSource.getAlbumTracks(album, artist)
 
-  override suspend fun getNonAlbumTracks(artist: String): FlowCursorList<Track> =
+  override suspend fun getNonAlbumTracks(artist: String): List<Track> =
     localDataSource.getNonAlbumTracks(artist)
 
-  override suspend fun getAndSaveRemote(): FlowCursorList<Track> {
+  override suspend fun getAndSaveRemote(): List<Track> {
     getRemote()
     return localDataSource.loadAllCursor()
   }
@@ -46,7 +45,7 @@ class TrackRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): FlowCursorList<Track> {
+  override suspend fun search(term: String): List<Track> {
     return localDataSource.search(term)
   }
 

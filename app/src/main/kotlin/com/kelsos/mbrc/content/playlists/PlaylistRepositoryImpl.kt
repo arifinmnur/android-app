@@ -1,7 +1,6 @@
 package com.kelsos.mbrc.content.playlists
 
 import com.kelsos.mbrc.di.modules.AppDispatchers
-import com.raizlabs.android.dbflow.list.FlowCursorList
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -12,9 +11,9 @@ class PlaylistRepositoryImpl
   private val remoteDataSource: RemotePlaylistDataSource,
   private val dispatchers: AppDispatchers
 ) : PlaylistRepository {
-  override suspend fun getAllCursor(): FlowCursorList<Playlist> = localDataSource.loadAllCursor()
+  override suspend fun getAllCursor(): List<Playlist> = localDataSource.loadAllCursor()
 
-  override suspend fun getAndSaveRemote(): FlowCursorList<Playlist> {
+  override suspend fun getAndSaveRemote(): List<Playlist> {
     getRemote()
     return localDataSource.loadAllCursor()
   }
@@ -28,7 +27,7 @@ class PlaylistRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): FlowCursorList<Playlist> = localDataSource.search(term)
+  override suspend fun search(term: String): List<Playlist> = localDataSource.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
 
