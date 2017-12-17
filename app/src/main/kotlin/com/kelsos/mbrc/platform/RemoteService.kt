@@ -81,7 +81,7 @@ class RemoteService : Service() {
 
   override fun onDestroy() {
     super.onDestroy()
-    SERVICE_STOPPING = true;
+    SERVICE_STOPPING = true
     stopForeground(true)
     this.unregisterReceiver(receiver)
     handler.postDelayed({

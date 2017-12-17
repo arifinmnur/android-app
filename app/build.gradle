@@ -1,336 +1,341 @@
 import java.text.SimpleDateFormat
 
 plugins {
-  id "com.google.protobuf" version "0.8.12"
-  id 'com.android.application'
-  id 'kotlin-android'
-  id 'kotlin-kapt'
-  id 'idea'
-  id 'jacoco'
-  id 'com.github.kt3k.coveralls'
+    id "com.google.protobuf" version "0.8.12"
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'idea'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls'
 }
 
 repositories {
-  maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 static buildTime() {
-  def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-  df.setTimeZone(TimeZone.getTimeZone("UTC"))
-  return df.format(new Date())
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
 }
 
 def gitHash() {
-  return "git -C ${rootDir} rev-parse --short HEAD".execute().text.trim()
+    return "git -C ${rootDir} rev-parse --short HEAD".execute().text.trim()
 }
 
 def version = "1.4.0"
 def version_code = 120
 
 android {
-  compileSdkVersion 30
-  buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "29.0.3"
 
-  defaultConfig {
-    applicationId "com.kelsos.mbrc"
-    minSdkVersion 23
-    targetSdkVersion 30
-    versionCode version_code
-    versionName version
-    buildConfigField "String", "GIT_SHA", "\"${gitHash()}\""
-    buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
+    defaultConfig {
+        applicationId "com.kelsos.mbrc"
+        minSdkVersion 23
+        targetSdkVersion 30
+        versionCode version_code
+        versionName version
+        buildConfigField "String", "GIT_SHA", "\"${gitHash()}\""
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
 
-    // Enabling multidex support.
-    multiDexEnabled true
+        // Enabling multidex support.
+        multiDexEnabled true
 
-    testInstrumentationRunner 'com.kelsos.mbrc.MockTestRunner'
-    testApplicationId "com.kelsos.mbrc.test"
-    vectorDrawables.useSupportLibrary = true
-  }
-
-  testOptions {
-    unitTests.returnDefaultValues = true
-    unitTests.all {
-      jacoco {
-        includeNoLocationClasses = true
-      }
+        testInstrumentationRunner 'com.kelsos.mbrc.MockTestRunner'
+        testApplicationId "com.kelsos.mbrc.test"
+        vectorDrawables.useSupportLibrary = true
     }
 
-    execution 'ANDROID_TEST_ORCHESTRATOR'
-  }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
 
-  compileOptions {
-    // Flag to enable support for the new language APIs
-    coreLibraryDesugaringEnabled true
-    // Sets Java compatibility to Java 8
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
-  kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
-  }
-
-  dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.0'
-  }
-
-  signingConfigs {
-    release {
-      storeFile file('placeholder')
-      keyAlias "placeholder"
-      storePassword "placeholder"
-      keyPassword "placeholder"
-    }
-  }
-
-  flavorDimensions "basic"
-
-  buildTypes {
-    release {
-      signingConfig signingConfigs.release
-      debuggable false
-      zipAlignEnabled true
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-      buildConfigField "String", "GIT_SHA", "\"${gitHash()}\""
-      buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
-      buildConfigField "boolean", "USE_CRASHLYTICS", "true"
+        execution 'ANDROID_TEST_ORCHESTRATOR'
     }
 
-    debug {
-      applicationIdSuffix ".dev"
-      versionNameSuffix "-dev"
-      testCoverageEnabled true
-
-      buildConfigField "String", "GIT_SHA", "\"debug_build\""
-      buildConfigField "String", "BUILD_TIME", "\"debug_build\""
-      buildConfigField "boolean", "USE_CRASHLYTICS", "true"
-    }
-  }
-
-  productFlavors {
-    play {
-      ext.enableCrashlytics = true
-      apply plugin: 'com.google.gms.google-services'
-      apply plugin: 'com.google.firebase.crashlytics'
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    github {
-      ext.enableCrashlytics = false
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-  }
 
-
-  packagingOptions {
-    exclude 'META-INF/ASL2.0'
-    exclude 'META-INF/LICENSE'
-    exclude 'META-INF/NOTICE'
-    exclude 'META-INF/services/javax.annotation.processing.Processor'
-    pickFirst("META-INF/atomicfu.kotlin_module")
-  }
-
-  lintOptions {
-    abortOnError false
-    lintConfig file("lint.xml")
-    xmlReport false
-    htmlReport true
-    htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
-    xmlOutput file("$project.buildDir/reports/lint/lint-result.xml")
-  }
-
-  dexOptions {
-    javaMaxHeapSize "2G"
-  }
-
-  android.applicationVariants.all { variant ->
-    variant.outputs.all {
-      outputFileName = "${defaultConfig.applicationId}-${variant.flavorName}-${variant.versionCode}-v${variant.versionName}.apk"
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.0'
     }
-  }
 
-  sourceSets {
-    androidTest.java.srcDirs += "src/androidTest/kotlin"
-    test.java.srcDirs += 'src/test/kotlin'
-    main.java.srcDirs += 'src/main/kotlin'
-    debug.java.srcDirs += 'src/debug/kotlin'
-    play.java.srcDirs += 'src/play/kotlin'
-  }
+    signingConfigs {
+        release {
+            storeFile file('placeholder')
+            keyAlias "placeholder"
+            storePassword "placeholder"
+            keyPassword "placeholder"
+        }
+    }
+
+    flavorDimensions "basic"
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            debuggable false
+            zipAlignEnabled true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "GIT_SHA", "\"${gitHash()}\""
+            buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
+            buildConfigField "boolean", "USE_CRASHLYTICS", "true"
+        }
+
+        debug {
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            testCoverageEnabled true
+
+            buildConfigField "String", "GIT_SHA", "\"debug_build\""
+            buildConfigField "String", "BUILD_TIME", "\"debug_build\""
+            buildConfigField "boolean", "USE_CRASHLYTICS", "true"
+        }
+    }
+
+    productFlavors {
+        play {
+            ext.enableCrashlytics = true
+            apply plugin: 'com.google.gms.google-services'
+            apply plugin: 'com.google.firebase.crashlytics'
+        }
+
+        github {
+            ext.enableCrashlytics = false
+        }
+    }
+
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        pickFirst("META-INF/atomicfu.kotlin_module")
+    }
+
+    lintOptions {
+        abortOnError false
+        lintConfig file("lint.xml")
+        xmlReport false
+        htmlReport true
+        htmlOutput file("$project.buildDir/reports/lint/lint-result.html")
+        xmlOutput file("$project.buildDir/reports/lint/lint-result.xml")
+    }
+
+    dexOptions {
+        javaMaxHeapSize "2G"
+    }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${defaultConfig.applicationId}-${variant.flavorName}-${variant.versionCode}-v${variant.versionName}.apk"
+        }
+    }
+
+    sourceSets {
+        androidTest.java.srcDirs += "src/androidTest/kotlin"
+        test.java.srcDirs += 'src/test/kotlin'
+        main.java.srcDirs += 'src/main/kotlin'
+        debug.java.srcDirs += 'src/debug/kotlin'
+        play.java.srcDirs += 'src/play/kotlin'
+    }
 }
 
 idea {
-  module {
-    downloadJavadoc = true
-    downloadSources = true
-  }
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
 }
 
 ext {
-  dbflow_version = "4.1.2"
-  toothpick_version = "1.1.1"
-  jackson_version = "2.11.3"
-  runner_version = "1.0.1"
-  espresso_version = "3.0.1"
-  junit_version = "4.12"
-  mockito_version = "2.12.0"
-  robolectric_version = "3.5.1"
-  truth_version = "0.36"
-  leakcanary_version = "2.5"
+    dbflow_version = "4.1.2"
+    toothpick_version = "1.1.1"
+    jackson_version = "2.11.3"
+    runner_version = "1.0.1"
+    espresso_version = "3.0.1"
+    junit_version = "4.12"
+    mockito_version = "2.13.0"
+    robolectric_version = "3.5.1"
+    truth_version = "0.37"
+    leakcanary_version = "2.5"
 }
 
 dependencies {
-  implementation project(path: ':changelog')
-  implementation 'androidx.viewpager2:viewpager2:1.0.0'
-
-  androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
-    exclude group: 'com.android.support', module: 'support-annotations'
-  })
-  androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
-  androidTestImplementation "junit:junit:${junit_version}"
-  // 2017-01-04 (I spend a couple of days until I figured out that if I specify the mockitoA
-  // version to an different than the one dexmaker supports the tests would crash...)
-  androidTestImplementation "org.mockito:mockito-core:${mockito_version}"
-  androidTestImplementation "org.mockito:mockito-android:${mockito_version}"
-
-  androidTestImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${toothpick_version}"
-  androidTestImplementation 'androidx.annotation:annotation:1.1.0'
-  androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-  androidTestImplementation 'androidx.test:rules:1.3.0'
-  androidTestImplementation 'com.linkedin.testbutler:test-butler-library:2.1.0'
-
-  // Test dependencies
-  testImplementation "junit:junit:${junit_version}"
-  testImplementation "org.mockito:mockito-core:${mockito_version}"
-  testImplementation "org.robolectric:robolectric:${robolectric_version}"
-  testImplementation "org.robolectric:shadows-multidex:${robolectric_version}"
-  testImplementation "com.google.truth:truth:${truth_version}"
-
-  testImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${toothpick_version}"
-  //The android library only will fail the robolectric tests
-  testImplementation 'org.threeten:threetenbp:1.4.4'
-
-  implementation 'androidx.appcompat:appcompat:1.2.0'
-  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-  implementation 'androidx.annotation:annotation:1.1.0'
-  implementation 'androidx.recyclerview:recyclerview:1.1.0'
-  implementation 'com.google.android.material:material:1.3.0-alpha03'
-  implementation 'androidx.preference:preference-ktx:1.1.1'
-  implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
-  kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
-
-  //Some of the dependencies pull the wrong version support v13
-  implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-
-  kapt "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
-
-  implementation "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
-  implementation "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
-  implementation "com.github.Raizlabs.DBFlow:dbflow-kotlinextensions:${dbflow_version}@aar"
-  implementation "com.github.Raizlabs.DBFlow:dbflow-rx2:${dbflow_version}"
-  implementation "com.github.Raizlabs.DBFlow:dbflow-rx2-kotlinextensions:${dbflow_version}"
-
-  implementation "com.fasterxml.jackson.core:jackson-core:${jackson_version}"
-  implementation "com.fasterxml.jackson.core:jackson-databind:${jackson_version}"
-  implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${jackson_version}"
-
-  implementation "com.github.stephanenicolas.toothpick:toothpick-runtime:${toothpick_version}"
-  implementation "com.github.stephanenicolas.toothpick:smoothie:${toothpick_version}"
-  kapt "com.github.stephanenicolas.toothpick:toothpick-compiler:${toothpick_version}"
-
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
-
-  implementation 'androidx.multidex:multidex:2.0.1'
-  implementation 'com.squareup.picasso:picasso:2.71828'
-
-  implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-  implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
-  implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
-
-  implementation 'com.jakewharton.timber:timber:4.7.1'
-  implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-
-  implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
-
-  implementation  "androidx.datastore:datastore-core:1.0.0-alpha02"
-  implementation  "com.google.protobuf:protobuf-javalite:3.10.0"
+    implementation project(path: ':changelog')
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
 
-  debugImplementation "com.squareup.leakcanary:leakcanary-android:${leakcanary_version}"
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
+    androidTestImplementation "junit:junit:${junit_version}"
+    // 2017-01-04 (I spend a couple of days until I figured out that if I specify the mockitoA
+    // version to an different than the one dexmaker supports the tests would crash...)
+    androidTestImplementation "org.mockito:mockito-core:${mockito_version}"
+    androidTestImplementation "org.mockito:mockito-android:${mockito_version}"
 
-  // Import the BoM for the Firebase platform
-  playImplementation platform('com.google.firebase:firebase-bom:25.12.0')
+    androidTestImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${toothpick_version}"
+    androidTestImplementation 'androidx.annotation:annotation:1.1.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'com.linkedin.testbutler:test-butler-library:2.1.0'
 
-  // Declare the dependencies for the Crashlytics and Analytics libraries
-  // When using the BoM, you don't specify versions in Firebase library dependencies
-  playImplementation 'com.google.firebase:firebase-crashlytics-ktx'
-  playImplementation 'com.google.firebase:firebase-analytics-ktx'
+    // Test dependencies
+    testImplementation "junit:junit:${junit_version}"
+    testImplementation "org.mockito:mockito-core:${mockito_version}"
+    testImplementation "org.robolectric:robolectric:${robolectric_version}"
+    testImplementation "org.robolectric:shadows-multidex:${robolectric_version}"
+    testImplementation "com.google.truth:truth:${truth_version}"
+
+    testImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${toothpick_version}"
+    //The android library only will fail the robolectric tests
+    testImplementation 'org.threeten:threetenbp:1.4.4'
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.android.material:material:1.3.0-alpha03'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
+
+    //Some of the dependencies pull the wrong version support v13
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+
+    implementation "androidx.paging:paging-runtime-ktx:2.1.2";
+
+    implementation 'androidx.room:room-runtime:2.2.6';
+    implementation "androidx.room:room-ktx:2.2.6"
+    kapt 'androidx.room:room-compiler:2.2.6'
+
+    implementation "com.fasterxml.jackson.core:jackson-core:${jackson_version}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jackson_version}"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${jackson_version}"
+
+    implementation "com.github.stephanenicolas.toothpick:toothpick-runtime:${toothpick_version}"
+    implementation "com.github.stephanenicolas.toothpick:smoothie:${toothpick_version}"
+    kapt "com.github.stephanenicolas.toothpick:toothpick-compiler:${toothpick_version}"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
+
+    implementation "androidx.datastore:datastore-core:1.0.0-alpha02"
+    implementation "com.google.protobuf:protobuf-javalite:3.10.0"
+
+
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${leakcanary_version}"
+
+    // Import the BoM for the Firebase platform
+    playImplementation platform('com.google.firebase:firebase-bom:25.12.0')
+
+    // Declare the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    playImplementation 'com.google.firebase:firebase-crashlytics-ktx'
+    playImplementation 'com.google.firebase:firebase-analytics-ktx'
 }
 
 protobuf {
-  protoc {
-    artifact = "com.google.protobuf:protoc:3.10.0"
-  }
-
-  // Generates the java Protobuf-lite code for the Protobufs in this project. See
-  // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
-  // for more information.
-  generateProtoTasks {
-    all().each { task ->
-      task.builtins {
-        java {
-          option 'lite'
-        }
-      }
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.10.0"
     }
-  }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+        }
+    }
 }
 
 
 allprojects {
-  afterEvaluate { project ->
+    afterEvaluate { project ->
 
-    def signProperties = rootProject.file('signing.properties')
-    if (signProperties.exists()) {
-      def prop = new Properties()
-      prop.load(new FileInputStream(signProperties))
-      def filepath = prop["keys"]
-      def keyProperties = file(filepath)
-      if (keyProperties.exists()) {
-        def props = new Properties()
-        props.load(new FileInputStream(keyProperties))
-        def keystorePath = props['keystore']
-        def releaseConfig = android.signingConfigs['release']
-        releaseConfig.storeFile = file(keystorePath)
-        releaseConfig.storePassword = props['storePass']
-        releaseConfig.keyAlias = props['keyAlias']
-        releaseConfig.keyPassword = props['keyPass']
-      }
+        def signProperties = rootProject.file('signing.properties')
+        if (signProperties.exists()) {
+            def prop = new Properties()
+            prop.load(new FileInputStream(signProperties))
+            def filepath = prop["keys"]
+            def keyProperties = file(filepath)
+            if (keyProperties.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(keyProperties))
+                def keystorePath = props['keystore']
+                def releaseConfig = android.signingConfigs['release']
+                releaseConfig.storeFile = file(keystorePath)
+                releaseConfig.storePassword = props['storePass']
+                releaseConfig.keyAlias = props['keyAlias']
+                releaseConfig.keyPassword = props['keyPass']
+            }
+        }
     }
-  }
 }
 
 coveralls {
-  jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
 }
 
 tasks.coveralls {
-  dependsOn 'jacocoTestReport'
-  onlyIf { System.env.'CI' }
+    dependsOn 'jacocoTestReport'
+    onlyIf { System.env.'CI' }
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 kapt {
-  arguments {
-    arg('toothpick_registry_package_name', 'com.kelsos.mbrc')
-  }
+    arguments {
+        arg('toothpick_registry_package_name', 'com.kelsos.mbrc')
+    }
 }
 
 //task jacocoTestReport(type: JacocoReport,

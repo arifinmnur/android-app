@@ -53,7 +53,7 @@ constructor(
       }
 
 
-      return@withContext ActiveConnection(socket, bufferedReader, handshake)
+      return@withContext ActiveConnection(socket, bufferedReader)
     }
 
   private fun getProtocolPayload(): ProtocolPayload {

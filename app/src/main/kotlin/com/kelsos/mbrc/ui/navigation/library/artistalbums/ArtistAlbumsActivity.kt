@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
@@ -25,9 +25,12 @@ class ArtistAlbumsActivity : BaseActivity(),
   private val recyclerView: EmptyRecyclerView by bindView(R.id.album_recycler)
   private val emptyView: ConstraintLayout by bindView(R.id.empty_view)
 
-  @Inject lateinit var actionHandler: PopupActionHandler
-  @Inject lateinit var adapter: AlbumEntryAdapter
-  @Inject lateinit var presenter: ArtistAlbumsPresenter
+  @Inject
+  lateinit var actionHandler: PopupActionHandler
+  @Inject
+  lateinit var adapter: AlbumEntryAdapter
+  @Inject
+  lateinit var presenter: ArtistAlbumsPresenter
 
   private var artist: String? = null
   private lateinit var scope: Scope
@@ -74,18 +77,18 @@ class ArtistAlbumsActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, album: Album) {
+  override fun onMenuItemSelected(menuItem: MenuItem, album: AlbumEntity) {
     val action = actionHandler.albumSelected(menuItem, album, this)
     if (action != Queue.PROFILE) {
       presenter.queue(action, album)
     }
   }
 
-  override fun onItemClicked(album: Album) {
+  override fun onItemClicked(album: AlbumEntity) {
     actionHandler.albumSelected(album, this)
   }
 
-  override fun update(albums: List<Album>) {
+  override fun update(albums: List<AlbumEntity>) {
     adapter.update(albums)
   }
 

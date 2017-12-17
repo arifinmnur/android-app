@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.tracks
 
-import com.kelsos.mbrc.content.library.tracks.Track
+import androidx.paging.DataSource
+import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
 import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
@@ -8,6 +9,7 @@ import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,7 +48,13 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        view().update(getData(term))
+        val data = getData(term)
+        val liveData = data.paged()
+        liveData.observe(this@BrowseTrackPresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.v(e, "Error while loading the data from the database")
       }
@@ -54,9 +62,9 @@ constructor(
     }
   }
 
-  private suspend fun getData(term: String): List<Track> {
+  private suspend fun getData(term: String): DataSource.Factory<Int, TrackEntity> {
     return if (term.isEmpty()) {
-      repository.getAllCursor()
+      repository.getAll()
     } else {
       repository.search(term)
     }
@@ -68,7 +76,7 @@ constructor(
     }
   }
 
-  override fun queue(track: Track, action: String?) {
+  override fun queue(track: TrackEntity, action: String?) {
     scope.launch {
       val (success, tracks) = if (action == null) {
         queue.queueTrack(track)

@@ -23,7 +23,7 @@ class LibrarySyncInteractorImpl
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
   private val bus: RxBus,
-  private val dispatchers: AppDispatchers
+  dispatchers: AppDispatchers
 ) : LibrarySyncInteractor {
 
   private var running: Boolean = false

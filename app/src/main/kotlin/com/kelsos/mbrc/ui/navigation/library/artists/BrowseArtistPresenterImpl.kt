@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.artists
 
-import com.kelsos.mbrc.content.library.artists.Artist
+import androidx.paging.DataSource
+import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
 import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
@@ -10,6 +11,7 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.ui.navigation.library.ArtistTabRefreshEvent
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -50,7 +52,13 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        view().update(getData(term))
+        val data = getData(term)
+        val liveData = data.paged()
+        liveData.observe(this@BrowseArtistPresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.v(e, "Error while loading the data from the database")
       }
@@ -58,13 +66,13 @@ constructor(
     }
   }
 
-  private suspend fun getData(term: String): List<Artist> {
+  private suspend fun getData(term: String): DataSource.Factory<Int, ArtistEntity> {
     return if (term.isEmpty()) {
       val shouldDisplay = settingsManager.shouldDisplayOnlyAlbumArtists()
       if (shouldDisplay) {
         repository.getAlbumArtistsOnly()
       } else {
-        repository.getAllCursor()
+        repository.getAll()
       }
     } else {
       repository.search(term)
@@ -77,9 +85,9 @@ constructor(
     }
   }
 
-  override fun queue(action: String, entry: Artist) {
+  override fun queue(action: String, entry: ArtistEntity) {
     scope.launch {
-      val artist = entry.artist ?: throw IllegalArgumentException("artist should not be null")
+      val artist = entry.artist
       val (success, tracks) = queue.queueArtist(action, artist)
       view().queue(success, tracks)
     }

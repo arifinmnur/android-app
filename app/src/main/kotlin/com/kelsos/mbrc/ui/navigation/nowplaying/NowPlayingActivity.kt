@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackInfo
-import com.kelsos.mbrc.content.nowplaying.NowPlaying
+import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
@@ -148,7 +148,7 @@ class NowPlayingActivity : BaseNavigationActivity(),
     super.onDestroy()
   }
 
-  override fun update(cursor: List<NowPlaying>) {
+  override fun update(cursor: List<NowPlayingEntity>) {
     adapter.update(cursor)
     swipeRefreshLayout.isRefreshing = false
   }

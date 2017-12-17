@@ -6,11 +6,6 @@ import android.view.View.VISIBLE
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 
-
-fun View?.hide() {
-  this?.visibility = INVISIBLE
-}
-
 fun View?.show() {
   this?.visibility = VISIBLE
 }

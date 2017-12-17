@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.Track
+import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class TrackEntryAdapter
 @Inject
 constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHolder>() {
-  private var data: List<Track>? = null
+  private var data: List<TrackEntity>? = null
   private var mListener: MenuItemSelectedListener? = null
   private val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -103,7 +103,7 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
     val entry = data?.get(holder.adapterPosition)
     entry?.let { (artist, title) ->
       holder.title.text = title
-      holder.artist.text = if (artist.isNullOrBlank()) holder.unknownArtist else artist
+      holder.artist.text = if (artist.isBlank()) holder.unknownArtist else artist
     }
 
   }
@@ -116,9 +116,9 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
   override fun getItemCount(): Int = data?.size ?: 0
 
   interface MenuItemSelectedListener {
-    fun onMenuItemSelected(menuItem: MenuItem, track: Track)
+    fun onMenuItemSelected(menuItem: MenuItem, track: TrackEntity)
 
-    fun onItemClicked(track: Track)
+    fun onItemClicked(track: TrackEntity)
   }
 
   class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -128,7 +128,7 @@ constructor(context: Activity) : RecyclerView.Adapter<TrackEntryAdapter.ViewHold
     val unknownArtist: String by lazy { string(R.string.unknown_artist) }
   }
 
-  fun update(cursor: List<Track>) {
+  fun update(cursor: List<TrackEntity>) {
     data = cursor
     notifyDataSetChanged()
   }

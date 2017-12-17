@@ -53,7 +53,7 @@ constructor(
     var success = false
     try {
       val paths = trackRepository.getAlbumTrackPaths(album, artist)
-      tracks = paths.size;
+      tracks = paths.size
       success = queue(type, paths)
     } catch (e: Exception) {
       Timber.e(e)
@@ -69,7 +69,7 @@ constructor(
     var success = false
     try {
       val paths = trackRepository.getArtistTrackPaths(artist)
-      tracks = paths.size;
+      tracks = paths.size
       success = queue(type, paths)
     } catch (e: Exception) {
       Timber.e(e)
@@ -85,7 +85,7 @@ constructor(
     var success = false
     try {
       val paths = trackRepository.getGenreTrackPaths(genre)
-      tracks = paths.size;
+      tracks = paths.size
       success = queue(type, paths)
     } catch (e: Exception) {
       Timber.e(e)
@@ -117,7 +117,7 @@ constructor(
       Queue.ADD_ALL -> {
         path = track.src
         if (queueAlbum) {
-          trackRepository.getAlbumTrackPaths(track.album!!, track.albumArtist!!)
+          trackRepository.getAlbumTrackPaths(track.album, track.albumArtist)
         } else {
           trackRepository.getAllTrackPaths()
         }
@@ -125,16 +125,16 @@ constructor(
       Queue.PLAY_ALBUM -> {
         action = Queue.ADD_ALL
         path = track.src
-        trackRepository.getAlbumTrackPaths(track.album!!, track.albumArtist!!)
+        trackRepository.getAlbumTrackPaths(track.album, track.albumArtist)
       }
       Queue.PLAY_ARTIST -> {
         action = Queue.ADD_ALL
         path = track.src
-        trackRepository.getArtistTrackPaths(track.artist!!)
+        trackRepository.getArtistTrackPaths(track.artist)
       }
       else -> {
         path = null
-        listOf(track.src!!)
+        listOf(track.src)
       }
     }
 

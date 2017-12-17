@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.view.MenuItem
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumMapper
-import com.kelsos.mbrc.content.library.artists.Artist
-import com.kelsos.mbrc.content.library.genres.Genre
+import com.kelsos.mbrc.content.library.artists.ArtistEntity
+import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.ui.navigation.library.albumtracks.AlbumTracksActivity
 import com.kelsos.mbrc.ui.navigation.library.artistalbums.ArtistAlbumsActivity
@@ -21,7 +21,7 @@ class PopupActionHandler
 constructor() {
 
   @Queue.Action
-  fun albumSelected(menuItem: MenuItem, entry: Album, context: Context): String {
+  fun albumSelected(menuItem: MenuItem, entry: AlbumEntity, context: Context): String {
     if (menuItem.itemId == R.id.popup_album_tracks) {
       openProfile(entry, context)
       return Queue.PROFILE
@@ -36,7 +36,7 @@ constructor() {
   }
 
   @Queue.Action
-  fun artistSelected(menuItem: MenuItem, entry: Artist, context: Context): String {
+  fun artistSelected(menuItem: MenuItem, entry: ArtistEntity, context: Context): String {
     if (menuItem.itemId == R.id.popup_artist_album) {
       openProfile(entry, context)
       return Queue.PROFILE
@@ -51,7 +51,7 @@ constructor() {
   }
 
   @Queue.Action
-  fun genreSelected(menuItem: MenuItem, entry: Genre, context: Context): String {
+  fun genreSelected(menuItem: MenuItem, entry: GenreEntity, context: Context): String {
     if (R.id.popup_genre_artists == menuItem.itemId) {
       openProfile(entry, context)
       return Queue.PROFILE
@@ -77,32 +77,32 @@ constructor() {
       else -> Queue.NOW
     }
 
-  fun albumSelected(album: Album, context: Context) {
+  fun albumSelected(album: AlbumEntity, context: Context) {
     openProfile(album, context)
   }
 
-  fun artistSelected(artist: Artist, context: Context) {
+  fun artistSelected(artist: ArtistEntity, context: Context) {
     openProfile(artist, context)
   }
 
-  fun genreSelected(genre: Genre, context: Context) {
+  fun genreSelected(genre: GenreEntity, context: Context) {
     openProfile(genre, context)
   }
 
-  private fun openProfile(artist: Artist, context: Context) {
+  private fun openProfile(artist: ArtistEntity, context: Context) {
     val intent = Intent(context, ArtistAlbumsActivity::class.java)
     intent.putExtra(ArtistAlbumsActivity.ARTIST_NAME, artist.artist)
     context.startActivity(intent)
   }
 
-  private fun openProfile(album: Album, context: Context) {
+  private fun openProfile(album: AlbumEntity, context: Context) {
     val mapper = AlbumMapper()
     val intent = Intent(context, AlbumTracksActivity::class.java)
     intent.putExtra(AlbumTracksActivity.ALBUM, mapper.map(album))
     context.startActivity(intent)
   }
 
-  private fun openProfile(genre: Genre, context: Context) {
+  private fun openProfile(genre: GenreEntity, context: Context) {
     val intent = Intent(context, GenreArtistsActivity::class.java)
     intent.putExtra(GenreArtistsActivity.GENRE_NAME, genre.genre)
     context.startActivity(intent)

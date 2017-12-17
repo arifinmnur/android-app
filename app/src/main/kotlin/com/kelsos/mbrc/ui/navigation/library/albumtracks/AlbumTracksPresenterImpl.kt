@@ -1,11 +1,12 @@
 package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
-import com.kelsos.mbrc.content.library.tracks.Track
+import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,28 +16,33 @@ class AlbumTracksPresenterImpl
 constructor(
   private val repository: TrackRepository,
   private val queue: QueueHandler
-) : BasePresenter<AlbumTracksView>(),
-  AlbumTracksPresenter {
+) : BasePresenter<AlbumTracksView>(), AlbumTracksPresenter {
+
   override fun load(album: AlbumInfo) {
     scope.launch {
       try {
-        view().update(
-          when {
-            album.album.isEmpty() -> {
-              repository.getNonAlbumTracks(album.artist)
-            }
-            else -> {
-              repository.getAlbumTracks(album.album, album.artist)
-            }
+        val data = when {
+          album.album.isEmpty() -> {
+            repository.getNonAlbumTracks(album.artist)
           }
-        )
+          else -> {
+            repository.getAlbumTracks(album.album, album.artist)
+          }
+        }
+
+        val liveData = data.paged()
+        liveData.observe(this@AlbumTracksPresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.v(e)
       }
     }
   }
 
-  override fun queue(entry: Track, action: String?) {
+  override fun queue(entry: TrackEntity, action: String?) {
     scope.launch {
       val (success, tracks) = if (action == null) {
         queue.queueTrack(entry, true)

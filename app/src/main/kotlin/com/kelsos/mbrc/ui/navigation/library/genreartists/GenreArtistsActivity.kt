@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.artists.Artist
+import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
@@ -77,18 +77,18 @@ class GenreArtistsActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, artist: Artist) {
+  override fun onMenuItemSelected(menuItem: MenuItem, artist: ArtistEntity) {
     val action = actionHandler.artistSelected(menuItem, artist, this)
     if (action != Queue.PROFILE) {
       presenter.queue(action, artist)
     }
   }
 
-  override fun onItemClicked(artist: Artist) {
+  override fun onItemClicked(artist: ArtistEntity) {
     actionHandler.artistSelected(artist, this)
   }
 
-  override fun update(data: List<Artist>) {
+  override fun update(data: List<ArtistEntity>) {
     adapter.update(data)
   }
 

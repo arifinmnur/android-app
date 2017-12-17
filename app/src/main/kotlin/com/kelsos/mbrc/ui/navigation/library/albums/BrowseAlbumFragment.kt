@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.dialogs.SortingDialog
@@ -49,7 +49,7 @@ class BrowseAlbumFragment : Fragment(),
   @Inject
   lateinit var presenter: BrowseAlbumPresenter
 
-  private lateinit var syncButton: Button;
+  private lateinit var syncButton: Button
 
   override fun search(term: String) {
     syncButton.isGone = term.isNotEmpty()
@@ -98,7 +98,7 @@ class BrowseAlbumFragment : Fragment(),
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     emptyViewTitle.setText(R.string.albums_list_empty)
-    syncButton = view.findViewById(R.id.list_empty_sync);
+    syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
       presenter.sync()
     }
@@ -111,18 +111,18 @@ class BrowseAlbumFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, album: Album) {
+  override fun onMenuItemSelected(menuItem: MenuItem, album: AlbumEntity) {
     val action = actionHandler.albumSelected(menuItem, album, requireActivity())
     if (action != Queue.PROFILE) {
       presenter.queue(action, album)
     }
   }
 
-  override fun onItemClicked(album: Album) {
+  override fun onItemClicked(album: AlbumEntity) {
     actionHandler.albumSelected(album, requireActivity())
   }
 
-  override fun update(cursor: List<Album>) {
+  override fun update(cursor: List<AlbumEntity>) {
     adapter.update(cursor)
   }
 

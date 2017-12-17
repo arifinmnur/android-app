@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.artists.Artist
+import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class ArtistEntryAdapter
 @Inject constructor(context: Activity) : RecyclerView.Adapter<ArtistEntryAdapter.ViewHolder>() {
 
   private val inflater: LayoutInflater = LayoutInflater.from(context)
-  private var data: List<Artist>? = null
+  private var data: List<ArtistEntity>? = null
   private var mListener: MenuItemSelectedListener? = null
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
@@ -102,7 +102,7 @@ class ArtistEntryAdapter
     val artist = data?.get(holder.adapterPosition)
 
     artist?.let {
-      holder.title.text = if (it.artist.isNullOrBlank()) {
+      holder.title.text = if (it.artist.isBlank()) {
         holder.empty
       } else {
         it.artist
@@ -118,9 +118,9 @@ class ArtistEntryAdapter
   override fun getItemCount(): Int = data?.size ?: 0
 
   interface MenuItemSelectedListener {
-    fun onMenuItemSelected(menuItem: MenuItem, artist: Artist)
+    fun onMenuItemSelected(menuItem: MenuItem, artist: ArtistEntity)
 
-    fun onItemClicked(artist: Artist)
+    fun onItemClicked(artist: ArtistEntity)
   }
 
   class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -129,7 +129,7 @@ class ArtistEntryAdapter
     val empty: String = itemView.context.getString(R.string.empty)
   }
 
-  fun update(data: List<Artist>) {
+  fun update(data: List<ArtistEntity>) {
     this.data = data
     notifyDataSetChanged()
   }

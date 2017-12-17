@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.Track
+import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter.MenuItemSelectedListener
@@ -42,7 +42,7 @@ class BrowseTrackFragment : Fragment(),
   @Inject
   lateinit var presenter: BrowseTrackPresenter
 
-  private lateinit var syncButton: Button;
+  private lateinit var syncButton: Button
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -96,15 +96,15 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(it: List<Track>) {
+  override fun update(it: List<TrackEntity>) {
     adapter.update(it)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, track: Track) {
+  override fun onMenuItemSelected(menuItem: MenuItem, track: TrackEntity) {
     presenter.queue(track, actionHandler.trackSelected(menuItem))
   }
 
-  override fun onItemClicked(track: Track) {
+  override fun onItemClicked(track: TrackEntity) {
     presenter.queue(track)
   }
 

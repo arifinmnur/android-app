@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.ui.navigation.library.albums
 
-import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -10,6 +10,7 @@ import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.AlbumSortingStore
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,8 +24,7 @@ constructor(
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queueHandler: QueueHandler,
   private val searchModel: LibrarySearchModel
-) : BasePresenter<BrowseAlbumView>(),
-  BrowseAlbumPresenter {
+) : BasePresenter<BrowseAlbumView>(), BrowseAlbumPresenter {
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -35,7 +35,12 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        view().update(getData(term))
+        val liveData = getData(term).paged()
+        liveData.observe(this@BrowseAlbumPresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.v(e)
       }
@@ -76,7 +81,13 @@ constructor(
     scope.launch {
       view().showLoading()
       try {
-        view().update(repository.getAlbumsSorted(sortingSelection, ascending))
+        val cursor = repository.getAlbumsSorted(sortingSelection, ascending)
+        val liveData = cursor.paged()
+        liveData.observe(this@BrowseAlbumPresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.e(e)
       }
@@ -96,9 +107,9 @@ constructor(
     }
   }
 
-  override fun queue(action: String, entry: Album) {
+  override fun queue(action: String, entry: AlbumEntity) {
     scope.launch {
-      val (success, tracks) = queueHandler.queueAlbum(action, entry.album!!, entry.artist!!)
+      val (success, tracks) = queueHandler.queueAlbum(action, entry.album, entry.artist)
       view().queue(success, tracks)
     }
   }

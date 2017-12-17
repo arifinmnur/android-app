@@ -7,7 +7,7 @@ import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.networking.StartServiceDiscoveryEvent
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
-import com.kelsos.mbrc.networking.connections.ConnectionSettings
+import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.preferences.DefaultSettingsChangedEvent
 import com.kelsos.mbrc.utilities.SchedulerProvider
 import kotlinx.coroutines.launch
@@ -17,27 +17,27 @@ import javax.inject.Inject
 class ConnectionManagerPresenterImpl
 @Inject
 constructor(
-    private val repository: ConnectionRepository,
-    private val schedulerProvider: SchedulerProvider,
-    private val bus: RxBus
+  private val repository: ConnectionRepository,
+  private val schedulerProvider: SchedulerProvider,
+  private val bus: RxBus
 ) : BasePresenter<ConnectionManagerView>(), ConnectionManagerPresenter {
 
   override fun attach(view: ConnectionManagerView) {
     super.attach(view)
     addDisposable(bus.observe(ConnectionSettingsChanged::class)
-        .subscribeOn(schedulerProvider.io())
-        .observeOn(schedulerProvider.main())
-        .subscribe { view().onConnectionSettingsChange(it) })
+      .subscribeOn(schedulerProvider.io())
+      .observeOn(schedulerProvider.main())
+      .subscribe { view().onConnectionSettingsChange(it) })
 
     addDisposable(bus.observe(DiscoveryStopped::class)
-        .subscribeOn(schedulerProvider.io())
-        .observeOn(schedulerProvider.main())
-        .subscribe { view().onDiscoveryStopped(it) })
+      .subscribeOn(schedulerProvider.io())
+      .observeOn(schedulerProvider.main())
+      .subscribe { view().onDiscoveryStopped(it) })
 
     addDisposable(bus.observe(NotifyUser::class)
-        .subscribeOn(schedulerProvider.io())
-        .observeOn(schedulerProvider.main())
-        .subscribe { view().onUserNotification(it) })
+      .subscribeOn(schedulerProvider.io())
+      .observeOn(schedulerProvider.main())
+      .subscribe { view().onUserNotification(it) })
   }
 
   override fun startDiscovery() {
@@ -56,7 +56,7 @@ constructor(
     }
   }
 
-  override fun setDefault(settings: ConnectionSettings) {
+  override fun setDefault(settings: ConnectionSettingsEntity) {
     checkIfAttached()
     scope.launch {
       repository.setDefault(settings)
@@ -65,15 +65,12 @@ constructor(
     }
   }
 
-  override fun save(settings: ConnectionSettings) {
+  override fun save(settings: ConnectionSettingsEntity) {
     checkIfAttached()
+
     scope.launch {
       try {
-        if (settings.id > 0) {
-          repository.update(settings)
-        } else {
-          repository.save(settings)
-        }
+        repository.save(settings)
 
         if (settings.id == repository.defaultId) {
           bus.post(DefaultSettingsChangedEvent())
@@ -86,7 +83,7 @@ constructor(
     }
   }
 
-  override fun delete(settings: ConnectionSettings) {
+  override fun delete(settings: ConnectionSettingsEntity) {
     scope.launch {
       checkIfAttached()
       repository.delete(settings)

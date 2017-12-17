@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.genres
 
-import com.kelsos.mbrc.content.library.genres.Genre
+import androidx.paging.DataSource
+import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
 import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
@@ -8,6 +9,7 @@ import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,7 +48,13 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        view().update(getData(term))
+        val data = getData(term)
+        val liveData = data.paged()
+        liveData.observe(this@BrowseGenrePresenterImpl, {
+          if (it != null) {
+            view().update(it)
+          }
+        })
       } catch (e: Exception) {
         Timber.v(e, "Error while loading the data from the database")
       }
@@ -54,9 +62,9 @@ constructor(
     }
   }
 
-  private suspend fun getData(term: String): List<Genre> {
+  private suspend fun getData(term: String): DataSource.Factory<Int, GenreEntity> {
     return if (term.isEmpty()) {
-      repository.getAllCursor()
+      repository.getAll()
     } else {
       repository.search(term)
     }
@@ -68,9 +76,9 @@ constructor(
     }
   }
 
-  override fun queue(action: String, genre: Genre) {
+  override fun queue(action: String, genre: GenreEntity) {
     scope.launch {
-      val genreName = genre.genre ?: throw IllegalArgumentException("null genre")
+      val genreName = genre.genre
       val (success, tracks) = queue.queueGenre(action, genreName)
       view().queue(success, tracks)
     }

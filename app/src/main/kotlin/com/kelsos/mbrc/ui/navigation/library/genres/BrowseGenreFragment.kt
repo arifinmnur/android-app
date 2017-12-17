@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.genres.Genre
+import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
@@ -39,8 +39,10 @@ class BrowseGenreFragment : Fragment(),
 
   @Inject
   lateinit var adapter: GenreEntryAdapter
+
   @Inject
   lateinit var actionHandler: PopupActionHandler
+
   @Inject
   lateinit var presenter: BrowseGenrePresenter
 
@@ -82,7 +84,7 @@ class BrowseGenreFragment : Fragment(),
     presenter.detach()
   }
 
-  override fun update(cursor: List<Genre>) {
+  override fun update(cursor: List<GenreEntity>) {
     adapter.update(cursor)
   }
 
@@ -102,7 +104,7 @@ class BrowseGenreFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, genre: Genre): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem, genre: GenreEntity): Boolean {
     val action = actionHandler.genreSelected(menuItem, genre, requireActivity())
     if (action != Queue.PROFILE) {
       presenter.queue(action, genre)
@@ -110,7 +112,7 @@ class BrowseGenreFragment : Fragment(),
     return true
   }
 
-  override fun onItemClicked(genre: Genre) {
+  override fun onItemClicked(genre: GenreEntity) {
     actionHandler.genreSelected(genre, requireActivity())
   }
 

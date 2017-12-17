@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.Album
+import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
@@ -21,7 +21,7 @@ class AlbumEntryAdapter
 constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHolder>() {
 
   private val inflater: LayoutInflater = LayoutInflater.from(context)
-  private var data: List<Album> = emptyList()
+  private var data: List<AlbumEntity> = emptyList()
   private var listener: MenuItemSelectedListener? = null
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -60,9 +60,9 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
   }
 
   interface MenuItemSelectedListener {
-    fun onMenuItemSelected(menuItem: MenuItem, album: Album)
+    fun onMenuItemSelected(menuItem: MenuItem, album: AlbumEntity)
 
-    fun onItemClicked(album: Album)
+    fun onItemClicked(album: AlbumEntity)
   }
 
   class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -72,11 +72,11 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
     private val unknownArtist: String by lazy { string(R.string.unknown_artist) }
     private val emptyAlbum: String by lazy { string(R.string.non_album_tracks) }
 
-    fun bind(album: Album) {
+    fun bind(album: AlbumEntity) {
       val title = album.album
       val artist = album.artist
-      this.album.text = if (title.isNullOrBlank()) emptyAlbum else title
-      this.artist.text = if (artist.isNullOrBlank()) unknownArtist else artist
+      this.album.text = if (title.isBlank()) emptyAlbum else title
+      this.artist.text = if (artist.isBlank()) unknownArtist else artist
     }
 
     fun setIndicatorOnClickListener(listener: (view: View) -> Unit) {
@@ -84,7 +84,7 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
     }
   }
 
-  fun update(albums: List<Album>) {
+  fun update(albums: List<AlbumEntity>) {
     data = albums
     notifyDataSetChanged()
   }

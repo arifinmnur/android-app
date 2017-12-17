@@ -1,35 +1,48 @@
 package com.kelsos.mbrc.content.playlists
 
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PlaylistRepositoryImpl
 @Inject constructor(
-  private val localDataSource: LocalPlaylistDataSource,
+  private val dao: PlaylistDao,
   private val remoteDataSource: RemotePlaylistDataSource,
   private val dispatchers: AppDispatchers
 ) : PlaylistRepository {
-  override suspend fun getAllCursor(): List<Playlist> = localDataSource.loadAllCursor()
+  private val mapper = PlaylistDtoMapper()
 
-  override suspend fun getAndSaveRemote(): List<Playlist> {
+  override suspend fun getAll(): DataSource.Factory<Int, PlaylistEntity> = dao.getAll()
+
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, PlaylistEntity> {
     getRemote()
-    return localDataSource.loadAllCursor()
+    return dao.getAll()
   }
 
   override suspend fun getRemote() {
-    localDataSource.deleteAll()
+    val added = epoch()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch().collect {
-        localDataSource.saveAll(it)
+      remoteDataSource.fetch().onCompletion {
+        dao.removePreviousEntries(added)
+      }.collect { items ->
+        val playlists = items.map {
+          mapper.map(it).apply {
+            this.dateAdded = added
+          }
+        }
+        dao.insertAll(playlists)
       }
     }
   }
 
-  override suspend fun search(term: String): List<Playlist> = localDataSource.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, PlaylistEntity> =
+    dao.search(term)
 
-  override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
+  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
 
-  override suspend fun count(): Long = localDataSource.count()
+  override suspend fun count(): Long = dao.count()
 }

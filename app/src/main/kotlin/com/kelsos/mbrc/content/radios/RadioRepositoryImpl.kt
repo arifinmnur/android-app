@@ -1,37 +1,45 @@
 package com.kelsos.mbrc.content.radios
 
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RadioRepositoryImpl
-@Inject constructor(
-  private val localDataSource: LocalRadioDataSource,
+@Inject
+constructor(
+  private val dao: RadioStationDao,
   private val remoteDataSource: RemoteRadioDataSource,
   private val dispatchers: AppDispatchers
 ) : RadioRepository {
-  override suspend fun getAllCursor(): List<RadioStation> =
-    localDataSource.loadAllCursor()
+  private val mapper = RadioDtoMapper()
 
-  override suspend fun getAndSaveRemote(): List<RadioStation> {
+  override suspend fun getAll(): DataSource.Factory<Int, RadioStationEntity> =
+    dao.getAll()
+
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, RadioStationEntity> {
     getRemote()
-    return localDataSource.loadAllCursor()
+    return dao.getAll()
   }
 
   override suspend fun getRemote() {
-    localDataSource.deleteAll()
+    val added = epoch()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch().collect {
-        localDataSource.saveAll(it)
+      remoteDataSource.fetch().onCompletion {
+        dao.removePreviousEntries(added)
+      }.collect {
+        dao.insertAll(it.map { mapper.map(it).apply { dateAdded = added } })
       }
     }
   }
 
-  override suspend fun search(term: String): List<RadioStation> =
-    localDataSource.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, RadioStationEntity> =
+    dao.search(term)
 
-  override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
+  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
 
-  override suspend fun count(): Long = localDataSource.count()
+  override suspend fun count(): Long = dao.count()
 }

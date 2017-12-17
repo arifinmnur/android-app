@@ -1,5 +1,6 @@
 package com.kelsos.mbrc.content.library.albums
 
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
@@ -8,40 +9,92 @@ import javax.inject.Inject
 class AlbumRepositoryImpl
 @Inject
 constructor(
-  private val localDataSource: LocalAlbumDataSource,
+  private val dao: AlbumDao,
   private val remoteDataSource: RemoteAlbumDataSource,
   private val dispatchers: AppDispatchers
 ) : AlbumRepository {
+  private val mapper = AlbumDtoMapper()
 
-  override suspend fun getAlbumsByArtist(artist: String): List<Album> =
-    localDataSource.getAlbumsByArtist(artist)
+  override suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity> =
+    dao.getAlbumsByArtist(artist)
 
-  override suspend fun getAllCursor(): List<Album> = localDataSource.loadAllCursor()
+  override suspend fun getAll(): DataSource.Factory<Int, AlbumEntity> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): List<Album> {
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, AlbumEntity>{
     getRemote()
-    return localDataSource.loadAllCursor()
+    return dao.getAll()
   }
 
   override suspend fun getRemote() {
-    localDataSource.deleteAll()
+    dao.deleteAll()
     withContext(dispatchers.io) {
       remoteDataSource.fetch().collect {
-        localDataSource.saveAll(it)
+        dao.insert(it.map { mapper.map(it) })
       }
     }
   }
 
-  override suspend fun search(term: String): List<Album> = localDataSource.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, AlbumEntity> = dao.search(term)
 
-  override suspend fun cacheIsEmpty(): Boolean = localDataSource.isEmpty()
+  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
 
-  override suspend fun count(): Long = localDataSource.count()
+  override suspend fun count(): Long = dao.count()
 
   override suspend fun getAlbumsSorted(
     @Sorting.Fields order: Int,
     ascending: Boolean
-  ): List<Album> {
-    return localDataSource.getAlbumsSorted(order, ascending)
+  ): DataSource.Factory<Int, AlbumEntity> {
+    return when (order) {
+      Sorting.ALBUM -> {
+        if (ascending) {
+          dao.getSortedByAlbumAsc()
+        } else {
+          dao.getSortedByAlbumDesc()
+        }
+      }
+      Sorting.ALBUM_ARTIST__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByAlbumArtistAndAlbumAsc()
+        } else {
+          dao.getSortedByAlbumArtistAndAlbumDesc()
+        }
+      }
+      Sorting.ALBUM_ARTIST__YEAR__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByAlbumArtistAndYearAndAlbumAsc()
+        } else {
+          dao.getSortedByAlbumArtistAndYearAndAlbumDesc()
+        }
+      }
+      Sorting.ARTIST__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByArtistAndAlbumAsc()
+        } else {
+          dao.getSortedByArtistAndAlbumDesc()
+        }
+      }
+      Sorting.GENRE__ALBUM_ARTIST__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByGenreAndAlbumArtistAndAlbumAsc()
+        } else {
+          dao.getSortedByGenreAndAlbumArtistAndAlbumDesc()
+        }
+      }
+      Sorting.YEAR__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByYearAndAlbumAsc()
+        } else {
+          dao.getSortedByYearAndAlbumDesc()
+        }
+      }
+      Sorting.YEAR__ALBUM_ARTIST__ALBUM -> {
+        if (ascending) {
+          dao.getSortedByYearAndAlbumArtistAndAlbumAsc()
+        } else {
+          dao.getSortedByYearAndAlbumArtistAndAlbumDesc()
+        }
+      }
+      else -> throw IllegalArgumentException("Invalid option")
+    }
   }
 }

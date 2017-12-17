@@ -189,6 +189,4 @@ constructor(
       }
     }
   }
-
-  class CancelNotificationEvent
 }

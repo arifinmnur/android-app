@@ -21,7 +21,7 @@ object RemoteUtils {
   }
 
   fun bitmapFromFile(path: String): Observable<Bitmap> {
-    return Observable.create<Bitmap>({
+    return Observable.create({
       try {
         val options = BitmapFactory.Options()
         options.inPreferredConfig = Bitmap.Config.RGB_565
@@ -46,7 +46,7 @@ object RemoteUtils {
 
   fun coverBitmapSync(coverPath: String): Bitmap? {
     return try {
-      RemoteUtils.coverBitmap(coverPath).blockingLast()
+      coverBitmap(coverPath).blockingLast()
     } catch (e: Exception) {
       null
     }

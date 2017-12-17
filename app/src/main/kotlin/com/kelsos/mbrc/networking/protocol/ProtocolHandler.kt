@@ -104,8 +104,8 @@ constructor(
   fun sendProtocolPayload() {
     val payload = ProtocolPayload(clientInformationStore.getClientId())
     payload.noBroadcast = false
-    payload.protocolVersion = com.kelsos.mbrc.networking.protocol.Protocol.ProtocolVersionNumber
-    bus.post(SendProtocolMessage(SocketMessage.create(com.kelsos.mbrc.networking.protocol.Protocol.ProtocolTag, payload)))
+    payload.protocolVersion = Protocol.ProtocolVersionNumber
+    bus.post(SendProtocolMessage(SocketMessage.create(Protocol.ProtocolTag, payload)))
   }
 
   private fun clientNotAllowed() {
@@ -117,7 +117,7 @@ constructor(
   private fun handshakeComplete() {
     if (model.pluginProtocol > 2) {
       Timber.v("Sending init request")
-      bus.post(SendProtocolMessage(SocketMessage.create(com.kelsos.mbrc.networking.protocol.Protocol.INIT)))
+      bus.post(SendProtocolMessage(SocketMessage.create(Protocol.INIT)))
     } else {
 
       Timber.v("Preparing to send requests for state")

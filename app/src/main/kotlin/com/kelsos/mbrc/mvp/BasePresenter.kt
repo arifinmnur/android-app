@@ -3,19 +3,19 @@ package com.kelsos.mbrc.mvp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 
 open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
-  private var view: T? = null
-
-  private val compositeDisposable = CompositeDisposable()
+  @Suppress("LeakingThis")
   private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
-
+  override fun getLifecycle(): Lifecycle = this.lifecycleRegistry
+  private var view: T? = null
+  private val compositeDisposable = CompositeDisposable()
   private val job = SupervisorJob()
   private val coroutineContext = job + Dispatchers.Main
   protected val scope: CoroutineScope = CoroutineScope(coroutineContext)
@@ -52,8 +52,4 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
 
   protected class ViewNotAttachedException :
     RuntimeException("Please call Presenter.attach(BaseView) before calling a method on the presenter")
-
-  override fun getLifecycle(): Lifecycle {
-    return this.lifecycleRegistry
-  }
 }
