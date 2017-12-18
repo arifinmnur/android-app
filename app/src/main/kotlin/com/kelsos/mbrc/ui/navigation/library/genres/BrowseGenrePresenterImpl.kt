@@ -1,6 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.genres
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -22,8 +24,9 @@ constructor(
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queue: QueueHandler,
   private val searchModel: LibrarySearchModel
-) : BasePresenter<BrowseGenreView>(),
-  BrowseGenrePresenter {
+) : BasePresenter<BrowseGenreView>(), BrowseGenrePresenter {
+
+  private lateinit var genres: LiveData<PagedList<GenreEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -48,13 +51,7 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        val data = getData(term)
-        val liveData = data.paged()
-        liveData.observe(this@BrowseGenrePresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        onGenresLoaded(getData(term))
       } catch (e: Exception) {
         Timber.v(e, "Error while loading the data from the database")
       }
@@ -68,6 +65,15 @@ constructor(
     } else {
       repository.search(term)
     }
+  }
+
+  private fun onGenresLoaded(data: DataSource.Factory<Int, GenreEntity>) {
+    genres = data.paged()
+    genres.observe(this@BrowseGenrePresenterImpl, {
+      if (it != null) {
+        view().update(it)
+      }
+    })
   }
 
   override fun sync() {

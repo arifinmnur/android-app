@@ -1,5 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.albums
 
+import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
@@ -25,6 +27,8 @@ constructor(
   private val queueHandler: QueueHandler,
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseAlbumView>(), BrowseAlbumPresenter {
+
+  private lateinit var albums: LiveData<PagedList<AlbumEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -82,8 +86,8 @@ constructor(
       view().showLoading()
       try {
         val cursor = repository.getAlbumsSorted(sortingSelection, ascending)
-        val liveData = cursor.paged()
-        liveData.observe(this@BrowseAlbumPresenterImpl, {
+        albums = cursor.paged()
+        albums.observe(this@BrowseAlbumPresenterImpl, {
           if (it != null) {
             view().update(it)
           }

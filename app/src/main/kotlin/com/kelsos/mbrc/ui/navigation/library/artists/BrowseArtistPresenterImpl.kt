@@ -1,6 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.artists
 
+import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -25,8 +27,9 @@ constructor(
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queue: QueueHandler,
   private val searchModel: LibrarySearchModel
-) : BasePresenter<BrowseArtistView>(),
-  BrowseArtistPresenter {
+) : BasePresenter<BrowseArtistView>(), BrowseArtistPresenter {
+
+  private lateinit var artists: LiveData<PagedList<ArtistEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -52,18 +55,21 @@ constructor(
       view().showLoading()
       view().search(term)
       try {
-        val data = getData(term)
-        val liveData = data.paged()
-        liveData.observe(this@BrowseArtistPresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        onArtistsLoaded(getData(term))
       } catch (e: Exception) {
         Timber.v(e, "Error while loading the data from the database")
       }
       view().hideLoading()
     }
+  }
+
+  private fun onArtistsLoaded(factory: DataSource.Factory<Int, ArtistEntity>) {
+    artists = factory.paged()
+    artists.observe(this@BrowseArtistPresenterImpl, {
+      if (it != null) {
+        view().update(it)
+      }
+    })
   }
 
   private suspend fun getData(term: String): DataSource.Factory<Int, ArtistEntity> {

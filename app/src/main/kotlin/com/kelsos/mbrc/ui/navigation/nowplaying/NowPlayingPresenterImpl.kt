@@ -1,6 +1,10 @@
 package com.kelsos.mbrc.ui.navigation.nowplaying
 
+import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.activestatus.MainDataModel
+import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.content.nowplaying.NowPlayingRepository
 import com.kelsos.mbrc.events.TrackInfoChangeEvent
 import com.kelsos.mbrc.events.UserAction
@@ -21,17 +25,13 @@ constructor(
 ) : BasePresenter<NowPlayingView>(),
   NowPlayingPresenter {
 
+  private lateinit var nowPlayingTracks: LiveData<PagedList<NowPlayingEntity>>
+
   override fun reload(scrollToTrack: Boolean) {
     view().showLoading()
     scope.launch {
       try {
-        val data = repository.getAndSaveRemote()
-        val liveData = data.paged()
-        liveData.observe(this@NowPlayingPresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        onNowPlayingTracksLoaded(repository.getAndSaveRemote())
         view().trackChanged(model.trackInfo, scrollToTrack)
       } catch (e: Exception) {
         view().failure(e)
@@ -40,17 +40,20 @@ constructor(
     }
   }
 
+  private fun onNowPlayingTracksLoaded(it: DataSource.Factory<Int, NowPlayingEntity>) {
+    nowPlayingTracks = it.paged()
+    nowPlayingTracks.observe(this@NowPlayingPresenterImpl, {
+      if (it != null) {
+        view().update(it)
+      }
+    })
+  }
+
   override fun load() {
     view().showLoading()
     scope.launch {
       try {
-        val data = repository.getAll()
-        val liveData = data.paged()
-        liveData.observe(this@NowPlayingPresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        onNowPlayingTracksLoaded(repository.getAll())
         view().trackChanged(model.trackInfo, true)
       } catch (e: Exception) {
         view().failure(e)

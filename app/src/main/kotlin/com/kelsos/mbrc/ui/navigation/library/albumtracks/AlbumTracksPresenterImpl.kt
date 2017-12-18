@@ -1,5 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
+import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
@@ -18,6 +20,8 @@ constructor(
   private val queue: QueueHandler
 ) : BasePresenter<AlbumTracksView>(), AlbumTracksPresenter {
 
+  private lateinit var tracks: LiveData<PagedList<TrackEntity>>
+
   override fun load(album: AlbumInfo) {
     scope.launch {
       try {
@@ -30,8 +34,8 @@ constructor(
           }
         }
 
-        val liveData = data.paged()
-        liveData.observe(this@AlbumTracksPresenterImpl, {
+        tracks = data.paged()
+        tracks.observe(this@AlbumTracksPresenterImpl, {
           if (it != null) {
             view().update(it)
           }
