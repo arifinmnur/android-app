@@ -1,19 +1,21 @@
 package com.kelsos.mbrc.ui.navigation.radio
 
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioStation
+import com.kelsos.mbrc.extensions.gone
+import com.kelsos.mbrc.extensions.hide
+import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter.OnRadioPressedListener
-import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
-import com.kelsos.mbrc.ui.widgets.MultiSwipeRefreshLayout
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
@@ -25,13 +27,13 @@ class RadioActivity : BaseNavigationActivity(),
   SwipeRefreshLayout.OnRefreshListener,
   OnRadioPressedListener {
 
-  private val swipeLayout: MultiSwipeRefreshLayout by bindView(R.id.swipe_layout)
-  private val radioView: EmptyRecyclerView by bindView(R.id.radio_list)
-  private val emptyView: View by bindView(R.id.empty_view)
-  private val emptyViewTitle: TextView by bindView(R.id.list_empty_title)
-  private val emptyViewIcon: ImageView by bindView(R.id.list_empty_icon)
-  private val emptyViewSubTitle: TextView by bindView(R.id.list_empty_subtitle)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.empty_view_progress_bar)
+  private val swipeLayout: SwipeRefreshLayout by bindView(R.id.radio_stations__refresh_layout)
+  private val radioView: RecyclerView by bindView(R.id.radio_stations__stations_list)
+  private val emptyView: Group by bindView(R.id.radio_stations__empty_group)
+  private val emptyViewTitle: TextView by bindView(R.id.radio_stations__text_title)
+  private val emptyViewIcon: ImageView by bindView(R.id.radio_stations__empty_icon)
+  private val emptyViewSubTitle: TextView by bindView(R.id.radio_stations__text_subtitle)
+  private val emptyViewProgress: ProgressBar by bindView(R.id.radio_stations__loading_bar)
 
   @Inject lateinit var presenter: RadioPresenter
   @Inject lateinit var adapter: RadioAdapter
@@ -52,11 +54,9 @@ class RadioActivity : BaseNavigationActivity(),
 
     super.setup()
     swipeLayout.setOnRefreshListener(this)
-    swipeLayout.setSwipeableChildren(R.id.radio_list, R.id.empty_view)
     emptyViewTitle.setText(R.string.radio__no_radio_stations)
     emptyViewIcon.setImageResource(R.drawable.ic_radio_black_80dp)
     radioView.adapter = adapter
-    radioView.emptyView = emptyView
     radioView.layoutManager = LinearLayoutManager(this)
     presenter.attach(this)
     presenter.load()
@@ -75,6 +75,11 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun update(data: List<RadioStation>) {
+    if (data.isEmpty()) {
+      emptyView.show()
+    } else {
+      emptyView.hide()
+    }
     adapter.update(data)
   }
 
@@ -99,17 +104,11 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun showLoading() {
-    emptyViewProgress.visibility = View.VISIBLE
-    emptyViewIcon.visibility = View.GONE
-    emptyViewTitle.visibility = View.GONE
-    emptyViewSubTitle.visibility = View.GONE
+
   }
 
   override fun hideLoading() {
-    emptyViewProgress.visibility = View.GONE
-    emptyViewIcon.visibility = View.VISIBLE
-    emptyViewTitle.visibility = View.VISIBLE
-    emptyViewSubTitle.visibility = View.VISIBLE
+    emptyViewProgress.gone()
     swipeLayout.isRefreshing = false
   }
 
