@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
@@ -19,7 +21,6 @@ import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter.MenuItemSelectedListener
-import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
@@ -29,13 +30,13 @@ class BrowseArtistFragment : Fragment(),
   BrowseArtistView,
   MenuItemSelectedListener {
 
-  private val recycler: EmptyRecyclerView by bindView(R.id.library_data_list)
+  private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
-  private val emptyView: View by bindView(R.id.empty_view)
-  private val emptyViewTitle: TextView by bindView(R.id.list_empty_title)
-  private val emptyViewIcon: ImageView by bindView(R.id.list_empty_icon)
-  private val emptyViewSubTitle: TextView by bindView(R.id.list_empty_subtitle)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.empty_view_progress_bar)
+  private val emptyView: Group by bindView(R.id.library_browser__empty_group)
+  private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
+  private val emptyViewIcon: ImageView by bindView(R.id.library_browser__empty_icon)
+  private val emptyViewSubTitle: TextView by bindView(R.id.library_browser__text_subtitle)
+  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   @Inject
   lateinit var adapter: ArtistEntryAdapter
@@ -90,6 +91,7 @@ class BrowseArtistFragment : Fragment(),
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
     emptyViewTitle.setText(R.string.artists_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
@@ -97,7 +99,6 @@ class BrowseArtistFragment : Fragment(),
     }
     recycler.setHasFixedSize(true)
     recycler.adapter = adapter
-    recycler.emptyView = emptyView
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     adapter.setMenuItemSelectedListener(this)
     presenter.attach(this)

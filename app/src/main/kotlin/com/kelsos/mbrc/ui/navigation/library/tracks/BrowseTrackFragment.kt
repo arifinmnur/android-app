@@ -9,16 +9,17 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter.MenuItemSelectedListener
-import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import kotterknife.bindView
 import toothpick.Toothpick
 import javax.inject.Inject
@@ -27,18 +28,20 @@ class BrowseTrackFragment : Fragment(),
   BrowseTrackView,
   MenuItemSelectedListener {
 
-  private val recycler: EmptyRecyclerView by bindView(R.id.library_data_list)
+  private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
-  private val emptyView: View by bindView(R.id.empty_view)
-  private val emptyViewTitle: TextView by bindView(R.id.list_empty_title)
-  private val emptyViewIcon: ImageView by bindView(R.id.list_empty_icon)
-  private val emptyViewSubTitle: TextView by bindView(R.id.list_empty_subtitle)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.empty_view_progress_bar)
+  private val emptyView: Group by bindView(R.id.library_browser__empty_group)
+  private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
+  private val emptyViewIcon: ImageView by bindView(R.id.library_browser__empty_icon)
+  private val emptyViewSubTitle: TextView by bindView(R.id.library_browser__text_subtitle)
+  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   @Inject
   lateinit var adapter: TrackEntryAdapter
+
   @Inject
   lateinit var actionHandler: PopupActionHandler
+
   @Inject
   lateinit var presenter: BrowseTrackPresenter
 
@@ -82,13 +85,13 @@ class BrowseTrackFragment : Fragment(),
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
     emptyViewTitle.setText(R.string.tracks_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
       presenter.sync()
     }
     recycler.adapter = adapter
-    recycler.emptyView = emptyView
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
@@ -121,5 +124,4 @@ class BrowseTrackFragment : Fragment(),
     emptyViewTitle.visibility = View.VISIBLE
     emptyViewSubTitle.visibility = View.VISIBLE
   }
-
 }

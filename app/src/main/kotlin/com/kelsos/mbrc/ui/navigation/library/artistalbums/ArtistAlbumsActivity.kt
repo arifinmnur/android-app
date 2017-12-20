@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
@@ -11,7 +12,6 @@ import com.kelsos.mbrc.content.nowplaying.queue.Queue
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
-import com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
@@ -22,7 +22,7 @@ class ArtistAlbumsActivity : BaseActivity(),
   ArtistAlbumsView,
   AlbumEntryAdapter.MenuItemSelectedListener {
 
-  private val recyclerView: EmptyRecyclerView by bindView(R.id.album_recycler)
+  private val recyclerView: RecyclerView by bindView(R.id.album_recycler)
   private val emptyView: ConstraintLayout by bindView(R.id.empty_view)
 
   @Inject
@@ -61,7 +61,6 @@ class ArtistAlbumsActivity : BaseActivity(),
     adapter.setMenuItemSelectedListener(this)
     recyclerView.layoutManager = LinearLayoutManager(this)
     recyclerView.adapter = adapter
-    recyclerView.emptyView = emptyView
     presenter.attach(this)
     presenter.load(artist!!)
   }

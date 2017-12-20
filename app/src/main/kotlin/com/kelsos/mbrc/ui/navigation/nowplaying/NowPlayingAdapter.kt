@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
@@ -60,7 +59,6 @@ class NowPlayingAdapter
     val inflatedView = inflater.inflate(R.layout.ui_list_track_item, parent, false)
     val holder = TrackHolder(inflatedView)
     holder.itemView.setOnClickListener { onClick(holder) }
-    holder.container.setOnClickListener { onClick(holder) }
     holder.dragHandle.setOnTouchListener { view, motionEvent ->
       view.performClick()
       if (motionEvent.action == ACTION_DOWN) {
@@ -158,7 +156,6 @@ class NowPlayingAdapter
     val title: TextView by bindView(R.id.track_title)
     val artist: TextView by bindView(R.id.track_artist)
     val trackPlaying: ImageView by bindView(R.id.track_indicator_view)
-    val container: ConstraintLayout by bindView(R.id.track_container)
     val dragHandle: View by bindView(R.id.drag_handle)
 
     override fun onItemSelected() {

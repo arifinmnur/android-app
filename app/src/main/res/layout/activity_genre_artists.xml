@@ -6,23 +6,6 @@
   android:layout_height="match_parent"
   android:fitsSystemWindows="true">
 
-  <RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    <com.kelsos.mbrc.ui.widgets.EmptyRecyclerView
-      android:id="@+id/genre_artists_recycler"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_marginTop="@dimen/small_margin"
-      android:layout_marginBottom="@dimen/small_margin"
-      tools:listitem="@layout/listitem_single" />
-
-    <include layout="@layout/empty_list" />
-
-  </RelativeLayout>
-
   <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/app_bar_layout"
     android:layout_width="match_parent"
@@ -36,6 +19,46 @@
 
   </com.google.android.material.appbar.AppBarLayout>
 
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/genre_artists_recycler"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginBottom="@dimen/small_margin"
+      android:layout_marginTop="@dimen/small_margin"
+      tools:listitem="@layout/listitem_single" />
+
+    <LinearLayout
+      android:id="@+id/empty_view"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:orientation="horizontal"
+      android:visibility="gone"
+      tools:showIn="@layout/activity_album_tracks">
+
+      <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/small_margin"
+        app:tint="@color/white"
+        app:srcCompat="@drawable/ic_error_outline_black_24dp"
+        tools:ignore="RtlSymmetry" />
+
+      <TextView
+        android:id="@+id/empty_view_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/no_results_found"
+        android:textColor="@color/primary_text"
+        tools:ignore="UnusedAttribute" />
+    </LinearLayout>
+  </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

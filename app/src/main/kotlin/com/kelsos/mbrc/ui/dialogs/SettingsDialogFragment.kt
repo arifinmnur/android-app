@@ -60,9 +60,9 @@ class SettingsDialogFragment : DialogFragment() {
       .show()
 
 
-    hostEdit = dialog.findViewById(R.id.settings_dialog_host) ?: error("not found")
-    nameEdit = dialog.findViewById(R.id.settings_dialog_name) ?: error("not found")
-    portEdit = dialog.findViewById(R.id.settings_dialog_port) ?: error("not found")
+    hostEdit = dialog.findViewById(R.id.settings_dialog__hostname_edit) ?: error("not found")
+    nameEdit = dialog.findViewById(R.id.settings_dialog__name_edit) ?: error("not found")
+    portEdit = dialog.findViewById(R.id.settings_dialog__port_edit) ?: error("not found")
     return dialog
   }
 
