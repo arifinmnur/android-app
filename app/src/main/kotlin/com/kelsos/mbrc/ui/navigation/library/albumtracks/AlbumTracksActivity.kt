@@ -2,7 +2,7 @@ package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +24,8 @@ class AlbumTracksActivity : BaseActivity(),
   AlbumTracksView,
   TrackEntryAdapter.MenuItemSelectedListener {
 
-  private val listTracks: RecyclerView by bindView(R.id.list_tracks)
-  private val emptyView: LinearLayout by bindView(R.id.empty_view)
+  private val listTracks: RecyclerView by bindView(R.id.album_tracks__track_list)
+  private val emptyView: Group by bindView(R.id.album_tracks__empty_view)
   private val playAlbum: FloatingActionButton by bindView(R.id.play_album)
 
   @Inject
@@ -42,10 +42,7 @@ class AlbumTracksActivity : BaseActivity(),
 
   public override fun onCreate(savedInstanceState: Bundle?) {
     scope = Toothpick.openScopes(application, this)
-    scope.installModules(
-      SmoothieActivityModule(this),
-      AlbumTracksModule()
-    )
+    scope.installModules(SmoothieActivityModule(this), AlbumTracksModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setContentView(R.layout.activity_album_tracks)

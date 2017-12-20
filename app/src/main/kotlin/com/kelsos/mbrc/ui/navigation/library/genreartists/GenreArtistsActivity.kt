@@ -2,7 +2,7 @@ package com.kelsos.mbrc.ui.navigation.library.genreartists
 
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -23,8 +23,8 @@ class GenreArtistsActivity : BaseActivity(),
   GenreArtistsView,
   MenuItemSelectedListener {
 
-  private val recyclerView: RecyclerView by bindView(R.id.genre_artists_recycler)
-  private val emptyView: ConstraintLayout by bindView(R.id.empty_view)
+  private val recyclerView: RecyclerView by bindView(R.id.genre_artists__artist_list)
+  private val emptyView: Group by bindView(R.id.genre_artists__empty_view)
 
   @Inject
   lateinit var adapter: ArtistEntryAdapter
@@ -39,14 +39,11 @@ class GenreArtistsActivity : BaseActivity(),
   private lateinit var scope: Scope
 
   public override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_genre_artists)
     scope = Toothpick.openScopes(application, this)
-    scope.installModules(
-      SmoothieActivityModule(this),
-      GenreArtistsModule()
-    )
+    scope.installModules(SmoothieActivityModule(this), GenreArtistsModule())
+    super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
+    setContentView(R.layout.activity_genre_artists)
 
     genre = intent?.extras?.getString(GENRE_NAME)
 
