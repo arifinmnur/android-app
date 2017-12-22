@@ -4,7 +4,7 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
@@ -61,6 +61,6 @@ class RadioAdapter
 
   class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val name: TextView by bindView(R.id.line_one)
-    val context: LinearLayout by bindView(R.id.ui_item_context_indicator)
+    val context: ImageView by bindView(R.id.ui_item_context_indicator)
   }
 }

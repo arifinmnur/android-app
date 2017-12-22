@@ -61,7 +61,7 @@ constructor(
     scope.launch {
       repository.setDefault(settings)
       bus.post(DefaultSettingsChangedEvent())
-      view().dataUpdated()
+      load()
     }
   }
 
@@ -76,7 +76,7 @@ constructor(
           bus.post(DefaultSettingsChangedEvent())
         }
 
-        view().dataUpdated()
+        load()
       } catch (e: Exception) {
         Timber.v(e)
       }
@@ -91,7 +91,7 @@ constructor(
         bus.post(DefaultSettingsChangedEvent())
       }
 
-      view().dataUpdated()
+      load()
     }
   }
 }
