@@ -32,7 +32,7 @@ class ConnectionManagerActivity : BaseActivity(),
 
   private val recyclerView: RecyclerView by bindView(R.id.connection_manager__connections)
 
-  private var adapter: ConnectionAdapter? = null
+  private lateinit var adapter: ConnectionAdapter
   private lateinit var scope: Scope
 
   private val addButton: Button by bindView(R.id.connection_manager__add)
@@ -63,7 +63,7 @@ class ConnectionManagerActivity : BaseActivity(),
     val mLayoutManager = LinearLayoutManager(this)
     recyclerView.layoutManager = mLayoutManager
     adapter = ConnectionAdapter()
-    adapter!!.setChangeListener(this)
+    adapter.setChangeListener(this)
     recyclerView.adapter = adapter
     presenter.attach(this)
     presenter.load()
@@ -88,7 +88,7 @@ class ConnectionManagerActivity : BaseActivity(),
   }
 
   override fun onConnectionSettingsChange(event: ConnectionSettingsChanged) {
-    adapter!!.setSelectionId(event.defaultId)
+    adapter.setSelectionId(event.defaultId)
   }
 
   override fun onDiscoveryStopped(event: DiscoveryStopped) {
@@ -125,7 +125,11 @@ class ConnectionManagerActivity : BaseActivity(),
     presenter.setDefault(settings)
   }
 
-  override fun updateModel(connectionModel: ConnectionModel) {
-    adapter!!.update(connectionModel)
+  override fun updateData(data: List<ConnectionSettingsEntity>) {
+    adapter.updateData(data)
+  }
+
+  override fun updateDefault(defaultId: Long) {
+    adapter.setSelectionId(defaultId)
   }
 }
