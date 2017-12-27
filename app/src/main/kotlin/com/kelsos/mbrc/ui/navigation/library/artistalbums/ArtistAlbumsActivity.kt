@@ -2,7 +2,9 @@ package com.kelsos.mbrc.ui.navigation.library.artistalbums
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -73,8 +75,8 @@ class ArtistAlbumsActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, album: AlbumEntity) {
-    val action = actionHandler.albumSelected(menuItem, album, this)
+  override fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity) {
+    val action = actionHandler.albumSelected(itemId, album, this)
     if (action != Queue.PROFILE) {
       presenter.queue(action, album)
     }
@@ -84,8 +86,8 @@ class ArtistAlbumsActivity : BaseActivity(),
     actionHandler.albumSelected(album, this)
   }
 
-  override fun update(albums: List<AlbumEntity>) {
-    adapter.update(albums)
+  override fun update(albums: PagedList<AlbumEntity>) {
+    adapter.submitList(albums)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

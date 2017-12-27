@@ -2,7 +2,9 @@ package com.kelsos.mbrc.ui.navigation.library.genreartists
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -73,8 +75,8 @@ class GenreArtistsActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, artist: ArtistEntity) {
-    val action = actionHandler.artistSelected(menuItem, artist, this)
+  override fun onMenuItemSelected(@IdRes itemId: Int, artist: ArtistEntity) {
+    val action = actionHandler.artistSelected(itemId, artist, this)
     if (action != Queue.PROFILE) {
       presenter.queue(action, artist)
     }
@@ -84,8 +86,8 @@ class GenreArtistsActivity : BaseActivity(),
     actionHandler.artistSelected(artist, this)
   }
 
-  override fun update(data: List<ArtistEntity>) {
-    adapter.update(data)
+  override fun update(data: PagedList<ArtistEntity>) {
+    adapter.submitList(data)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

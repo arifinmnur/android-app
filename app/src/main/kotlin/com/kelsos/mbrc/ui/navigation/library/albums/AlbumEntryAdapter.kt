@@ -1,13 +1,14 @@
 package com.kelsos.mbrc.ui.navigation.library.albums
 
-import android.app.Activity
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.appcompat.widget.PopupMenu
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
@@ -18,22 +19,19 @@ import javax.inject.Inject
 
 class AlbumEntryAdapter
 @Inject
-constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHolder>() {
+constructor() : PagedListAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
 
-  private val inflater: LayoutInflater = LayoutInflater.from(context)
-  private var data: List<AlbumEntity> = emptyList()
   private var listener: MenuItemSelectedListener? = null
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
-    val holder = ViewHolder(view)
+    val holder = ViewHolder.create(parent)
     holder.setIndicatorOnClickListener {
       val popupMenu = PopupMenu(it.context, it)
       popupMenu.inflate(R.menu.popup_album)
       popupMenu.setOnMenuItemClickListener {
         val position = holder.adapterPosition
-        ifNotNull(listener, data[position]) { listener, album ->
-          listener.onMenuItemSelected(it, album)
+        ifNotNull(listener, getItem(position)) { listener, album ->
+          listener.onMenuItemSelected(it.itemId, album)
         }
         true
       }
@@ -42,25 +40,42 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
 
     holder.itemView.setOnClickListener {
       val position = holder.adapterPosition
-      val album = data[position]
-      listener?.onItemClicked(album)
+      getItem(position)?.run {
+        listener?.onItemClicked(this)
+      }
+
     }
     return holder
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    val album = data[holder.adapterPosition]
-    holder.bind(album)
-  }
+    val albumEntity = getItem(position)
 
-  override fun getItemCount(): Int = data.size
+    if (albumEntity != null) {
+      holder.bind(albumEntity)
+    } else {
+      holder.clear()
+    }
+  }
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
     this.listener = listener
   }
 
+  companion object {
+    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<AlbumEntity>() {
+      override fun areItemsTheSame(oldItem: AlbumEntity, newItem: AlbumEntity): Boolean {
+        return oldItem.id == newItem.id
+      }
+
+      override fun areContentsTheSame(oldItem: AlbumEntity, newItem: AlbumEntity): Boolean {
+        return oldItem == newItem
+      }
+    }
+  }
+
   interface MenuItemSelectedListener {
-    fun onMenuItemSelected(menuItem: MenuItem, album: AlbumEntity)
+    fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity)
 
     fun onItemClicked(album: AlbumEntity)
   }
@@ -82,10 +97,17 @@ constructor(context: Activity) : RecyclerView.Adapter<AlbumEntryAdapter.ViewHold
     fun setIndicatorOnClickListener(listener: (view: View) -> Unit) {
       indicator.setOnClickListener { listener(it) }
     }
-  }
 
-  fun update(albums: List<AlbumEntity>) {
-    data = albums
-    notifyDataSetChanged()
+    companion object {
+      fun create(parent: ViewGroup): ViewHolder {
+        val inflater: LayoutInflater = LayoutInflater.from(parent.context)
+        val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
+        return ViewHolder(view)
+      }
+    }
+
+    fun clear() {
+
+    }
   }
 }

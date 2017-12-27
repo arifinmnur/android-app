@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -105,8 +107,8 @@ class BrowseArtistFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, artist: ArtistEntity) {
-    val action = actionHandler.artistSelected(menuItem, artist, requireActivity())
+  override fun onMenuItemSelected(@IdRes itemId: Int, artist: ArtistEntity) {
+    val action = actionHandler.artistSelected(itemId, artist, requireActivity())
     if (action != Queue.PROFILE) {
       presenter.queue(action, artist)
     }
@@ -116,8 +118,8 @@ class BrowseArtistFragment : Fragment(),
     actionHandler.artistSelected(artist, requireActivity())
   }
 
-  override fun update(data: List<ArtistEntity>) {
-    adapter.update(data)
+  override fun update(data: PagedList<ArtistEntity>) {
+    adapter.submitList(data)
   }
 
   override fun showLoading() {

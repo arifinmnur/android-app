@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -99,12 +101,12 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(it: List<TrackEntity>) {
-    adapter.update(it)
+  override fun update(it: PagedList<TrackEntity>) {
+    adapter.submitList(it)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, track: TrackEntity) {
-    presenter.queue(track, actionHandler.trackSelected(menuItem))
+  override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {
+    presenter.queue(track, actionHandler.trackSelected(itemId))
   }
 
   override fun onItemClicked(track: TrackEntity) {

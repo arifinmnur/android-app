@@ -2,7 +2,7 @@ package com.kelsos.mbrc.ui.navigation.library
 
 import android.content.Context
 import android.content.Intent
-import android.view.MenuItem
+import androidx.annotation.IdRes
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumMapper
@@ -21,13 +21,13 @@ class PopupActionHandler
 constructor() {
 
   @Queue.Action
-  fun albumSelected(menuItem: MenuItem, entry: AlbumEntity, context: Context): String {
-    if (menuItem.itemId == R.id.popup_album_tracks) {
+  fun albumSelected(@IdRes itemId: Int, entry: AlbumEntity, context: Context): String {
+    if (itemId == R.id.popup_album_tracks) {
       openProfile(entry, context)
       return Queue.PROFILE
     }
 
-    return when (menuItem.itemId) {
+    return when (itemId) {
       R.id.popup_album_queue_next -> Queue.NEXT
       R.id.popup_album_queue_last -> Queue.LAST
       R.id.popup_album_play -> Queue.NOW
@@ -36,13 +36,13 @@ constructor() {
   }
 
   @Queue.Action
-  fun artistSelected(menuItem: MenuItem, entry: ArtistEntity, context: Context): String {
-    if (menuItem.itemId == R.id.popup_artist_album) {
+  fun artistSelected(@IdRes itemId: Int, entry: ArtistEntity, context: Context): String {
+    if (itemId == R.id.popup_artist_album) {
       openProfile(entry, context)
       return Queue.PROFILE
     }
 
-    return when (menuItem.itemId) {
+    return when (itemId) {
       R.id.popup_artist_queue_next -> Queue.NEXT
       R.id.popup_artist_queue_last -> Queue.LAST
       R.id.popup_artist_play -> Queue.NOW
@@ -51,13 +51,13 @@ constructor() {
   }
 
   @Queue.Action
-  fun genreSelected(menuItem: MenuItem, entry: GenreEntity, context: Context): String {
-    if (R.id.popup_genre_artists == menuItem.itemId) {
+  fun genreSelected(@IdRes itemId: Int, entry: GenreEntity, context: Context): String {
+    if (R.id.popup_genre_artists == itemId) {
       openProfile(entry, context)
       return Queue.PROFILE
     }
 
-    return when (menuItem.itemId) {
+    return when (itemId) {
       R.id.popup_genre_queue_next -> Queue.NEXT
       R.id.popup_genre_queue_last -> Queue.LAST
       R.id.popup_genre_play -> Queue.NOW
@@ -66,8 +66,8 @@ constructor() {
   }
 
   @Queue.Action
-  fun trackSelected(menuItem: MenuItem): String =
-    when (menuItem.itemId) {
+  fun trackSelected(@IdRes itemId: Int): String =
+    when (itemId) {
       R.id.popup_track_queue_next -> Queue.NEXT
       R.id.popup_track_queue_last -> Queue.LAST
       R.id.popup_track_play -> Queue.NOW

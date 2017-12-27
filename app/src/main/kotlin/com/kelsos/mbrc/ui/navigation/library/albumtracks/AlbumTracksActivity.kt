@@ -2,8 +2,10 @@ package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -92,16 +94,16 @@ class AlbumTracksActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, track: TrackEntity) {
-    presenter.queue(track, actionHandler.trackSelected(menuItem))
+  override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {
+    presenter.queue(track, actionHandler.trackSelected(itemId))
   }
 
   override fun onItemClicked(track: TrackEntity) {
     presenter.queue(track)
   }
 
-  override fun update(cursor: List<TrackEntity>) {
-    adapter.update(cursor)
+  override fun update(cursor: PagedList<TrackEntity>) {
+    adapter.submitList(cursor)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

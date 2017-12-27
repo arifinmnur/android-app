@@ -2,16 +2,17 @@ package com.kelsos.mbrc.ui.navigation.library.genres
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -85,8 +86,8 @@ class BrowseGenreFragment : Fragment(),
     presenter.detach()
   }
 
-  override fun update(cursor: List<GenreEntity>) {
-    adapter.update(cursor)
+  override fun update(cursor: PagedList<GenreEntity>) {
+    adapter.submitList(cursor)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -105,8 +106,8 @@ class BrowseGenreFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(menuItem: MenuItem, genre: GenreEntity): Boolean {
-    val action = actionHandler.genreSelected(menuItem, genre, requireActivity())
+  override fun onMenuItemSelected(@IdRes itemId: Int, genre: GenreEntity): Boolean {
+    val action = actionHandler.genreSelected(itemId, genre, requireActivity())
     if (action != Queue.PROFILE) {
       presenter.queue(action, genre)
     }
