@@ -61,6 +61,10 @@ constructor(
   }
 
   private fun onTrackLoad(it: DataSource.Factory<Int, TrackEntity>) {
+    if (::tracks.isInitialized) {
+      tracks.removeObservers(this)
+    }
+
     tracks = it.paged()
     tracks.observe(this@BrowseTrackPresenterImpl, {
       if (it != null) {

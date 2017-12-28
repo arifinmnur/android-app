@@ -20,6 +20,9 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   private val coroutineContext = job + Dispatchers.Main
   protected val scope: CoroutineScope = CoroutineScope(coroutineContext)
 
+  protected val disposables: CompositeDisposable
+    get() = compositeDisposable
+
   override val isAttached: Boolean
     get() = view != null
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.utilities.paged
@@ -38,7 +38,7 @@ constructor(
     }
   }
 
-  override fun queue(@Queue.Action action: String, entry: ArtistEntity) {
+  override fun queue(@LibraryPopup.Action action: String, entry: ArtistEntity) {
     scope.launch {
       val artist = entry.artist
       val (success, tracks) = queue.queueArtist(action, artist)

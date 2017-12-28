@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
@@ -77,7 +77,7 @@ class ArtistAlbumsActivity : BaseActivity(),
 
   override fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity) {
     val action = actionHandler.albumSelected(itemId, album, this)
-    if (action != Queue.PROFILE) {
+    if (action != LibraryPopup.PROFILE) {
       presenter.queue(action, album)
     }
   }

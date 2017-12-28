@@ -2,7 +2,6 @@ package com.kelsos.mbrc.ui.navigation.library.tracks
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -101,8 +100,8 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(it: PagedList<TrackEntity>) {
-    adapter.submitList(it)
+  override fun update(pagedList: PagedList<TrackEntity>) {
+    adapter.submitList(pagedList)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {

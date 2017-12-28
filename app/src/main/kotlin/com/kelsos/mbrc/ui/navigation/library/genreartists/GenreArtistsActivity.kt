@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
@@ -77,7 +77,7 @@ class GenreArtistsActivity : BaseActivity(),
 
   override fun onMenuItemSelected(@IdRes itemId: Int, artist: ArtistEntity) {
     val action = actionHandler.artistSelected(itemId, artist, this)
-    if (action != Queue.PROFILE) {
+    if (action != LibraryPopup.PROFILE) {
       presenter.queue(action, artist)
     }
   }
@@ -86,8 +86,8 @@ class GenreArtistsActivity : BaseActivity(),
     actionHandler.artistSelected(artist, this)
   }
 
-  override fun update(data: PagedList<ArtistEntity>) {
-    adapter.submitList(data)
+  override fun update(pagedList: PagedList<ArtistEntity>) {
+    adapter.submitList(pagedList)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

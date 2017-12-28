@@ -102,8 +102,8 @@ class AlbumTracksActivity : BaseActivity(),
     presenter.queue(track)
   }
 
-  override fun update(cursor: PagedList<TrackEntity>) {
-    adapter.submitList(cursor)
+  override fun update(pagedList: PagedList<TrackEntity>) {
+    adapter.submitList(pagedList)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

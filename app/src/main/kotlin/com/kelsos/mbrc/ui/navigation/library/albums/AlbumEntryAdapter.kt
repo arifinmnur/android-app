@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.appcompat.widget.PopupMenu
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.extensions.string
-import com.kelsos.mbrc.utilities.Checks.ifNotNull
+import com.kelsos.mbrc.ui.navigation.library.popup
+import com.kelsos.mbrc.utilities.Checks
 import kotterknife.bindView
 import javax.inject.Inject
 
@@ -23,29 +23,21 @@ constructor() : PagedListAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>(DIFF
 
   private var listener: MenuItemSelectedListener? = null
 
+  private val indicatorPressed: (View, Int) -> Unit = { view, position ->
+    view.popup(R.menu.popup_album) {
+      Checks.ifNotNull(listener, getItem(position)) { listener, album ->
+        listener.onMenuItemSelected(it, album)
+      }
+    }
+  }
+  private val pressed: (View, Int) -> Unit = { _, position ->
+    getItem(position)?.run {
+      listener?.onItemClicked(this)
+    }
+  }
+
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    val holder = ViewHolder.create(parent)
-    holder.setIndicatorOnClickListener {
-      val popupMenu = PopupMenu(it.context, it)
-      popupMenu.inflate(R.menu.popup_album)
-      popupMenu.setOnMenuItemClickListener {
-        val position = holder.adapterPosition
-        ifNotNull(listener, getItem(position)) { listener, album ->
-          listener.onMenuItemSelected(it.itemId, album)
-        }
-        true
-      }
-      popupMenu.show()
-    }
-
-    holder.itemView.setOnClickListener {
-      val position = holder.adapterPosition
-      getItem(position)?.run {
-        listener?.onItemClicked(this)
-      }
-
-    }
-    return holder
+    return ViewHolder.create(parent, indicatorPressed, pressed)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -80,12 +72,21 @@ constructor() : PagedListAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>(DIFF
     fun onItemClicked(album: AlbumEntity)
   }
 
-  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+  class ViewHolder(
+      itemView: View,
+      indicatorPressed: (View, Int) -> Unit,
+      pressed: (View, Int) -> Unit
+  ) : RecyclerView.ViewHolder(itemView) {
     private val artist: TextView by bindView(R.id.line_two)
     private val album: TextView by bindView(R.id.line_one)
     private val indicator: ImageView by bindView(R.id.overflow_menu)
     private val unknownArtist: String by lazy { string(R.string.unknown_artist) }
     private val emptyAlbum: String by lazy { string(R.string.non_album_tracks) }
+
+    init {
+      indicator.setOnClickListener { indicatorPressed(it, adapterPosition) }
+      itemView.setOnClickListener { pressed(it, adapterPosition) }
+    }
 
     fun bind(album: AlbumEntity) {
       val title = album.album
@@ -94,20 +95,21 @@ constructor() : PagedListAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>(DIFF
       this.artist.text = if (artist.isBlank()) unknownArtist else artist
     }
 
-    fun setIndicatorOnClickListener(listener: (view: View) -> Unit) {
-      indicator.setOnClickListener { listener(it) }
-    }
-
     companion object {
-      fun create(parent: ViewGroup): ViewHolder {
+      fun create(
+          parent: ViewGroup,
+          indicatorPressed: (View, Int) -> Unit,
+          pressed: (View, Int) -> Unit
+      ): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, indicatorPressed, pressed)
       }
     }
 
     fun clear() {
-
+      artist.text = ""
+      album.text = ""
     }
   }
 }

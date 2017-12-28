@@ -18,29 +18,26 @@ import javax.inject.Inject
 class ArtistEntryAdapter
 @Inject constructor() : PagedListAdapter<ArtistEntity, ArtistEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
   private var listener: MenuItemSelectedListener? = null
+  private val indicatorPressed: (View, Int) -> Unit = { view, position ->
+    view.popup(R.menu.popup_artist) {
+      ifNotNull(listener, getItem(position)) { listener, artist ->
+        listener.onMenuItemSelected(it, artist)
+      }
+    }
+  }
+
+  private val pressed: (View, Int) -> Unit = { _, position ->
+    ifNotNull(listener, getItem(position)) { listener, artist ->
+      listener.onItemClicked(artist)
+    }
+  }
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
     this.listener = listener
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
-    val holder = ViewHolder.create(parent)
-    holder.onIndicatorClick { view, position ->
-      view.popup(R.menu.popup_artist) {
-        ifNotNull(listener, getItem(position)) { listener, artist ->
-          listener.onMenuItemSelected(it, artist)
-        }
-      }
-    }
-
-    holder.onPress { position ->
-      ifNotNull(listener, getItem(position)) { listener, artist ->
-        listener.onItemClicked(artist)
-      }
-
-    }
-    return holder
+    return ViewHolder.create(parent, indicatorPressed, pressed)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -71,16 +68,29 @@ class ArtistEntryAdapter
     fun onItemClicked(artist: ArtistEntity)
   }
 
-  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+  class ViewHolder(
+      itemView: View,
+      indicatorPressed: (View, Int) -> Unit,
+      pressed: (View, Int) -> Unit
+  ) : RecyclerView.ViewHolder(itemView) {
     private val title: TextView by bindView(R.id.line_one)
     private val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
     private val empty: String = itemView.context.getString(R.string.empty)
 
+    init {
+      indicator.setOnClickListener { indicatorPressed(it, adapterPosition) }
+      itemView.setOnClickListener { pressed(it, adapterPosition) }
+    }
+
     companion object {
-      fun create(parent: ViewGroup): ViewHolder {
+      fun create(
+          parent: ViewGroup,
+          indicatorPressed: (View, Int) -> Unit,
+          pressed: (View, Int) -> Unit
+      ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.listitem_single, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, indicatorPressed, pressed)
       }
     }
 
@@ -90,14 +100,6 @@ class ArtistEntryAdapter
       } else {
         artistEntity.artist
       }
-    }
-
-    fun onIndicatorClick(onClick: (view: View, position: Int) -> Unit) {
-      indicator.setOnClickListener { onClick(it, adapterPosition) }
-    }
-
-    fun onPress(onPress: (position: Int) -> Unit) {
-      itemView.setOnClickListener { onPress(adapterPosition) }
     }
 
     fun clear() {

@@ -52,7 +52,6 @@ constructor(
 
   private fun updateUi(term: String) {
     scope.launch {
-      view().showLoading()
       view().search(term)
       try {
         onArtistsLoaded(getData(term))
@@ -64,6 +63,10 @@ constructor(
   }
 
   private fun onArtistsLoaded(factory: DataSource.Factory<Int, ArtistEntity>) {
+    if (::artists.isInitialized) {
+      artists.removeObservers(this)
+    }
+
     artists = factory.paged()
     artists.observe(this@BrowseArtistPresenterImpl, {
       if (it != null) {

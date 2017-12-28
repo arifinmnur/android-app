@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.ui.navigation.library.albums
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
@@ -34,17 +35,26 @@ constructor(
     searchModel.term.observe(this) { term -> updateUi(term) }
   }
 
+  private fun observeAlbums(it: DataSource.Factory<Int, AlbumEntity>) {
+
+    if (::albums.isInitialized) {
+      albums.removeObservers(this)
+    }
+
+    albums = it.paged()
+    albums.observe(this@BrowseAlbumPresenterImpl, {
+      if (it != null) {
+        view().update(it)
+      }
+    })
+  }
+
   private fun updateUi(term: String) {
     scope.launch {
       view().showLoading()
       view().search(term)
       try {
-        val liveData = getData(term).paged()
-        liveData.observe(this@BrowseAlbumPresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        observeAlbums(getData(term))
       } catch (e: Exception) {
         Timber.v(e)
       }
@@ -85,13 +95,7 @@ constructor(
     scope.launch {
       view().showLoading()
       try {
-        val cursor = repository.getAlbumsSorted(sortingSelection, ascending)
-        albums = cursor.paged()
-        albums.observe(this@BrowseAlbumPresenterImpl, {
-          if (it != null) {
-            view().update(it)
-          }
-        })
+        observeAlbums(repository.getAlbumsSorted(sortingSelection, ascending))
       } catch (e: Exception) {
         Timber.e(e)
       }

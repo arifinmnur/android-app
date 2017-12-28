@@ -68,6 +68,10 @@ constructor(
   }
 
   private fun onGenresLoaded(data: DataSource.Factory<Int, GenreEntity>) {
+    if (::genres.isInitialized) {
+      genres.removeObservers(this)
+    }
+
     genres = data.paged()
     genres.observe(this@BrowseGenrePresenterImpl, {
       if (it != null) {

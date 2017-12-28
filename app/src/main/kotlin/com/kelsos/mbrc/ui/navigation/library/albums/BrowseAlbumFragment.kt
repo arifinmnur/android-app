@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.dialogs.SortingDialog
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
@@ -72,8 +72,17 @@ class BrowseAlbumFragment : Fragment(),
     scope.installModules(SmoothieActivityModule(requireActivity()), BrowseAlbumModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
-    presenter.attach(this)
     setHasOptionsMenu(true)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    presenter.attach(this)
+  }
+
+  override fun onStop() {
+    super.onStop()
+    presenter.detach()
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -115,10 +124,11 @@ class BrowseAlbumFragment : Fragment(),
 
   override fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity) {
     val action = actionHandler.albumSelected(itemId, album, requireActivity())
-    if (action != Queue.PROFILE) {
+    if (action != LibraryPopup.PROFILE) {
       presenter.queue(action, album)
     }
   }
+
 
   override fun onItemClicked(album: AlbumEntity) {
     actionHandler.albumSelected(album, requireActivity())
@@ -151,11 +161,6 @@ class BrowseAlbumFragment : Fragment(),
     emptyViewIcon.visibility = View.VISIBLE
     emptyViewTitle.visibility = View.VISIBLE
     emptyViewSubTitle.visibility = View.VISIBLE
-  }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-    presenter.detach()
   }
 
   override fun onDestroy() {

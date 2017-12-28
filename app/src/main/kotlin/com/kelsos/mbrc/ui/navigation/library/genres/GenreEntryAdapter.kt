@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.appcompat.widget.PopupMenu
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.extensions.string
+import com.kelsos.mbrc.ui.navigation.library.popup
 import kotterknife.bindView
 import javax.inject.Inject
 
@@ -21,33 +21,38 @@ class GenreEntryAdapter
 constructor() : PagedListAdapter<GenreEntity, GenreEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
 
   private var listener: MenuItemSelectedListener? = null
+  private val indicatorPressed: (View, Int) -> Unit = { view, position ->
+    view.popup(R.menu.popup_genre) {
+      val genreEntity = getItem(position)
+
+      genreEntity?.run {
+        listener?.onMenuItemSelected(it, this)
+      }
+    }
+  }
+
+  private val pressed: (View, Int) -> Unit = { _, position ->
+    val genreEntity = getItem(position)
+    genreEntity?.let {
+      listener?.onItemClicked(it)
+    }
+  }
 
   fun setMenuItemSelectedListener(listener: MenuItemSelectedListener) {
     this.listener = listener
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-    return ViewHolder.create(parent)
+    return ViewHolder.create(parent, indicatorPressed, pressed)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     val genre = getItem(holder.adapterPosition)
-
-    genre?.let {
-      holder.title.text = if (it.genre.isBlank()) holder.empty else genre.genre
-      holder.indicator.setOnClickListener { createPopup(it, genre) }
-      holder.itemView.setOnClickListener { listener?.onItemClicked(genre) }
+    if (genre != null) {
+      holder.bindTo(genre)
+    } else {
+      holder.clear()
     }
-
-  }
-
-  private fun createPopup(it: View, genre: GenreEntity) {
-    val popupMenu = PopupMenu(it.context, it)
-    popupMenu.inflate(R.menu.popup_genre)
-    popupMenu.setOnMenuItemClickListener { menuItem ->
-      return@setOnMenuItemClickListener listener?.onMenuItemSelected(menuItem.itemId, genre) ?: false
-    }
-    popupMenu.show()
   }
 
   companion object {
@@ -68,17 +73,38 @@ constructor() : PagedListAdapter<GenreEntity, GenreEntryAdapter.ViewHolder>(DIFF
     fun onItemClicked(genre: GenreEntity)
   }
 
-  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val title: TextView by bindView(R.id.line_one)
-    val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
-    val empty: String by lazy { string(R.string.empty) }
+  class ViewHolder(
+      itemView: View,
+      indicatorPressed: (view: View, position: Int) -> Unit,
+      pressed: (view: View, position: Int) -> Unit
+  ) : RecyclerView.ViewHolder(itemView) {
+    private val title: TextView by bindView(R.id.line_one)
+    private val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
+    private val empty: String by lazy { string(R.string.empty) }
+
+    init {
+      indicator.setOnClickListener { indicatorPressed(it, adapterPosition) }
+      itemView.setOnClickListener { pressed(it, adapterPosition) }
+    }
 
     companion object {
-      fun create(parent: ViewGroup): ViewHolder {
+      fun create(
+          parent: ViewGroup,
+          indicatorPressed: (view: View, position: Int) -> Unit,
+          pressed: (view: View, position: Int) -> Unit
+      ): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.listitem_single, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, indicatorPressed, pressed)
       }
+    }
+
+    fun bindTo(genre: GenreEntity) {
+      title.text = if (genre.genre.isBlank()) empty else genre.genre
+    }
+
+    fun clear() {
+      title.text = ""
     }
   }
 }

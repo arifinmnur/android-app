@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
@@ -108,7 +108,7 @@ class BrowseGenreFragment : Fragment(),
 
   override fun onMenuItemSelected(@IdRes itemId: Int, genre: GenreEntity): Boolean {
     val action = actionHandler.genreSelected(itemId, genre, requireActivity())
-    if (action != Queue.PROFILE) {
+    if (action != LibraryPopup.PROFILE) {
       presenter.queue(action, genre)
     }
     return true

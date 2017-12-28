@@ -2,7 +2,9 @@ package com.kelsos.mbrc.content.library.artists
 
 import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -27,11 +29,15 @@ constructor(
   }
 
   override suspend fun getRemote() {
-    dao.deleteAll()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch().collect {
-        dao.insertAll(it.map { mapper.map(it) })
-      }
+      val added = epoch()
+      remoteDataSource.fetch()
+        .onCompletion {
+          dao.removePreviousEntries(added)
+        }
+        .collect {
+          dao.insertAll(it.map { mapper.map(it) })
+        }
     }
   }
 

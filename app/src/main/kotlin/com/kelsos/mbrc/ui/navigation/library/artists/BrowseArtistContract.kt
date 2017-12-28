@@ -6,11 +6,10 @@ import com.kelsos.mbrc.mvp.BaseView
 import com.kelsos.mbrc.mvp.Presenter
 
 interface BrowseArtistView : BaseView {
-  fun update(data: PagedList<ArtistEntity>)
+  fun update(pagedList: PagedList<ArtistEntity>)
   fun search(term: String)
   fun queue(success: Boolean, tracks: Int)
   fun hideLoading()
-  fun showLoading()
 }
 
 interface BrowseArtistPresenter : Presenter<BrowseArtistView> {

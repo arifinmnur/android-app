@@ -5,7 +5,7 @@ import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
-import com.kelsos.mbrc.content.nowplaying.queue.Queue
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.utilities.paged
@@ -59,7 +59,7 @@ constructor(
 
   override fun queueAlbum(artist: String, album: String) {
     scope.launch {
-      val (success, tracks) = queue.queueAlbum(Queue.NOW, album, artist)
+      val (success, tracks) = queue.queueAlbum(LibraryPopup.NOW, album, artist)
       view().queue(success, tracks)
     }
   }
