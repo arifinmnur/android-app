@@ -12,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.extensions.string
+import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import kotterknife.bindView
 import javax.inject.Inject
 
 class GenreEntryAdapter
 @Inject
-constructor() : PagedListAdapter<GenreEntity, GenreEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
+constructor() : BaseMediaAdapter<GenreEntity, GenreEntryAdapter.ViewHolder>() {
 
   private var listener: MenuItemSelectedListener? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->

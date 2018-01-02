@@ -1,12 +1,12 @@
 package com.kelsos.mbrc.interfaces.data
 
-import androidx.paging.DataSource
+import androidx.lifecycle.LiveData
 
 interface Repository<T : Data> {
-  suspend fun getAll(): DataSource.Factory<Int, T>
-  suspend fun getAndSaveRemote(): DataSource.Factory<Int, T>
+  suspend fun getAll(): LiveData<List<T>>
+  suspend fun getAndSaveRemote(): LiveData<List<T>>
   suspend fun getRemote()
-  suspend fun search(term: String): DataSource.Factory<Int, T>
+  suspend fun search(term: String): LiveData<List<T>>
   suspend fun cacheIsEmpty(): Boolean
   suspend fun count(): Long
 }

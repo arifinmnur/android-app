@@ -1,8 +1,6 @@
 package com.kelsos.mbrc.ui.navigation.library.artists
 
 import androidx.lifecycle.LiveData
-import androidx.paging.DataSource
-import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -13,7 +11,6 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.ui.navigation.library.ArtistTabRefreshEvent
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
-import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +26,7 @@ constructor(
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseArtistView>(), BrowseArtistPresenter {
 
-  private lateinit var artists: LiveData<PagedList<ArtistEntity>>
+  private lateinit var artists: LiveData<List<ArtistEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -62,12 +59,12 @@ constructor(
     }
   }
 
-  private fun onArtistsLoaded(factory: DataSource.Factory<Int, ArtistEntity>) {
+  private fun onArtistsLoaded(factory: LiveData<List<ArtistEntity>>) {
     if (::artists.isInitialized) {
       artists.removeObservers(this)
     }
 
-    artists = factory.paged()
+    artists = factory
     artists.observe(this@BrowseArtistPresenterImpl, {
       if (it != null) {
         view().update(it)
@@ -75,7 +72,7 @@ constructor(
     })
   }
 
-  private suspend fun getData(term: String): DataSource.Factory<Int, ArtistEntity> {
+  private suspend fun getData(term: String): LiveData<List<ArtistEntity>> {
     return if (term.isEmpty()) {
       val shouldDisplay = settingsManager.shouldDisplayOnlyAlbumArtists()
       if (shouldDisplay) {

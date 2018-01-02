@@ -15,7 +15,6 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -129,13 +128,12 @@ class BrowseAlbumFragment : Fragment(),
     }
   }
 
-
   override fun onItemClicked(album: AlbumEntity) {
     actionHandler.albumSelected(album, requireActivity())
   }
 
-  override fun update(pagedList: PagedList<AlbumEntity>) {
-    adapter.submitList(pagedList)
+  override fun update(pagedList: List<AlbumEntity>) {
+    adapter.setList(pagedList)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

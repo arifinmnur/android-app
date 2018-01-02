@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.extensions.string
+import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import com.kelsos.mbrc.utilities.Checks
 import kotterknife.bindView
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class AlbumEntryAdapter
 @Inject
-constructor() : PagedListAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
+constructor() : BaseMediaAdapter<AlbumEntity, AlbumEntryAdapter.ViewHolder>() {
 
   private var listener: MenuItemSelectedListener? = null
 

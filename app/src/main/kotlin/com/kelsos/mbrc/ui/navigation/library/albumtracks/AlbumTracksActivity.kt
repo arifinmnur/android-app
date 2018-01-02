@@ -5,7 +5,6 @@ import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -102,8 +101,8 @@ class AlbumTracksActivity : BaseActivity(),
     presenter.queue(track)
   }
 
-  override fun update(pagedList: PagedList<TrackEntity>) {
-    adapter.submitList(pagedList)
+  override fun update(pagedList: List<TrackEntity>) {
+    adapter.setList(pagedList)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

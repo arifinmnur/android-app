@@ -1,14 +1,12 @@
 package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
 import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
-import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,7 +18,7 @@ constructor(
   private val queue: QueueHandler
 ) : BasePresenter<AlbumTracksView>(), AlbumTracksPresenter {
 
-  private lateinit var tracks: LiveData<PagedList<TrackEntity>>
+  private lateinit var tracks: LiveData<List<TrackEntity>>
 
   override fun load(album: AlbumInfo) {
     scope.launch {
@@ -34,7 +32,7 @@ constructor(
           }
         }
 
-        tracks = data.paged()
+        tracks = data
         tracks.observe(this@AlbumTracksPresenterImpl, {
           if (it != null) {
             view().update(it)

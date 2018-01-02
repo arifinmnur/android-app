@@ -86,8 +86,8 @@ class GenreArtistsActivity : BaseActivity(),
     actionHandler.artistSelected(artist, this)
   }
 
-  override fun update(pagedList: PagedList<ArtistEntity>) {
-    adapter.submitList(pagedList)
+  override fun update(pagedList: List<ArtistEntity>) {
+    adapter.setList(pagedList)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

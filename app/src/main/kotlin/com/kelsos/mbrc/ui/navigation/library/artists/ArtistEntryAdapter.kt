@@ -5,18 +5,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
+import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
 import javax.inject.Inject
 
 class ArtistEntryAdapter
-@Inject constructor() : PagedListAdapter<ArtistEntity, ArtistEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
+@Inject constructor() : BaseMediaAdapter<ArtistEntity, ArtistEntryAdapter.ViewHolder>() {
   private var listener: MenuItemSelectedListener? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_artist) {
@@ -69,9 +69,9 @@ class ArtistEntryAdapter
   }
 
   class ViewHolder(
-      itemView: View,
-      indicatorPressed: (View, Int) -> Unit,
-      pressed: (View, Int) -> Unit
+    itemView: View,
+    indicatorPressed: (View, Int) -> Unit,
+    pressed: (View, Int) -> Unit
   ) : RecyclerView.ViewHolder(itemView) {
     private val title: TextView by bindView(R.id.line_one)
     private val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
@@ -84,9 +84,9 @@ class ArtistEntryAdapter
 
     companion object {
       fun create(
-          parent: ViewGroup,
-          indicatorPressed: (View, Int) -> Unit,
-          pressed: (View, Int) -> Unit
+        parent: ViewGroup,
+        indicatorPressed: (View, Int) -> Unit,
+        pressed: (View, Int) -> Unit
       ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.listitem_single, parent, false)

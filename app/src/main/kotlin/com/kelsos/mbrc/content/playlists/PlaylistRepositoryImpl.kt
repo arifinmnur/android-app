@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.playlists
 
-import androidx.paging.DataSource
+import androidx.lifecycle.LiveData
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -16,16 +16,16 @@ class PlaylistRepositoryImpl
 ) : PlaylistRepository {
   private val mapper = PlaylistDtoMapper()
 
-  override suspend fun getAll(): DataSource.Factory<Int, PlaylistEntity> = dao.getAll()
+  override suspend fun getAll(): LiveData<List<PlaylistEntity>> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, PlaylistEntity> {
+  override suspend fun getAndSaveRemote(): LiveData<List<PlaylistEntity>> {
     getRemote()
     return dao.getAll()
   }
 
   override suspend fun getRemote() {
-    val added = epoch()
     withContext(dispatchers.io) {
+      val added = epoch()
       remoteDataSource.fetch().onCompletion {
         dao.removePreviousEntries(added)
       }.collect { items ->
@@ -39,7 +39,7 @@ class PlaylistRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, PlaylistEntity> =
+  override suspend fun search(term: String): LiveData<List<PlaylistEntity>> =
     dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L

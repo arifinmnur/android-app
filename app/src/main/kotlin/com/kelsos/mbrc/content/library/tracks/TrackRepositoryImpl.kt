@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.library.tracks
 
-import androidx.paging.DataSource
+import androidx.lifecycle.LiveData
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -17,18 +17,18 @@ class TrackRepositoryImpl
 
   private val mapper = TrackDtoMapper()
 
-  override suspend fun getAll(): DataSource.Factory<Int, TrackEntity> = dao.getAll()
+  override suspend fun getAll(): LiveData<List<TrackEntity>> = dao.getAll()
 
   override suspend fun getAlbumTracks(
     album: String,
     artist: String
-  ): DataSource.Factory<Int, TrackEntity> =
+  ): LiveData<List<TrackEntity>> =
     dao.getAlbumTracks(album, artist)
 
-  override suspend fun getNonAlbumTracks(artist: String): DataSource.Factory<Int, TrackEntity> =
+  override suspend fun getNonAlbumTracks(artist: String): LiveData<List<TrackEntity>> =
     dao.getNonAlbumTracks(artist)
 
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, TrackEntity> {
+  override suspend fun getAndSaveRemote(): LiveData<List<TrackEntity>> {
     getRemote()
     return dao.getAll()
   }
@@ -45,7 +45,7 @@ class TrackRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, TrackEntity> {
+  override suspend fun search(term: String): LiveData<List<TrackEntity>> {
     return dao.search(term)
   }
 

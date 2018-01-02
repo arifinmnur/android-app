@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.library.artists
 
-import androidx.paging.DataSource
+import androidx.lifecycle.LiveData
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -18,12 +18,12 @@ constructor(
 
   private val mapper = ArtistDtoMapper()
 
-  override suspend fun getArtistByGenre(genre: String): DataSource.Factory<Int, ArtistEntity> =
+  override suspend fun getArtistByGenre(genre: String): LiveData<List<ArtistEntity>> =
     dao.getArtistByGenre(genre)
 
-  override suspend fun getAll(): DataSource.Factory<Int, ArtistEntity> = dao.getAll()
+  override suspend fun getAll(): LiveData<List<ArtistEntity>> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, ArtistEntity> {
+  override suspend fun getAndSaveRemote(): LiveData<List<ArtistEntity>> {
     getRemote()
     return dao.getAll()
   }
@@ -41,13 +41,13 @@ constructor(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, ArtistEntity> =
+  override suspend fun search(term: String): LiveData<List<ArtistEntity>> =
     dao.search(term)
 
-  override suspend fun getAlbumArtistsOnly(): DataSource.Factory<Int, ArtistEntity> =
+  override suspend fun getAlbumArtistsOnly(): LiveData<List<ArtistEntity>> =
     dao.getAlbumArtists()
 
-  override suspend fun getAllRemoteAndShowAlbumArtist(): DataSource.Factory<Int, ArtistEntity> {
+  override suspend fun getAllRemoteAndShowAlbumArtist(): LiveData<List<ArtistEntity>> {
     getRemote()
     return dao.getAlbumArtists()
   }

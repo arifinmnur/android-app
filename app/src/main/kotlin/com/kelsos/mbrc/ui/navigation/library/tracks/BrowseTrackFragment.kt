@@ -100,8 +100,8 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(pagedList: PagedList<TrackEntity>) {
-    adapter.submitList(pagedList)
+  override fun update(pagedList: List<TrackEntity>) {
+    adapter.setList(pagedList)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {

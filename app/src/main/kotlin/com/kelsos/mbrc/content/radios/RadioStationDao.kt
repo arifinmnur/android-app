@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.radios
 
-import androidx.paging.DataSource
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,10 +16,10 @@ interface RadioStationDao {
   fun insertAll(list: List<RadioStationEntity>)
 
   @Query("select * from radio_station")
-  fun getAll(): DataSource.Factory<Int, RadioStationEntity>
+  fun getAll(): LiveData<List<RadioStationEntity>>
 
   @Query("select * from radio_station where name like '%' || :term || '%' ")
-  fun search(term: String): DataSource.Factory<Int, RadioStationEntity>
+  fun search(term: String): LiveData<List<RadioStationEntity>>
 
   @Query("select count(*) from radio_station")
   fun count(): Long

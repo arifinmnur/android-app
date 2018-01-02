@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.extensions.string
+import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class TrackEntryAdapter
 @Inject
-constructor() : PagedListAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
+constructor() : BaseMediaAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>() {
   private var listener: MenuItemSelectedListener? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {
