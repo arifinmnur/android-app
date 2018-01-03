@@ -35,6 +35,7 @@ class LibraryActivity : BaseNavigationActivity(),
   private var pagerAdapter: LibraryPagerAdapter? = null
 
   private lateinit var scope: Scope
+
   @Inject
   lateinit var presenter: LibraryPresenter
 
@@ -71,8 +72,8 @@ class LibraryActivity : BaseNavigationActivity(),
   override fun onQueryTextChange(newText: String): Boolean = false
 
   public override fun onCreate(savedInstanceState: Bundle?) {
-    Toothpick.openScope(LIBRARY_SCOPE).installModules(LibraryModule())
-    scope = Toothpick.openScopes(application, LIBRARY_SCOPE, this)
+    Toothpick.openScope(PRESENTER_SCOPE).installModules(LibraryModule())
+    scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
     scope.installModules(SmoothieActivityModule(this))
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
@@ -171,12 +172,11 @@ class LibraryActivity : BaseNavigationActivity(),
     presenter.detach()
     pagerAdapter = null
     Toothpick.closeScope(this)
-    super.onDestroy()
-    pagerAdapter = null
 
-    if (isDestroyed) {
-      Toothpick.closeScope(LIBRARY_SCOPE)
+    if (isFinishing) {
+      Toothpick.closeScope(PRESENTER_SCOPE)
     }
+    super.onDestroy()
   }
 
   override fun onStart() {
@@ -227,8 +227,12 @@ class LibraryActivity : BaseNavigationActivity(),
     findViewById<TextView>(R.id.sync_progress_text).isGone = true
   }
 
+  @javax.inject.Scope
+  @Retention(AnnotationRetention.RUNTIME)
+  annotation class Presenter
+
   companion object {
     private const val PAGER_POSITION = "com.kelsos.mbrc.ui.activities.nav.PAGER_POSITION"
-    val LIBRARY_SCOPE: Class<*> = LibraryActivity::class.java
+    private val PRESENTER_SCOPE: Class<*> = Presenter::class.java
   }
 }

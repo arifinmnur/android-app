@@ -12,9 +12,8 @@ interface BrowseGenrePresenter : Presenter<BrowseGenreView> {
 }
 
 interface BrowseGenreView : BaseView {
-  fun update(pagedList: List<GenreEntity>)
+  fun update(list: List<GenreEntity>)
   fun search(term: String)
   fun queue(success: Boolean, tracks: Int)
   fun hideLoading()
-  fun showLoading()
 }

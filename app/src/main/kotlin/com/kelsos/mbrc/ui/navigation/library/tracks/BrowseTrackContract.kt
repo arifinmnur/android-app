@@ -6,11 +6,10 @@ import com.kelsos.mbrc.mvp.BaseView
 import com.kelsos.mbrc.mvp.Presenter
 
 interface BrowseTrackView : BaseView {
-  fun update(pagedList: List<TrackEntity>)
+  fun update(list: List<TrackEntity>)
   fun search(term: String)
   fun queue(success: Boolean, tracks: Int)
   fun hideLoading()
-  fun showLoading()
 }
 
 interface BrowseTrackPresenter : Presenter<BrowseTrackView> {

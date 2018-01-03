@@ -48,7 +48,6 @@ constructor(
 
   private fun updateUi(term: String) {
     scope.launch {
-      view().showLoading()
       view().search(term)
       try {
         observeAlbums(getData(term))
@@ -90,7 +89,6 @@ constructor(
 
   private fun loadSorted(sortingSelection: Int, ascending: Boolean) {
     scope.launch {
-      view().showLoading()
       try {
         observeAlbums(repository.getAlbumsSorted(sortingSelection, ascending))
       } catch (e: Exception) {

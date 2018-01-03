@@ -19,7 +19,6 @@ import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.extensions.gone
 import com.kelsos.mbrc.extensions.show
-import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter.MenuItemSelectedListener
 import kotterknife.bindView
@@ -39,8 +38,10 @@ class BrowseArtistFragment : Fragment(),
 
   @Inject
   lateinit var adapter: ArtistEntryAdapter
+
   @Inject
   lateinit var actionHandler: PopupActionHandler
+
   @Inject
   lateinit var presenter: BrowseArtistPresenter
 
@@ -63,8 +64,7 @@ class BrowseArtistFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    scope =
-      Toothpick.openScopes(requireActivity().application, LIBRARY_SCOPE, requireActivity(), this)
+    scope = Toothpick.openScopes(requireActivity().application, this)
     scope?.installModules(BrowseArtistModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)

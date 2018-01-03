@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.IdRes
@@ -21,9 +20,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
-import com.kelsos.mbrc.extensions.fail
+import com.kelsos.mbrc.extensions.gone
+import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.ui.dialogs.SortingDialog
-import com.kelsos.mbrc.ui.navigation.library.LibraryActivity.Companion.LIBRARY_SCOPE
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
 import toothpick.Toothpick
@@ -38,8 +37,6 @@ class BrowseAlbumFragment : Fragment(),
 
   private val emptyView: Group by bindView(R.id.library_browser__empty_group)
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
-  private val emptyViewIcon: ImageView by bindView(R.id.library_browser__empty_icon)
-  private val emptyViewSubTitle: TextView by bindView(R.id.library_browser__text_subtitle)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   @Inject
@@ -66,9 +63,8 @@ class BrowseAlbumFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val activity = activity ?: fail("null activity")
-    val scope = Toothpick.openScopes(requireActivity().application, LIBRARY_SCOPE, activity, this)
-    scope.installModules(SmoothieActivityModule(requireActivity()), BrowseAlbumModule())
+    val scope = Toothpick.openScopes(requireActivity().application, this)
+    scope.installModules(SmoothieActivityModule(activity), BrowseAlbumModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
     setHasOptionsMenu(true)
@@ -132,8 +128,13 @@ class BrowseAlbumFragment : Fragment(),
     actionHandler.albumSelected(album, requireActivity())
   }
 
-  override fun update(pagedList: List<AlbumEntity>) {
-    adapter.setList(pagedList)
+  override fun update(list: List<AlbumEntity>) {
+    if (list.isEmpty()) {
+      emptyView.show()
+    } else {
+      emptyView.gone()
+    }
+    adapter.setList(list)
   }
 
   override fun queue(success: Boolean, tracks: Int) {
@@ -147,18 +148,8 @@ class BrowseAlbumFragment : Fragment(),
       .show()
   }
 
-  override fun showLoading() {
-    emptyViewProgress.visibility = View.VISIBLE
-    emptyViewIcon.visibility = View.GONE
-    emptyViewTitle.visibility = View.GONE
-    emptyViewSubTitle.visibility = View.GONE
-  }
-
   override fun hideLoading() {
-    emptyViewProgress.visibility = View.GONE
-    emptyViewIcon.visibility = View.VISIBLE
-    emptyViewTitle.visibility = View.VISIBLE
-    emptyViewSubTitle.visibility = View.VISIBLE
+    emptyViewProgress.gone()
   }
 
   override fun onDestroy() {

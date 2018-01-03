@@ -20,7 +20,7 @@ constructor(
 
   override suspend fun getAll(): LiveData<List<AlbumEntity>> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): LiveData<List<AlbumEntity>>{
+  override suspend fun getAndSaveRemote(): LiveData<List<AlbumEntity>> {
     getRemote()
     return dao.getAll()
   }

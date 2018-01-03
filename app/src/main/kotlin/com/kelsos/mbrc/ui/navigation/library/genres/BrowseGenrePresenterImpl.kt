@@ -45,7 +45,6 @@ constructor(
 
   private fun updateUi(term: String) {
     scope.launch {
-      view().showLoading()
       view().search(term)
       try {
         onGenresLoaded(getData(term))
