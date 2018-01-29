@@ -86,8 +86,8 @@ class ArtistAlbumsActivity : BaseActivity(),
     actionHandler.albumSelected(album, this)
   }
 
-  override fun update(albums: List<AlbumEntity>) {
-    adapter.setList(albums)
+  override fun update(albums: PagedList<AlbumEntity>) {
+    adapter.submitList(albums)
   }
 
   override fun queue(success: Boolean, tracks: Int) {

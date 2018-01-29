@@ -1,11 +1,13 @@
 package com.kelsos.mbrc.ui.navigation.library.genreartists
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,12 +20,12 @@ constructor(
 ) : BasePresenter<GenreArtistsView>(),
   GenreArtistsPresenter {
 
-  private lateinit var artists: LiveData<List<ArtistEntity>>
+  private lateinit var artists: LiveData<PagedList<ArtistEntity>>
 
   override fun load(genre: String) {
     scope.launch {
       try {
-        artists = repository.getArtistByGenre(genre)
+        artists = repository.getArtistByGenre(genre).paged()
         artists.observe(this@GenreArtistsPresenterImpl, {
           if (it != null) {
             view().update(it)

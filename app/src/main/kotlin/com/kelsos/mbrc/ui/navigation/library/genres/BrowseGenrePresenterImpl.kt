@@ -1,6 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.genres
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -9,6 +11,7 @@ import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,7 +26,7 @@ constructor(
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseGenreView>(), BrowseGenrePresenter {
 
-  private lateinit var genres: LiveData<List<GenreEntity>>
+  private lateinit var genres: LiveData<PagedList<GenreEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -55,7 +58,7 @@ constructor(
     }
   }
 
-  private suspend fun getData(term: String): LiveData<List<GenreEntity>> {
+  private suspend fun getData(term: String): DataSource.Factory<Int, GenreEntity> {
     return if (term.isEmpty()) {
       repository.getAll()
     } else {
@@ -63,12 +66,12 @@ constructor(
     }
   }
 
-  private fun onGenresLoaded(data: LiveData<List<GenreEntity>>) {
+  private fun onGenresLoaded(data: DataSource.Factory<Int, GenreEntity>) {
     if (::genres.isInitialized) {
       genres.removeObservers(this)
     }
 
-    genres = data
+    genres = data.paged()
     genres.observe(this@BrowseGenrePresenterImpl, {
       if (it != null) {
         view().update(it)

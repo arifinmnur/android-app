@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.extensions.string
-import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class TrackEntryAdapter
 @Inject
-constructor() : BaseMediaAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>() {
+constructor() : PagedListAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
   private var listener: MenuItemSelectedListener? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {
@@ -72,9 +72,9 @@ constructor() : BaseMediaAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>() {
   }
 
   class ViewHolder(
-      itemView: View,
-      indicatorPressed: (view: View, position: Int) -> Unit,
-      pressed: (view: View, position: Int) -> Unit
+    itemView: View,
+    indicatorPressed: (view: View, position: Int) -> Unit,
+    pressed: (view: View, position: Int) -> Unit
   ) : RecyclerView.ViewHolder(itemView) {
     private val artist: TextView by bindView(R.id.line_two)
     private val title: TextView by bindView(R.id.line_one)
@@ -85,11 +85,12 @@ constructor() : BaseMediaAdapter<TrackEntity, TrackEntryAdapter.ViewHolder>() {
       indicator.setOnClickListener { indicatorPressed(it, adapterPosition) }
       itemView.setOnClickListener { pressed(it, adapterPosition) }
     }
+
     companion object {
       fun create(
-          parent: ViewGroup,
-          indicatorPressed: (view: View, position: Int) -> Unit,
-          pressed: (view: View, position: Int) -> Unit
+        parent: ViewGroup,
+        indicatorPressed: (view: View, position: Int) -> Unit,
+        pressed: (view: View, position: Int) -> Unit
       ): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.ui_list_dual, parent, false)

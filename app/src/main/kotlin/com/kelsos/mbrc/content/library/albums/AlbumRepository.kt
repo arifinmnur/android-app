@@ -1,10 +1,10 @@
 package com.kelsos.mbrc.content.library.albums
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import com.kelsos.mbrc.interfaces.data.Repository
 
 interface AlbumRepository : Repository<AlbumEntity> {
-  suspend fun getAlbumsByArtist(artist: String): LiveData<List<AlbumEntity>>
+  suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity>
 
   /**
    * Retrieves the albums ordered by
@@ -12,5 +12,5 @@ interface AlbumRepository : Repository<AlbumEntity> {
   suspend fun getAlbumsSorted(
     @Sorting.Fields order: Int = Sorting.ALBUM_ARTIST__ALBUM,
     ascending: Boolean = true
-  ): LiveData<List<AlbumEntity>>
+  ): DataSource.Factory<Int, AlbumEntity>
 }

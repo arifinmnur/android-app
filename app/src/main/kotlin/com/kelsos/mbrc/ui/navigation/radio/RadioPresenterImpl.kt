@@ -1,10 +1,13 @@
 package com.kelsos.mbrc.ui.navigation.radio
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.radios.RadioRepository
 import com.kelsos.mbrc.content.radios.RadioStationEntity
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,7 +19,7 @@ constructor(
   private val queue: QueueHandler
 ) : BasePresenter<RadioView>(), RadioPresenter {
 
-  private lateinit var radios: LiveData<List<RadioStationEntity>>
+  private lateinit var radios: LiveData<PagedList<RadioStationEntity>>
 
   override fun load() {
     view().showLoading()
@@ -30,9 +33,9 @@ constructor(
     }
   }
 
-  private fun onRadiosLoaded(radios: LiveData<List<RadioStationEntity>>) {
-    this.radios = radios
-    this.radios.observe(this@RadioPresenterImpl, {
+  private fun onRadiosLoaded(factory: DataSource.Factory<Int, RadioStationEntity>) {
+    radios = factory.paged()
+    radios.observe(this@RadioPresenterImpl, {
       if (it != null) {
         view().update(it)
       }

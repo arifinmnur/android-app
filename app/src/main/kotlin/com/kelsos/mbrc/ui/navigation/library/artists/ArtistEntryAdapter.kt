@@ -5,18 +5,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
-import com.kelsos.mbrc.ui.navigation.library.BaseMediaAdapter
 import com.kelsos.mbrc.ui.navigation.library.popup
 import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
 import javax.inject.Inject
 
 class ArtistEntryAdapter
-@Inject constructor() : BaseMediaAdapter<ArtistEntity, ArtistEntryAdapter.ViewHolder>() {
+@Inject constructor() : PagedListAdapter<ArtistEntity, ArtistEntryAdapter.ViewHolder>(DIFF_CALLBACK) {
   private var listener: MenuItemSelectedListener? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_artist) {

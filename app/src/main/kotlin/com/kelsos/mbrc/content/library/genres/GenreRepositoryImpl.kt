@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.library.genres
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -18,9 +18,9 @@ constructor(
 
   private val mapper = GenreDtoMapper()
 
-  override suspend fun getAll(): LiveData<List<GenreEntity>> = dao.getAll()
+  override suspend fun getAll(): DataSource.Factory<Int, GenreEntity> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): LiveData<List<GenreEntity>> {
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, GenreEntity> {
     getRemote()
     return dao.getAll()
   }
@@ -38,7 +38,7 @@ constructor(
     }
   }
 
-  override suspend fun search(term: String): LiveData<List<GenreEntity>> = dao.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, GenreEntity> = dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
 

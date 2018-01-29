@@ -1,6 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.tracks
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
@@ -10,6 +12,7 @@ import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
 import com.kelsos.mbrc.utilities.SchedulerProvider
+import com.kelsos.mbrc.utilities.paged
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -27,7 +30,7 @@ constructor(
 ) : BasePresenter<BrowseTrackView>(),
   BrowseTrackPresenter {
 
-  private lateinit var tracks: LiveData<List<TrackEntity>>
+  private lateinit var tracks: LiveData<PagedList<TrackEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
@@ -62,7 +65,7 @@ constructor(
     }
   }
 
-  private suspend fun getData(term: String): LiveData<List<TrackEntity>> {
+  private suspend fun getData(term: String): DataSource.Factory<Int, TrackEntity> {
     return if (term.isEmpty()) {
       repository.getAll()
     } else {
@@ -86,13 +89,13 @@ constructor(
       view().queue(success, tracks)
     }
   }
-
-  private fun onTrackLoad(data: LiveData<List<TrackEntity>>) {
+  
+  private fun onTrackLoad(data: DataSource.Factory<Int, TrackEntity>) {
     if (::tracks.isInitialized) {
       tracks.removeObservers(this)
     }
 
-    tracks = data
+    tracks = data.paged()
     tracks.observe(this@BrowseTrackPresenterImpl, {
       if (it != null) {
         view().update(it)

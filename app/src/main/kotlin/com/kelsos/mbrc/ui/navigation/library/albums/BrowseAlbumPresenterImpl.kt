@@ -1,6 +1,8 @@
 package com.kelsos.mbrc.ui.navigation.library.albums
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
@@ -11,6 +13,7 @@ import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.AlbumSortingStore
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
+import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,19 +29,19 @@ constructor(
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseAlbumView>(), BrowseAlbumPresenter {
 
-  private lateinit var albums: LiveData<List<AlbumEntity>>
+  private lateinit var albums: LiveData<PagedList<AlbumEntity>>
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
   }
 
-  private fun observeAlbums(it: LiveData<List<AlbumEntity>>) {
+  private fun observeAlbums(it: DataSource.Factory<Int, AlbumEntity>) {
 
     if (::albums.isInitialized) {
       albums.removeObservers(this)
     }
 
-    albums = it
+    albums = it.paged()
     albums.observe(this@BrowseAlbumPresenterImpl, {
       if (it != null) {
         view().update(it)

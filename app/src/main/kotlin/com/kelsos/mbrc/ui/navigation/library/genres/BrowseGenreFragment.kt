@@ -11,13 +11,13 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
-import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.extensions.gone
 import com.kelsos.mbrc.extensions.hide
 import com.kelsos.mbrc.extensions.show
@@ -72,8 +72,7 @@ class BrowseGenreFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val activity = activity ?: fail("null activity")
-    val scope = Toothpick.openScopes(requireActivity().application, activity, this)
+    val scope = Toothpick.openScopes(requireActivity().application, requireActivity(), this)
     scope.installModules(BrowseGenreModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
@@ -84,14 +83,14 @@ class BrowseGenreFragment : Fragment(),
     presenter.detach()
   }
 
-  override fun update(list: List<GenreEntity>) {
-    if (list.isEmpty()) {
+  override fun update(pagedList: PagedList<GenreEntity>) {
+    if (pagedList.isEmpty()) {
       emptyView.show()
     } else {
       emptyView.hide()
     }
 
-    adapter.setList(list)
+    adapter.submitList(pagedList)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

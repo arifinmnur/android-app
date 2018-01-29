@@ -11,6 +11,7 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -97,13 +98,13 @@ class BrowseTrackFragment : Fragment(),
     presenter.load()
   }
 
-  override fun update(list: List<TrackEntity>) {
-    if (list.isEmpty()) {
+  override fun update(pagedList: PagedList<TrackEntity>) {
+    if (pagedList.isEmpty()) {
       emptyView.show()
     } else {
       emptyView.hide()
     }
-    adapter.setList(list)
+    adapter.submitList(pagedList)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {

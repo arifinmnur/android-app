@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.radios
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -17,10 +17,10 @@ constructor(
 ) : RadioRepository {
   private val mapper = RadioDtoMapper()
 
-  override suspend fun getAll(): LiveData<List<RadioStationEntity>> =
+  override suspend fun getAll(): DataSource.Factory<Int, RadioStationEntity> =
     dao.getAll()
 
-  override suspend fun getAndSaveRemote(): LiveData<List<RadioStationEntity>> {
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, RadioStationEntity> {
     getRemote()
     return dao.getAll()
   }
@@ -37,7 +37,7 @@ constructor(
     }
   }
 
-  override suspend fun search(term: String): LiveData<List<RadioStationEntity>> =
+  override suspend fun search(term: String): DataSource.Factory<Int, RadioStationEntity> =
     dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L

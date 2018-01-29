@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.nowplaying
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,10 +16,10 @@ interface NowPlayingDao {
   fun deleteAll()
 
   @Query("select * from now_playing")
-  fun getAll(): LiveData<List<NowPlayingEntity>>
+  fun getAll(): DataSource.Factory<Int, NowPlayingEntity>
 
   @Query("select * from now_playing where title like '%' || :term || '%' or artist like '%' || :term || '%'")
-  fun search(term: String): LiveData<List<NowPlayingEntity>>
+  fun search(term: String): DataSource.Factory<Int, NowPlayingEntity>
 
   @Query("select count(*) from now_playing")
   fun count(): Long

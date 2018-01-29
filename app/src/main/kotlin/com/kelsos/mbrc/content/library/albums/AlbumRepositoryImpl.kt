@@ -1,8 +1,10 @@
 package com.kelsos.mbrc.content.library.albums
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -15,26 +17,30 @@ constructor(
 ) : AlbumRepository {
   private val mapper = AlbumDtoMapper()
 
-  override suspend fun getAlbumsByArtist(artist: String): LiveData<List<AlbumEntity>> =
+  override suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity> =
     dao.getAlbumsByArtist(artist)
 
-  override suspend fun getAll(): LiveData<List<AlbumEntity>> = dao.getAll()
+  override suspend fun getAll(): DataSource.Factory<Int, AlbumEntity> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): LiveData<List<AlbumEntity>> {
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, AlbumEntity> {
     getRemote()
     return dao.getAll()
   }
 
   override suspend fun getRemote() {
-    dao.deleteAll()
+    val added = epoch()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch().collect {
-        dao.insert(it.map { mapper.map(it) })
-      }
+      remoteDataSource.fetch()
+        .onCompletion {
+          dao.removePreviousEntries(added)
+        }
+        .collect {
+          dao.insert(it.map { mapper.map(it) })
+        }
     }
   }
 
-  override suspend fun search(term: String): LiveData<List<AlbumEntity>> = dao.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, AlbumEntity> = dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
 
@@ -43,7 +49,7 @@ constructor(
   override suspend fun getAlbumsSorted(
     @Sorting.Fields order: Int,
     ascending: Boolean
-  ): LiveData<List<AlbumEntity>> {
+  ): DataSource.Factory<Int, AlbumEntity> {
     return when (order) {
       Sorting.ALBUM -> {
         if (ascending) {

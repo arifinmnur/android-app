@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.content.nowplaying
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
@@ -16,9 +16,9 @@ class NowPlayingRepositoryImpl
 ) : NowPlayingRepository {
   private val mapper = NowPlayingDtoMapper()
 
-  override suspend fun getAll(): LiveData<List<NowPlayingEntity>> = dao.getAll()
+  override suspend fun getAll(): DataSource.Factory<Int, NowPlayingEntity> = dao.getAll()
 
-  override suspend fun getAndSaveRemote(): LiveData<List<NowPlayingEntity>> {
+  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, NowPlayingEntity> {
     getRemote()
     return dao.getAll()
   }
@@ -35,7 +35,7 @@ class NowPlayingRepositoryImpl
     }
   }
 
-  override suspend fun search(term: String): LiveData<List<NowPlayingEntity>> =
+  override suspend fun search(term: String): DataSource.Factory<Int, NowPlayingEntity> =
     dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
