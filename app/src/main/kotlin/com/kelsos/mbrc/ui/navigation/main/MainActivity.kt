@@ -188,9 +188,9 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.menu, menu)
     this.menu = menu
-    val shareItem = menu.findItem(R.id.actionbar_share)
-    mShareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
-    mShareActionProvider!!.setShareIntent(shareIntent)
+//    val shareItem = menu.findItem(R.id.actionbar_share)
+//    mShareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
+//    mShareActionProvider!!.setShareIntent(shareIntent)
     bus.post(OnMainFragmentOptionsInflated())
     return super.onCreateOptionsMenu(menu)
   }
