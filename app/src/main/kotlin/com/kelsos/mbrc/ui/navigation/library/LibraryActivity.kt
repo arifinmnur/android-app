@@ -48,7 +48,6 @@ class LibraryActivity : BaseNavigationActivity(),
       supportActionBar?.setSubtitle(R.string.library_search_subtitle)
       searchMenuItem?.isVisible = false
       searchClear?.isVisible = true
-
     } else {
       presenter.search("")
     }

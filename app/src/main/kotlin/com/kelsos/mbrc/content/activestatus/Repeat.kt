@@ -11,5 +11,4 @@ object Repeat {
   @StringDef(ALL, NONE, ONE)
   @Retention(AnnotationRetention.SOURCE)
   annotation class Mode
-
 }

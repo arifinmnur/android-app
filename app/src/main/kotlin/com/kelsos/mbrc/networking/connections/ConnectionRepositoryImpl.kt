@@ -12,7 +12,7 @@ import javax.inject.Inject
 class ConnectionRepositoryImpl
 @Inject
 constructor(
-    private val connectionDao: ConnectionDao,
+  private val connectionDao: ConnectionDao,
   private val preferences: SharedPreferences,
   private val resources: Resources,
   private val dispatchers: AppDispatchers
@@ -20,7 +20,7 @@ constructor(
 
   override suspend fun save(settings: ConnectionSettingsEntity) = withContext(dispatchers.db) {
 
-    if (settings.id > 0)  {
+    if (settings.id > 0) {
       connectionDao.update(settings)
     } else {
       connectionDao.insert(settings)
@@ -86,7 +86,7 @@ constructor(
       this.preferences.edit().putLong(key, id).apply()
     }
 
-  override suspend fun getModel():ConnectionModel = withContext(dispatchers.db) {
+  override suspend fun getModel(): ConnectionModel = withContext(dispatchers.db) {
     return@withContext ConnectionModel(defaultId, getAll())
   }
 
@@ -95,5 +95,4 @@ constructor(
   override suspend fun count(): Long = withContext(dispatchers.db) {
     return@withContext connectionDao.count()
   }
-
 }

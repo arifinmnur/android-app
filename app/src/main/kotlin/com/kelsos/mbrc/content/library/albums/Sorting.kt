@@ -2,7 +2,6 @@ package com.kelsos.mbrc.content.library.albums
 
 import androidx.annotation.IntDef
 
-
 object Sorting {
   const val ALBUM = 1
   const val ALBUM_ARTIST__ALBUM = 2

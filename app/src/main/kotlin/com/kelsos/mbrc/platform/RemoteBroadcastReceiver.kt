@@ -18,9 +18,9 @@ import javax.inject.Inject
 
 class RemoteBroadcastReceiver
 @Inject constructor(
-    private val settingsManager: SettingsManager,
-    private val bus: RxBus,
-    private val volumeInteractor: VolumeInteractor
+  private val settingsManager: SettingsManager,
+  private val bus: RxBus,
+  private val volumeInteractor: VolumeInteractor
 ) : BroadcastReceiver() {
 
   /**

@@ -27,7 +27,6 @@ import timber.log.Timber
 class SettingsFragment : PreferenceFragmentCompat() {
   private var bus: RxBus? = null
 
-
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     addPreferencesFromResource(R.xml.application_settings)
 
@@ -86,7 +85,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     mBuild?.summary = BuildConfig.BUILD_TIME
     mRevision?.summary = BuildConfig.GIT_SHA
   }
-
 
   private fun requestPhoneStatePermission() {
     requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), REQUEST_CODE)
@@ -154,7 +152,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     } else {
       super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
   }
 
   companion object {

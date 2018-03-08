@@ -19,6 +19,6 @@ fun View?.hide() {
   this?.visibility = INVISIBLE
 }
 
-fun RecyclerView.ViewHolder.string(@StringRes resId: Int) : String {
+fun RecyclerView.ViewHolder.string(@StringRes resId: Int): String {
   return this.itemView.context.getString(resId)
 }

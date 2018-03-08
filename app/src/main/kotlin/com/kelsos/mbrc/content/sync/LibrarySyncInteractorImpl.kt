@@ -61,7 +61,7 @@ class LibrarySyncInteractorImpl
         bus.post(LibraryRefreshCompleteEvent())
         onCompleteListener?.onSuccess(
           LibraryStats(
-            genres = genreRepository.count(),
+    genres = genreRepository.count(),
             artists = artistRepository.count(),
             albums = albumRepository.count(),
             tracks = trackRepository.count(),

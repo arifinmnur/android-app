@@ -14,6 +14,7 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.activities.BaseActivity
+import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter
 import kotterknife.bindView
@@ -24,7 +25,7 @@ import javax.inject.Inject
 
 class AlbumTracksActivity : BaseActivity(),
   AlbumTracksView,
-  TrackEntryAdapter.MenuItemSelectedListener {
+  MenuItemSelectedListener<TrackEntity> {
 
   private val listTracks: RecyclerView by bindView(R.id.album_tracks__track_list)
   private val emptyView: Group by bindView(R.id.album_tracks__empty_view)
@@ -94,12 +95,12 @@ class AlbumTracksActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, track: TrackEntity) {
-    presenter.queue(track, actionHandler.trackSelected(itemId))
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: TrackEntity) {
+    presenter.queue(item, actionHandler.trackSelected(itemId))
   }
 
-  override fun onItemClicked(track: TrackEntity) {
-    presenter.queue(track)
+  override fun onItemClicked(item: TrackEntity) {
+    presenter.queue(item)
   }
 
   override fun update(pagedList: PagedList<TrackEntity>) {

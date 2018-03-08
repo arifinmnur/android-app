@@ -30,7 +30,6 @@ open class RemoteApplication : MultiDexApplication() {
     initializeTimber()
   }
 
-
   private fun initializeTimber() {
     if (BuildConfig.DEBUG) {
       Timber.plant(object : Timber.DebugTree() {
@@ -57,7 +56,6 @@ open class RemoteApplication : MultiDexApplication() {
       applicationScope.installModules(SmoothieApplicationModule(this), RemoteModule())
     }
   }
-
 
   internal open fun testMode(): Boolean = false
 }

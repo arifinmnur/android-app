@@ -25,11 +25,11 @@ import javax.inject.Inject
 class MulticastConfigurationDiscovery
 @Inject
 internal constructor(
-    private val manager: WifiManager,
-    private val connectivityManager: ConnectivityManager,
-    private val mapper: ObjectMapper,
-    private val bus: RxBus,
-    private val connectionRepository: ConnectionRepository
+  private val manager: WifiManager,
+  private val connectivityManager: ConnectivityManager,
+  private val mapper: ObjectMapper,
+  private val bus: RxBus,
+  private val connectionRepository: ConnectionRepository
 ) {
   private var job = SupervisorJob()
   private var scope = CoroutineScope(job + Dispatchers.IO)
@@ -150,11 +150,11 @@ internal constructor(
         })
         send(DatagramPacket(data, data.size, group, MULTICASTPORT))
       }
-    } catch (e: IOException) {
-      Timber.v(e, "Failed to open multi cast socket")
-      throw RuntimeException(e)
+      } catch (e: IOException) {
+        Timber.v(e, "Failed to open multicast socket")
+        throw RuntimeException(e)
+      }
     }
-  }
 
   companion object {
     private const val NOTIFY = "notify"

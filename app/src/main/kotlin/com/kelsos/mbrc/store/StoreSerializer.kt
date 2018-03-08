@@ -16,5 +16,4 @@ object StoreSerializer : Serializer<Store> {
   }
 
   override fun writeTo(t: Store, output: OutputStream) = t.writeTo(output)
-
 }

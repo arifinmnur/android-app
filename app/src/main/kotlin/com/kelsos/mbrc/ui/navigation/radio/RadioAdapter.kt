@@ -28,7 +28,6 @@ class RadioAdapter
       path?.let {
         radioPressedListener?.onRadioPressed(it)
       }
-
     }
     return viewHolder
   }
@@ -39,7 +38,6 @@ class RadioAdapter
       holder.name.text = radio.name
     }
     holder.context.visibility = View.GONE
-
   }
 
   override fun getItemCount(): Int {

@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import javax.inject.Inject
 
-
 class LibrarySearchModel
 @Inject
 constructor() {

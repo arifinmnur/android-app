@@ -101,7 +101,6 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun showLoading() {
-
   }
 
   override fun hideLoading() {

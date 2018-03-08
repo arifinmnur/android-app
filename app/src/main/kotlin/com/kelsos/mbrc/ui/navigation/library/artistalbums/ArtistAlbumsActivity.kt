@@ -12,6 +12,7 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.activities.BaseActivity
+import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import kotterknife.bindView
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 class ArtistAlbumsActivity : BaseActivity(),
   ArtistAlbumsView,
-  AlbumEntryAdapter.MenuItemSelectedListener {
+  MenuItemSelectedListener<AlbumEntity> {
 
   private val recyclerView: RecyclerView by bindView(R.id.artist_albums__album_list)
   private val emptyView: Group by bindView(R.id.artist_albums__empty_view)
@@ -75,15 +76,15 @@ class ArtistAlbumsActivity : BaseActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity) {
-    val action = actionHandler.albumSelected(itemId, album, this)
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: AlbumEntity) {
+    val action = actionHandler.albumSelected(itemId, item, this)
     if (action != LibraryPopup.PROFILE) {
-      presenter.queue(action, album)
+      presenter.queue(action, item)
     }
   }
 
-  override fun onItemClicked(album: AlbumEntity) {
-    actionHandler.albumSelected(album, this)
+  override fun onItemClicked(item: AlbumEntity) {
+    actionHandler.albumSelected(item, this)
   }
 
   override fun update(albums: PagedList<AlbumEntity>) {
@@ -115,5 +116,3 @@ class ArtistAlbumsActivity : BaseActivity(),
     const val ARTIST_NAME = "artist_name"
   }
 }
-
-

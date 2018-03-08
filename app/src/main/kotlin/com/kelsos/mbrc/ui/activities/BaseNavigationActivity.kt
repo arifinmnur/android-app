@@ -45,7 +45,6 @@ import kotterknife.bindView
 import timber.log.Timber
 import javax.inject.Inject
 
-
 abstract class BaseNavigationActivity : AppCompatActivity(),
   NavigationView.OnNavigationItemSelectedListener {
   @Inject
@@ -200,7 +199,6 @@ abstract class BaseNavigationActivity : AppCompatActivity(),
       stopService(Intent(this, RemoteService::class.java))
     }
 
-
     if (this is MainActivity) {
       finish()
     } else {
@@ -209,7 +207,6 @@ abstract class BaseNavigationActivity : AppCompatActivity(),
       intent.flags = FLAG_ACTIVITY_CLEAR_TOP
       startActivity(intent)
     }
-
   }
 
   private fun createBackStack(intent: Intent) {

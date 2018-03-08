@@ -16,7 +16,6 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.changelog.ChangelogDialog
@@ -221,7 +220,6 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
       .resize(dimens, dimens)
       .centerCrop()
       .into(albumCover)
-
   }
 
   override fun updateShuffleState(@ShuffleState shuffleState: String) {
@@ -302,7 +300,6 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
     if (STOPPED == tag || PAUSED == tag) {
       return
     }
-
 
     progressHelper.update(current, total)
   }
@@ -440,4 +437,3 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
   @Retention(AnnotationRetention.RUNTIME)
   annotation class Presenter
 }
-

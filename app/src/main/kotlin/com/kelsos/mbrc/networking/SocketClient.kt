@@ -161,9 +161,7 @@ constructor(
       socket?.close()
       socket = null
     } catch (ignore: IOException) {
-
     }
-
   }
 
   @Synchronized

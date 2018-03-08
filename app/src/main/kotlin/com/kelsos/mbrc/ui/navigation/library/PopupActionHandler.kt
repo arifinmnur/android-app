@@ -18,25 +18,34 @@ import javax.inject.Singleton
 @Singleton
 class PopupActionHandler
 @Inject
-constructor() {
+constructor(
+) {
 
   @LibraryPopup.Action
-  fun albumSelected(@IdRes itemId: Int, entry: AlbumEntity, context: Context): String {
+  fun albumSelected(
+    @IdRes itemId: Int,
+    entry: AlbumEntity,
+    context: Context
+  ): String {
     if (itemId == R.id.popup_album_tracks) {
       openProfile(entry, context)
       return LibraryPopup.PROFILE
     }
 
     return when (itemId) {
-      R.id.popup_album_queue_next -> LibraryPopup.NEXT
-      R.id.popup_album_queue_last -> LibraryPopup.LAST
+    R.id.popup_album_queue_next -> LibraryPopup.NEXT
+    R.id.popup_album_queue_last -> LibraryPopup.LAST
       R.id.popup_album_play -> LibraryPopup.NOW
       else -> LibraryPopup.NOW
     }
   }
 
   @LibraryPopup.Action
-  fun artistSelected(@IdRes itemId: Int, entry: ArtistEntity, context: Context): String {
+   fun artistSelected(
+     @IdRes itemId: Int,
+     entry: ArtistEntity,
+     context: Context
+   ): String {
     if (itemId == R.id.popup_artist_album) {
       openProfile(entry, context)
       return LibraryPopup.PROFILE
@@ -51,14 +60,18 @@ constructor() {
   }
 
   @LibraryPopup.Action
-  fun genreSelected(@IdRes itemId: Int, entry: GenreEntity, context: Context): String {
+   fun genreSelected(
+     @IdRes itemId: Int,
+     entry: GenreEntity,
+     context: Context
+   ): String {
     if (R.id.popup_genre_artists == itemId) {
       openProfile(entry, context)
       return LibraryPopup.PROFILE
     }
 
     return when (itemId) {
-      R.id.popup_genre_queue_next -> LibraryPopup.NEXT
+    R.id.popup_genre_queue_next -> LibraryPopup.NEXT
       R.id.popup_genre_queue_last -> LibraryPopup.LAST
       R.id.popup_genre_play -> LibraryPopup.NOW
       else -> LibraryPopup.NOW

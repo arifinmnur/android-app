@@ -12,7 +12,7 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 class ApiBase
-@Inject
+  @Inject
 constructor(
   private val mapper: ObjectMapper,
   private val apiRequestManager: RequestManager

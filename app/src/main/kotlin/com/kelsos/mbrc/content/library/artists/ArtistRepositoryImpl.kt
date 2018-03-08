@@ -38,7 +38,7 @@ constructor(
         .collect {
           dao.insertAll(it.map { mapper.map(it) })
         }
-    }
+      }
   }
 
   override suspend fun search(term: String): DataSource.Factory<Int, ArtistEntity> =

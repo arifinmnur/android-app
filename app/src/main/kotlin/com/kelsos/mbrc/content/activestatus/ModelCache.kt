@@ -36,7 +36,6 @@ constructor(
       }
     }
 
-
   override suspend fun persistInfo(trackInfo: TrackInfo) = withContext(dispatchers.io) {
     dataStore.updateData { store ->
       val track = Track.newBuilder()
@@ -72,11 +71,9 @@ constructor(
     }
   }
 
-
   override suspend fun restoreCover(): String {
     return storeFlow.first().cover
   }
-
 }
 
 interface ModelCache {

@@ -65,7 +65,6 @@ object Protocol {
   const val ONE = "one"
   const val ALL = "All"
 
-
   /**
    * Toggle action in protocol. This should be send to the functions with multiple states
    * in order to change to the next in order state.

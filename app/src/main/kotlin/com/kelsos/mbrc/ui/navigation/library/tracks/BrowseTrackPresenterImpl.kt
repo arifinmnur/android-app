@@ -89,7 +89,7 @@ constructor(
       view().queue(success, tracks)
     }
   }
-  
+
   private fun onTrackLoad(data: DataSource.Factory<Int, TrackEntity>) {
     if (::tracks.isInitialized) {
       tracks.removeObservers(this)

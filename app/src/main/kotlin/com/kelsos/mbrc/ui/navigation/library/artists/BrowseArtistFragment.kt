@@ -20,8 +20,8 @@ import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.extensions.gone
 import com.kelsos.mbrc.extensions.show
+import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
-import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter.MenuItemSelectedListener
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 class BrowseArtistFragment : Fragment(),
   BrowseArtistView,
-  MenuItemSelectedListener {
+  MenuItemSelectedListener<ArtistEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -109,15 +109,15 @@ class BrowseArtistFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, artist: ArtistEntity) {
-    val action = actionHandler.artistSelected(itemId, artist, requireActivity())
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: ArtistEntity) {
+    val action = actionHandler.artistSelected(itemId, item, requireActivity())
     if (action != LibraryPopup.PROFILE) {
-      presenter.queue(action, artist)
+      presenter.queue(action, item)
     }
   }
 
-  override fun onItemClicked(artist: ArtistEntity) {
-    actionHandler.artistSelected(artist, requireActivity())
+  override fun onItemClicked(item: ArtistEntity) {
+    actionHandler.artistSelected(item, requireActivity())
   }
 
   override fun update(pagedList: PagedList<ArtistEntity>) {

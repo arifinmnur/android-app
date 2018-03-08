@@ -24,6 +24,7 @@ import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.extensions.gone
 import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.ui.dialogs.SortingDialog
+import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
 import toothpick.Toothpick
@@ -32,7 +33,7 @@ import javax.inject.Inject
 
 class BrowseAlbumFragment : Fragment(),
   BrowseAlbumView,
-  AlbumEntryAdapter.MenuItemSelectedListener {
+  MenuItemSelectedListener<AlbumEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -118,17 +119,16 @@ class BrowseAlbumFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, album: AlbumEntity) {
-    val action = actionHandler.albumSelected(itemId, album, requireActivity())
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: AlbumEntity) {
+    val action = actionHandler.albumSelected(itemId, item, requireActivity())
     if (action != LibraryPopup.PROFILE) {
-      presenter.queue(action, album)
+      presenter.queue(action, item)
     }
   }
 
-  override fun onItemClicked(album: AlbumEntity) {
-    actionHandler.albumSelected(album, requireActivity())
+  override fun onItemClicked(item: AlbumEntity) {
+    actionHandler.albumSelected(item, requireActivity())
   }
-
 
   override fun update(pagedList: PagedList<AlbumEntity>) {
     if (pagedList.isEmpty()) {

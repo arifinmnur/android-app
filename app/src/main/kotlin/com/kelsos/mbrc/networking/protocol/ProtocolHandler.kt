@@ -27,11 +27,11 @@ import javax.inject.Singleton
 class ProtocolHandler
 @Inject
 constructor(
-    private val bus: RxBus,
-    private val mapper: ObjectMapper,
-    private val model: MainDataModel,
-    private val connectionStatusModel: ConnectionStatusModel,
-    private val clientInformationStore: ClientInformationStore
+  private val bus: RxBus,
+  private val mapper: ObjectMapper,
+  private val model: MainDataModel,
+  private val connectionStatusModel: ConnectionStatusModel,
+  private val clientInformationStore: ClientInformationStore
 ) {
 
   init {

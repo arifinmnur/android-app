@@ -130,7 +130,6 @@ class RadioPresenterImplTest {
     verify(radioView, never()).hideLoading()
   }
 
-
   @Test
   fun loadRadiosRefreshViewAttached() {
     val data = Single.just(result)

@@ -17,8 +17,8 @@ import javax.inject.Inject
 
 class UpdateNowPlayingTrackMoved
 @Inject constructor(
-    private val bus: RxBus,
-    private val mapper: ObjectMapper
+  private val bus: RxBus,
+  private val mapper: ObjectMapper
 
 ) : ICommand {
 
@@ -30,8 +30,8 @@ class UpdateNowPlayingTrackMoved
 
 class UpdateNowPlayingTrackRemoval
 @Inject constructor(
-    private val bus: RxBus,
-    private val mapper: ObjectMapper
+  private val bus: RxBus,
+  private val mapper: ObjectMapper
 ) : ICommand {
   override fun execute(e: IEvent) {
     val response: NowPlayingTrackRemoveResponse = mapper.treeToValue(e.data as JsonNode) ?: return
@@ -41,9 +41,9 @@ class UpdateNowPlayingTrackRemoval
 
 class UpdatePlaybackPositionCommand
 @Inject constructor(
-    private val bus: RxBus,
-    private val mapper: ObjectMapper,
-    private val mainDataModel: MainDataModel
+  private val bus: RxBus,
+  private val mapper: ObjectMapper,
+  private val mainDataModel: MainDataModel
 ) : ICommand {
 
   override fun execute(e: IEvent) {

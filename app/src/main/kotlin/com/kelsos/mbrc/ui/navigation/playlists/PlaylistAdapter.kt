@@ -29,7 +29,6 @@ constructor(context: Activity) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder
       path?.let {
         playlistPressedListener?.playlistPressed(it)
       }
-
     }
     return viewHolder
   }
@@ -40,7 +39,6 @@ constructor(context: Activity) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder
       holder.name.text = playlist.name
     }
     holder.context.visibility = View.GONE
-
   }
 
   override fun getItemCount(): Int = data?.size ?: 0

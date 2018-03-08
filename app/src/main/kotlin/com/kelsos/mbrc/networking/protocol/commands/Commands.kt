@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 class ProtocolPingHandle
 @Inject constructor(
-    private val client: SocketClient,
-    private var activityChecker: SocketActivityChecker
+  private val client: SocketClient,
+  private var activityChecker: SocketActivityChecker
 ) : ICommand {
 
   override fun execute(e: IEvent) {

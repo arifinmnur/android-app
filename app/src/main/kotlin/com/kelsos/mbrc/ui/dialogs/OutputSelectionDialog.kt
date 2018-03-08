@@ -95,7 +95,7 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
     val inflater = LayoutInflater.from(context)
     val view = inflater.inflate(R.layout.dialog__output_selection, null, false)
 
-    availableOutputs = view.findViewById(R.id.output_selection__available_outputs)
+availableOutputs = view.findViewById(R.id.output_selection__available_outputs)
     loadingProgress = view.findViewById(R.id.output_selection__loading_outputs)
     errorMessage = view.findViewById(R.id.output_selection__error_message)
 

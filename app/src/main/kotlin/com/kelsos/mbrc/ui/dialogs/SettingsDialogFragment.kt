@@ -62,7 +62,6 @@ class SettingsDialogFragment : DialogFragment() {
       }.setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
       .show()
 
-
     hostEdit = dialog.findViewById(R.id.settings_dialog__hostname_edit) ?: error("not found")
     nameEdit = dialog.findViewById(R.id.settings_dialog__name_edit) ?: error("not found")
     portEdit = dialog.findViewById(R.id.settings_dialog__port_edit) ?: error("not found")

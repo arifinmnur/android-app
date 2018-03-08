@@ -27,7 +27,8 @@ class MainViewPresenterImpl
   private val bus: RxBus,
   private val model: MainDataModel,
   private val connectionStatusModel: ConnectionStatusModel,
-  private val settingsManager: SettingsManager,
+  private val settingsManager: SettingsManager
+,
   private val modelInitializer: ModelInitializer
 ) : BasePresenter<MainView>(), MainViewPresenter {
   override fun stop(): Boolean {
@@ -172,6 +173,4 @@ class MainViewPresenterImpl
     bus.post(UserAction.toggle(Protocol.NowPlayingLfmRating))
     return true
   }
-
-
 }

@@ -123,7 +123,6 @@ constructor(
       .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, data.duration)
     mediaSession.setMetadata(builder.build())
-
   }
 
   private fun updateState(change: PlayStateChange) {

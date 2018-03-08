@@ -40,7 +40,6 @@ constructor(
 
         val message = mapper.readValue<SocketMessage>(line)
 
-
         val context = message.context
         Timber.v("incoming context => $context")
         if (Protocol.Player == context) {
@@ -51,7 +50,6 @@ constructor(
           break
         }
       }
-
 
       return@withContext ActiveConnection(socket, bufferedReader)
     }
@@ -104,4 +102,3 @@ constructor(
     this.outputStream.write(socketMessage.getBytes())
   }
 }
-

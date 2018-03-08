@@ -23,7 +23,6 @@ class NowPlayingTouchListener(context: Context, private val onLongClick: (Boolea
   }
 
   override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-
   }
 
   override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
@@ -38,7 +37,5 @@ class NowPlayingTouchListener(context: Context, private val onLongClick: (Boolea
   }
 
   override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-
   }
-
 }

@@ -55,7 +55,7 @@ constructor(
         settings = model.settings
         view().updateDefault(model.defaultId)
 
-        settings.observe(this@ConnectionManagerPresenterImpl,  {
+        settings.observe(this@ConnectionManagerPresenterImpl, {
           it?.let { data ->
             view().updateData(data)
           }
