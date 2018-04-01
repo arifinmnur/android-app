@@ -2,18 +2,25 @@ package com.kelsos.mbrc.ui.navigation.radio
 
 import android.app.Application
 import android.content.Intent
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.IdlingRegistry
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.swipeDown
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.test.espresso.intent.rule.IntentsTestRule
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.espresso.matcher.ViewMatchers.Visibility.VISIBLE
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
+import android.view.View.VISIBLE
+import androidx.test.InstrumentationRegistry.getTargetContext
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.swipeDown
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.idling.CountingIdlingResource
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.kelsos.mbrc.DbTest
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioRepository
@@ -21,13 +28,8 @@ import com.kelsos.mbrc.content.radios.RadioRepositoryImpl
 import com.kelsos.mbrc.content.radios.RadioStation
 import com.kelsos.mbrc.content.radios.RadioStationDao
 import com.kelsos.mbrc.content.radios.RadioStationDto
-import com.kelsos.mbrc.content.radios.RemoteRadioDataSource
-import com.kelsos.mbrc.events.bus.RxBus
-import com.kelsos.mbrc.networking.protocol.VolumeInteractor
-import com.kelsos.mbrc.platform.ServiceChecker
 import com.kelsos.mbrc.ui.minicontrol.MiniControlFragment
 import com.kelsos.mbrc.ui.minicontrol.MiniControlPresenter
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -41,7 +43,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import toothpick.Toothpick
 import toothpick.config.Module
@@ -81,16 +84,9 @@ class RadioActivityTest : DbTest() {
 
   @Mock
   lateinit var presenter: RadioPresenter
+
   @Mock
   lateinit var miniControlPresenter: MiniControlPresenter
-  @Mock
-  lateinit var bus: RxBus
-  @Mock
-  lateinit var serviceChecker: ServiceChecker
-  @Mock
-  lateinit var volumeInteractor: VolumeInteractor
-  @Mock
-  lateinit var remoteDataSource: RemoteRadioDataSource
 
   private lateinit var resource: CountingIdlingResource
 
@@ -124,7 +120,6 @@ class RadioActivityTest : DbTest() {
 
   @Test
   fun radioScreenIsEmpty() {
-    given(remoteDataSource.fetch()).willReturn(Observable.just(emptyList()))
     activityRule.launchActivity(Intent())
     mockDataLoading(activityRule.activity, resource)
     onView(withId(R.id.radio_stations__empty_icon)).check(matches(isDisplayed()))
@@ -133,8 +128,6 @@ class RadioActivityTest : DbTest() {
 
   @Test
   fun radioView_threeStationsAvailable_playSuccess() {
-    given(remoteDataSource.fetch()).willReturn(Observable.just(list))
-
     activityRule.launchActivity(Intent())
     verify(presenter, times(1)).load()
     mockDataLoading(activityRule.activity, resource)
@@ -151,16 +144,16 @@ class RadioActivityTest : DbTest() {
         fail()
       })
 
-    onView(allOf(
-      withId(android.support.design.R.id.snackbar_text),
-      withText(R.string.radio__play_successful)
-    )).check(matches(withEffectiveVisibility(VISIBLE)))
+    onView(
+      allOf(
+        withId(android.support.design.R.id.snackbar_text),
+        withText(R.string.radio__play_successful)
+      )
+    ).check(matches(withEffectiveVisibility(VISIBLE)))
   }
 
   @Test
   fun radioView_threeStationsAvailable_playFailure() {
-    given(remoteDataSource.fetch()).willReturn(Observable.just(list))
-
     activityRule.launchActivity(Intent())
     mockDataLoading(activityRule.activity, resource)
 
@@ -176,10 +169,12 @@ class RadioActivityTest : DbTest() {
         fail()
       })
 
-    onView(allOf(
-      withId(android.support.design.R.id.snackbar_text),
-      withText(R.string.radio__play_failed)
-    ))
+    onView(
+      allOf(
+        withId(android.support.design.R.id.snackbar_text),
+        withText(R.string.radio__play_failed)
+      )
+    )
       .check(matches(withEffectiveVisibility(VISIBLE)))
 
     verify(presenter, times(1)).play(station3.url)
@@ -188,7 +183,6 @@ class RadioActivityTest : DbTest() {
 
   @Test
   fun radioView_swipeToRefresh() {
-    given(remoteDataSource.fetch()).willReturn(Observable.just(emptyList()))
     activityRule.launchActivity(Intent())
     val activity = activityRule.activity
     verify(presenter, times(1)).load()
@@ -237,17 +231,17 @@ class RadioActivityTest : DbTest() {
 
   @Test
   fun radioView_swipeToRefresh_loadError() {
-    given(remoteDataSource.fetch()).willReturn(Observable.just(emptyList()))
-
     activityRule.launchActivity(Intent())
     val view = activityRule.activity
     given(presenter.refresh()).will { mockLoadingError(view, resource) }
 
     onView(withId(R.id.radio_stations__refresh_layout)).perform(swipeDown())
-    onView(allOf(
-      withId(android.support.design.R.id.snackbar_text),
-      withText(R.string.radio__loading_failed)
-    )).check(matches(withEffectiveVisibility(VISIBLE)))
+    onView(
+      allOf(
+        withId(android.support.design.R.id.snackbar_text),
+        withText(R.string.radio__loading_failed)
+      )
+    ).check(matches(withEffectiveVisibility(VISIBLE)))
 
     verify(presenter, times(1)).refresh()
     verify(presenter, times(1)).load()

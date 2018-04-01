@@ -6,8 +6,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "radio_station",
-    indices = [(Index("url", name = "radio_url_idx", unique = true))]
+  tableName = "radio_station",
+  indices = [(Index("url", name = "radio_url_idx", unique = true))]
 )
 data class RadioStationEntity(
   @ColumnInfo(name = "name")

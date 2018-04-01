@@ -17,19 +17,20 @@ class RadioPresenterImpl
 constructor(
   private val radioRepository: RadioRepository,
   private val queue: QueueHandler
-) : BasePresenter<RadioView>(), RadioPresenter {
+) : BasePresenter<RadioView>(),
+  RadioPresenter {
 
   private lateinit var radios: LiveData<PagedList<RadioStationEntity>>
 
   override fun load() {
-    view().showLoading()
+    view().loading(true)
     scope.launch {
       try {
         onRadiosLoaded(radioRepository.getAndSaveRemote())
       } catch (e: Exception) {
         view().error(e)
       }
-      view().hideLoading()
+      view().loading(false)
     }
   }
 
@@ -43,14 +44,14 @@ constructor(
   }
 
   override fun refresh() {
-    view().showLoading()
+    view().loading(true)
     scope.launch {
       try {
         onRadiosLoaded(radioRepository.getAndSaveRemote())
       } catch (e: Exception) {
         view().error(e)
       }
-      view().hideLoading()
+      view().loading(false)
     }
   }
 

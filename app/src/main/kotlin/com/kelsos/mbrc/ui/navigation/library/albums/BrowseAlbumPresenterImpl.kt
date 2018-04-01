@@ -7,8 +7,6 @@ import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
-import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.AlbumSortingStore
@@ -21,13 +19,13 @@ import javax.inject.Inject
 class BrowseAlbumPresenterImpl
 @Inject
 constructor(
-  private val bus: RxBus,
   private val repository: AlbumRepository,
   private val albumSortingStore: AlbumSortingStore,
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queueHandler: QueueHandler,
   private val searchModel: LibrarySearchModel
-) : BasePresenter<BrowseAlbumView>(), BrowseAlbumPresenter {
+) : BasePresenter<BrowseAlbumView>(),
+  BrowseAlbumPresenter {
 
   private lateinit var albums: LiveData<PagedList<AlbumEntity>>
 
@@ -63,16 +61,6 @@ constructor(
 
   private suspend fun getData(term: String) =
     if (term.isNotEmpty()) repository.search(term) else repository.getAlbumsSorted()
-
-  override fun attach(view: BrowseAlbumView) {
-    super.attach(view)
-    bus.register(this, LibraryRefreshCompleteEvent::class.java) { load() }
-  }
-
-  override fun detach() {
-    super.detach()
-    bus.unregister(this)
-  }
 
   override fun load() {
     updateUi(searchModel.term.value ?: "")

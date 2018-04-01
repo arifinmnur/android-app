@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.activestatus.PlayerState.State
-import com.kelsos.mbrc.content.library.tracks.TrackInfo
+import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.ui.navigation.main.MainActivity
@@ -71,7 +71,6 @@ class MiniControlFragment : Fragment(), MiniControlView {
   override fun onStart() {
     super.onStart()
     presenter.attach(this)
-    presenter.load()
   }
 
   override fun onStop() {
@@ -79,7 +78,7 @@ class MiniControlFragment : Fragment(), MiniControlView {
     presenter.detach()
   }
 
-  override fun updateCover(path: String) {
+  private fun updateCover(path: String) {
     val file = File(path)
 
     if (file.exists()) {
@@ -97,9 +96,10 @@ class MiniControlFragment : Fragment(), MiniControlView {
     }
   }
 
-  override fun updateTrackInfo(trackInfo: TrackInfo) {
-    trackArtist.text = trackInfo.artist
-    trackTitle.text = trackInfo.title
+  override fun updateTrackInfo(track: PlayingTrackModel) {
+    trackArtist.text = track.artist
+    trackTitle.text = track.title
+    updateCover(track.coverUrl)
   }
 
   override fun updateState(@State state: String) {

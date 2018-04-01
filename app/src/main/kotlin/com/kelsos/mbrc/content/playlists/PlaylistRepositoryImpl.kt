@@ -2,6 +2,8 @@ package com.kelsos.mbrc.content.playlists
 
 import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.networking.ApiBase
+import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -11,7 +13,7 @@ import javax.inject.Inject
 class PlaylistRepositoryImpl
 @Inject constructor(
   private val dao: PlaylistDao,
-  private val remoteDataSource: RemotePlaylistDataSource,
+  private val api: ApiBase,
   private val dispatchers: AppDispatchers
 ) : PlaylistRepository {
   private val mapper = PlaylistDtoMapper()
@@ -26,16 +28,17 @@ class PlaylistRepositoryImpl
   override suspend fun getRemote() {
     withContext(dispatchers.io) {
       val added = epoch()
-      remoteDataSource.fetch().onCompletion {
-        dao.removePreviousEntries(added)
-      }.collect { items ->
-        val playlists = items.map {
-          mapper.map(it).apply {
-            this.dateAdded = added
+      api.getAllPages(Protocol.PlaylistList, PlaylistDto::class)
+        .onCompletion {
+          dao.removePreviousEntries(added)
+        }.collect { items ->
+          val playlists = items.map {
+            mapper.map(it).apply {
+              this.dateAdded = added
+            }
           }
+          dao.insertAll(playlists)
         }
-        dao.insertAll(playlists)
-      }
     }
   }
 

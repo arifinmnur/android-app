@@ -5,15 +5,13 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.isVisible
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.radios.RadioStation
-import com.kelsos.mbrc.extensions.gone
-import com.kelsos.mbrc.extensions.hide
-import com.kelsos.mbrc.extensions.show
+import com.kelsos.mbrc.content.radios.RadioStationEntity
 import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter.OnRadioPressedListener
 import kotterknife.bindView
@@ -34,8 +32,10 @@ class RadioActivity : BaseNavigationActivity(),
   private val emptyViewIcon: ImageView by bindView(R.id.radio_stations__empty_icon)
   private val emptyViewProgress: ProgressBar by bindView(R.id.radio_stations__loading_bar)
 
-  @Inject lateinit var presenter: RadioPresenter
-  @Inject lateinit var adapter: RadioAdapter
+  @Inject
+  lateinit var presenter: RadioPresenter
+  @Inject
+  lateinit var adapter: RadioAdapter
 
   override fun active(): Int = R.id.nav_radio
 
@@ -48,16 +48,23 @@ class RadioActivity : BaseNavigationActivity(),
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_radio)
     Toothpick.inject(this, scope)
-
     super.setup()
-    swipeLayout.setOnRefreshListener(this)
-    emptyViewTitle.setText(R.string.radio__no_radio_stations)
-    emptyViewIcon.setImageResource(R.drawable.ic_radio_black_80dp)
-    radioView.adapter = adapter
-    radioView.layoutManager = LinearLayoutManager(this)
+    setupEmptyView()
+    setupRecycler()
     presenter.attach(this)
     presenter.load()
+  }
+
+  private fun setupRecycler() {
+    swipeLayout.setOnRefreshListener(this)
+    radioView.adapter = adapter
+    radioView.layoutManager = LinearLayoutManager(this)
     adapter.setOnRadioPressedListener(this)
+  }
+
+  private fun setupEmptyView() {
+    emptyViewTitle.setText(R.string.radio__no_radio_stations)
+    emptyViewIcon.setImageResource(R.drawable.ic_radio_black_80dp)
   }
 
   override fun onDestroy() {
@@ -71,17 +78,13 @@ class RadioActivity : BaseNavigationActivity(),
     super.onDestroy()
   }
 
-  override fun update(data: List<RadioStation>) {
-    if (data.isEmpty()) {
-      emptyView.show()
-    } else {
-      emptyView.hide()
-    }
-    adapter.update(data)
+  override fun update(data: PagedList<RadioStationEntity>) {
+    emptyView.isVisible = data.isEmpty()
+    adapter.submitList(data)
   }
 
   override fun error(error: Throwable) {
-    Snackbar.make(radioView, R.string.radio__loading_failed, Snackbar.LENGTH_SHORT).show()
+    showSnackbar(R.string.radio__loading_failed)
   }
 
   override fun onRadioPressed(path: String) {
@@ -93,19 +96,18 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun radioPlayFailed(error: Throwable?) {
-    Snackbar.make(radioView, R.string.radio__play_failed, Snackbar.LENGTH_SHORT).show()
+    showSnackbar(R.string.radio__play_failed)
   }
 
   override fun radioPlaySuccessful() {
-    Snackbar.make(radioView, R.string.radio__play_successful, Snackbar.LENGTH_SHORT).show()
+    showSnackbar(R.string.radio__play_successful)
   }
 
-  override fun showLoading() {
-  }
-
-  override fun hideLoading() {
-    emptyViewProgress.gone()
-    swipeLayout.isRefreshing = false
+  override fun loading(visible: Boolean) {
+    if (!visible) {
+      emptyViewProgress.isVisible = false
+      swipeLayout.isRefreshing = false
+    }
   }
 
   @javax.inject.Scope

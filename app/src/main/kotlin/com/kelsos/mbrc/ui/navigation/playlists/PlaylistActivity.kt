@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -11,8 +12,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.playlists.Playlist
-import com.kelsos.mbrc.extensions.gone
-import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.navigation.playlists.PlaylistAdapter.OnPlaylistPressedListener
 import kotterknife.bindView
@@ -33,8 +32,10 @@ class PlaylistActivity : BaseNavigationActivity(),
   private val emptyViewTitle: TextView by bindView(R.id.playlists__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.playlists__loading_bar)
 
-  @Inject lateinit var adapter: PlaylistAdapter
-  @Inject lateinit var presenter: PlaylistPresenter
+  @Inject
+  lateinit var adapter: PlaylistAdapter
+  @Inject
+  lateinit var presenter: PlaylistPresenter
 
   private lateinit var scope: Scope
 
@@ -80,11 +81,7 @@ class PlaylistActivity : BaseNavigationActivity(),
   }
 
   override fun update(cursor: List<Playlist>) {
-    if (cursor.isEmpty()) {
-      emptyView.show()
-    } else {
-      emptyView.gone()
-    }
+    emptyView.isVisible = cursor.isEmpty()
     adapter.update(cursor)
     swipeLayout.isRefreshing = false
   }
@@ -102,7 +99,7 @@ class PlaylistActivity : BaseNavigationActivity(),
   }
 
   override fun hideLoading() {
-    emptyViewProgress.gone()
+    emptyViewProgress.isVisible = false
     swipeLayout.isRefreshing = false
   }
 

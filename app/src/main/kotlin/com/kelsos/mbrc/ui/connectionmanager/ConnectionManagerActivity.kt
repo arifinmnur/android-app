@@ -10,10 +10,9 @@ import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.events.ConnectionSettingsChanged
-import com.kelsos.mbrc.events.DiscoveryStopped
 import com.kelsos.mbrc.events.NotifyUser
-import com.kelsos.mbrc.networking.DiscoveryStop
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
+import com.kelsos.mbrc.networking.discovery.DiscoveryStop
 import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
 import kotterknife.bindView
@@ -91,17 +90,17 @@ class ConnectionManagerActivity : BaseActivity(),
     adapter.setSelectionId(event.defaultId)
   }
 
-  override fun onDiscoveryStopped(event: DiscoveryStopped) {
+  override fun onDiscoveryStopped(status: Int) {
     findViewById<ProgressIndicator>(R.id.connection_manager__progress).isGone = true
 
-    val message: String = when (event.reason) {
+    val message: String = when (status) {
       DiscoveryStop.NO_WIFI -> getString(R.string.con_man_no_wifi)
       DiscoveryStop.NOT_FOUND -> getString(R.string.con_man_not_found)
       DiscoveryStop.COMPLETE -> {
         presenter.load()
         getString(R.string.con_man_success)
       }
-      else -> throw IllegalArgumentException(event.reason.toString())
+      else -> throw IllegalArgumentException(status.toString())
     }
 
     Snackbar.make(recyclerView, message, Snackbar.LENGTH_SHORT).show()

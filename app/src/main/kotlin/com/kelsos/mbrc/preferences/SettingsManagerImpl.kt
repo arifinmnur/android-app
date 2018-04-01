@@ -38,6 +38,7 @@ constructor(
   }
 
   @SettingsManager.CallAction
+
   override fun getCallAction(): String = preferences.getString(
     getKey(R.string.settings_key_incoming_call_action), NONE
   ) ?: NONE
@@ -57,7 +58,10 @@ constructor(
   }
 
   override suspend fun shouldDisplayOnlyAlbumArtists(): Boolean {
-    return preferences.getBoolean(getKey(R.string.settings_key_album_artists_only), false)
+    return preferences.getBoolean(
+        getKey(R.string.settings_key_album_artists_only),
+        false
+      )
   }
 
   override fun setShouldDisplayOnlyAlbumArtist(onlyAlbumArtist: Boolean) {
@@ -69,11 +73,11 @@ constructor(
     val lastVersionCode = preferences.getLong(getKey(R.string.settings_key_last_version_run), 0)
     val currentVersion = context.getVersionCode()
 
-    if (lastVersionCode < currentVersion) {
-      preferences.edit()
-        .putLong(getKey(R.string.settings_key_last_version_run), currentVersion)
-        .apply()
-      Timber.d("Update or fresh install")
+      if (lastVersionCode < currentVersion) {
+        preferences.edit()
+          .putLong(getKey(R.string.settings_key_last_version_run), currentVersion)
+          .apply()
+        Timber.d("Update or fresh install")
 
       return true
     }

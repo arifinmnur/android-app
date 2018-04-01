@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,9 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
-import com.kelsos.mbrc.extensions.gone
-import com.kelsos.mbrc.extensions.hide
-import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
@@ -38,6 +36,7 @@ class BrowseTrackFragment : Fragment(),
 
   @Inject
   lateinit var adapter: TrackEntryAdapter
+
   @Inject
   lateinit var actionHandler: PopupActionHandler
 
@@ -99,11 +98,7 @@ class BrowseTrackFragment : Fragment(),
   }
 
   override fun update(pagedList: PagedList<TrackEntity>) {
-    if (pagedList.isEmpty()) {
-      emptyView.show()
-    } else {
-      emptyView.hide()
-    }
+    emptyView.isVisible = pagedList.isEmpty()
     adapter.submitList(pagedList)
   }
 
@@ -116,6 +111,6 @@ class BrowseTrackFragment : Fragment(),
   }
 
   override fun hideLoading() {
-    emptyViewProgress.gone()
+    emptyViewProgress.isVisible
   }
 }

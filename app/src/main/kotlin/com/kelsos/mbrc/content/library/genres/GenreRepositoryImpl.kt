@@ -2,6 +2,8 @@ package com.kelsos.mbrc.content.library.genres
 
 import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.networking.ApiBase
+import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -12,7 +14,7 @@ class GenreRepositoryImpl
 @Inject
 constructor(
   private val dao: GenreDao,
-  private val remoteDataSource: RemoteGenreDataSource,
+  private val api: ApiBase,
   private val dispatchers: AppDispatchers
 ) : GenreRepository {
 
@@ -28,7 +30,7 @@ constructor(
   override suspend fun getRemote() {
     val added = epoch()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch()
+      api.getAllPages(Protocol.LibraryBrowseGenres, GenreDto::class)
         .onCompletion {
           dao.removePreviousEntries(added)
         }

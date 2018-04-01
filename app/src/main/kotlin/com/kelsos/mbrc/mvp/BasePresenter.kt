@@ -15,14 +15,11 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
   override fun getLifecycle(): Lifecycle = this.lifecycleRegistry
   private var view: T? = null
-  private val compositeDisposable = CompositeDisposable()
   private val job = SupervisorJob()
   private val coroutineContext = job + Dispatchers.Main
   protected val scope: CoroutineScope = CoroutineScope(coroutineContext)
 
-  protected val disposables: CompositeDisposable
-    get() = compositeDisposable
-
+  protected val disposables: CompositeDisposable = CompositeDisposable()
   override val isAttached: Boolean
     get() = view != null
 
@@ -35,12 +32,19 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   override fun detach() {
     lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     this.view = null
-    compositeDisposable.clear()
+    CompositeDisposable().clear()
     coroutineContext.cancelChildren()
   }
 
+  @Deprecated(
+    message = "use rxkotlin +=",
+    replaceWith = ReplaceWith(
+      "disposables += disposable",
+      imports = ["io.reactivex.rxkotlin.plusAssign"]
+    )
+  )
   protected fun addDisposable(disposable: Disposable) {
-    this.compositeDisposable.add(disposable)
+    CompositeDisposable().add(disposable)
   }
 
   fun view(): T {
@@ -54,5 +58,5 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   }
 
   protected class ViewNotAttachedException :
-    RuntimeException("Please call Presenter.attach(BaseView) before calling a method on the presenter")
+    RuntimeException("Please call Presenter.attach(BaseView) before any method on the presenter")
 }

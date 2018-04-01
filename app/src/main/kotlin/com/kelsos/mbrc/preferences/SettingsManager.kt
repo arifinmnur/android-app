@@ -6,6 +6,12 @@ import java.util.Date
 interface SettingsManager {
   @CallAction
   fun getCallAction(): String
+  suspend fun shouldDisplayOnlyAlbumArtists(): Boolean
+  fun setShouldDisplayOnlyAlbumArtist(onlyAlbumArtist: Boolean)
+  fun shouldShowChangeLog(): Boolean
+  fun isPluginUpdateCheckEnabled(): Boolean
+  fun getLastUpdated(): Date
+  fun setLastUpdated(lastChecked: Date)
 
   @StringDef(
     NONE,
@@ -22,11 +28,4 @@ interface SettingsManager {
     const val STOP = "stop"
     const val REDUCE = "reduce"
   }
-
-  suspend fun shouldDisplayOnlyAlbumArtists(): Boolean
-  fun setShouldDisplayOnlyAlbumArtist(onlyAlbumArtist: Boolean)
-  fun shouldShowChangeLog(): Boolean
-  fun isPluginUpdateCheckEnabled(): Boolean
-  fun getLastUpdated(): Date
-  fun setLastUpdated(lastChecked: Date)
 }

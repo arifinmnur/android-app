@@ -6,8 +6,6 @@ import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
 import com.kelsos.mbrc.di.modules.AppDispatchers
-import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.ui.navigation.library.LibraryStats
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -16,13 +14,13 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class LibrarySyncInteractorImpl
-@Inject constructor(
+@Inject
+constructor(
   private val genreRepository: GenreRepository,
   private val artistRepository: ArtistRepository,
   private val albumRepository: AlbumRepository,
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
-  private val bus: RxBus,
   dispatchers: AppDispatchers
 ) : LibrarySyncInteractor {
 
@@ -58,10 +56,10 @@ class LibrarySyncInteractorImpl
         albumRepository.getRemote()
         trackRepository.getRemote()
         playlistRepository.getRemote()
-        bus.post(LibraryRefreshCompleteEvent())
+
         onCompleteListener?.onSuccess(
           LibraryStats(
-    genres = genreRepository.count(),
+            genres = genreRepository.count(),
             artists = artistRepository.count(),
             albums = albumRepository.count(),
             tracks = trackRepository.count(),
@@ -95,12 +93,14 @@ class LibrarySyncInteractorImpl
 
   private suspend fun isEmpty(): Boolean {
     return genreRepository.cacheIsEmpty() &&
-        artistRepository.cacheIsEmpty() &&
-        albumRepository.cacheIsEmpty() &&
-        trackRepository.cacheIsEmpty()
+      artistRepository.cacheIsEmpty() &&
+      albumRepository.cacheIsEmpty() &&
+      trackRepository.cacheIsEmpty()
   }
 
-  override fun setOnCompleteListener(onCompleteListener: LibrarySyncInteractor.OnCompleteListener?) {
+  override fun setOnCompleteListener(
+    onCompleteListener: LibrarySyncInteractor.OnCompleteListener?
+  ) {
     this.onCompleteListener = onCompleteListener
   }
 

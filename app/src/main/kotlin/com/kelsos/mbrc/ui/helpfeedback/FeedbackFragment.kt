@@ -38,12 +38,12 @@ class FeedbackFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     LogHelper.logsExist(requireContext())
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe({
-          logInfo.isEnabled = true
-        }) {
-        }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe({
+        logInfo.isEnabled = true
+      }) {
+      }
     feedbackButton.setOnClickListener { onFeedbackButtonClicked() }
   }
 

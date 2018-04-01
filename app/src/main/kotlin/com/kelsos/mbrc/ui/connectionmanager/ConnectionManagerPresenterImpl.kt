@@ -1,15 +1,10 @@
 package com.kelsos.mbrc.ui.connectionmanager
 
 import androidx.lifecycle.LiveData
-import com.kelsos.mbrc.events.ConnectionSettingsChanged
-import com.kelsos.mbrc.events.DiscoveryStopped
-import com.kelsos.mbrc.events.NotifyUser
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
-import com.kelsos.mbrc.networking.StartServiceDiscoveryEvent
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
-import com.kelsos.mbrc.preferences.DefaultSettingsChangedEvent
+import com.kelsos.mbrc.networking.discovery.ServiceDiscoveryUseCase
 import com.kelsos.mbrc.utilities.SchedulerProvider
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -19,32 +14,34 @@ class ConnectionManagerPresenterImpl
 @Inject
 constructor(
   private val repository: ConnectionRepository,
-  private val schedulerProvider: SchedulerProvider,
-  private val bus: RxBus
+  private val serviceDiscoveryUseCase: ServiceDiscoveryUseCase,
+  private val schedulerProvider: SchedulerProvider
 ) : BasePresenter<ConnectionManagerView>(), ConnectionManagerPresenter {
 
   private lateinit var settings: LiveData<List<ConnectionSettingsEntity>>
 
   override fun attach(view: ConnectionManagerView) {
     super.attach(view)
-    addDisposable(bus.observe(ConnectionSettingsChanged::class)
-      .subscribeOn(schedulerProvider.io())
-      .observeOn(schedulerProvider.main())
-      .subscribe { view().onConnectionSettingsChange(it) })
+//    disposables += bus.observe(ConnectionSettingsChanged::class)
+//      .subscribeOn(schedulerProvider.io())
+//      .observeOn(schedulerProvider.main())
+//      .subscribe({ view().onConnectionSettingsChange(it) })
 
-    addDisposable(bus.observe(DiscoveryStopped::class)
-      .subscribeOn(schedulerProvider.io())
-      .observeOn(schedulerProvider.main())
-      .subscribe { view().onDiscoveryStopped(it) })
+//    disposables += bus.observe(DiscoveryStopped::class)
+//      .subscribeOn(schedulerProvider.io())
+//      .observeOn(schedulerProvider.main())
+//      .subscribe({ view().onDiscoveryStopped(it) })
 
-    addDisposable(bus.observe(NotifyUser::class)
-      .subscribeOn(schedulerProvider.io())
-      .observeOn(schedulerProvider.main())
-      .subscribe { view().onUserNotification(it) })
+//    disposables += bus.observe(NotifyUser::class)
+//      .subscribeOn(schedulerProvider.io())
+//      .observeOn(schedulerProvider.main())
+//      .subscribe({ view().onUserNotification(it) })
   }
 
   override fun startDiscovery() {
-    bus.post(StartServiceDiscoveryEvent())
+    serviceDiscoveryUseCase.discover {
+      view().onDiscoveryStopped(it)
+    }
   }
 
   override fun load() {
@@ -55,11 +52,11 @@ constructor(
         settings = model.settings
         view().updateDefault(model.defaultId)
 
-        settings.observe(this@ConnectionManagerPresenterImpl, {
+        settings.observe(this@ConnectionManagerPresenterImpl) {
           it?.let { data ->
             view().updateData(data)
           }
-        })
+        }
       } catch (e: Exception) {
         Timber.v(e, "Failure")
       }
@@ -70,7 +67,7 @@ constructor(
     checkIfAttached()
     scope.launch {
       repository.setDefault(settings)
-      bus.post(DefaultSettingsChangedEvent())
+      //bus.post(DefaultSettingsChangedEvent())
       load()
     }
   }
@@ -83,7 +80,7 @@ constructor(
         repository.save(settings)
 
         if (settings.id == repository.defaultId) {
-          bus.post(DefaultSettingsChangedEvent())
+          //bus.post(DefaultSettingsChangedEvent())
         }
 
         load()
@@ -100,7 +97,7 @@ constructor(
       repository.delete(settings)
 
       if (settings.id == repository.defaultId) {
-        bus.post(DefaultSettingsChangedEvent())
+        //bus.post(DefaultSettingsChangedEvent())
       }
     }
   }

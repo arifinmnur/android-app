@@ -8,7 +8,6 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import javax.inject.Inject
 
 class ArtistEntryAdapter
@@ -18,9 +17,8 @@ class ArtistEntryAdapter
 
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_artist) {
-      ifNotNull(listener, getItem(position)) { listener, artist ->
-        listener.onMenuItemSelected(it, artist)
-      }
+      val listener = checkNotNull(listener)
+      listener.onMenuItemSelected(it, checkNotNull(getItem(position)))
     }
   }
 

@@ -3,13 +3,12 @@ package com.kelsos.mbrc.ui.navigation.nowplaying
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.paging.PagedList
-import com.kelsos.mbrc.content.activestatus.MainDataModel
+import com.kelsos.mbrc.content.activestatus.livedata.PlayingTrackLiveDataProvider
 import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.content.nowplaying.NowPlayingRepository
-import com.kelsos.mbrc.events.TrackInfoChangeEvent
 import com.kelsos.mbrc.events.UserAction
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.NowPlayingMoveRequest
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.paged
@@ -18,20 +17,33 @@ import javax.inject.Inject
 
 class NowPlayingPresenterImpl
 @Inject constructor(
+  playingTrackLiveDataProvider: PlayingTrackLiveDataProvider,
   private val repository: NowPlayingRepository,
-  private val bus: RxBus,
-  private val model: MainDataModel
-) : BasePresenter<NowPlayingView>(),
-  NowPlayingPresenter {
+  private val moveManager: MoveManager,
+  private val userActionUseCase: UserActionUseCase
+) : BasePresenter<NowPlayingView>(), NowPlayingPresenter {
 
   private lateinit var nowPlayingTracks: LiveData<PagedList<NowPlayingEntity>>
+
+  init {
+    moveManager.onMoveSubmit { originalPosition, finalPosition ->
+      val data = NowPlayingMoveRequest(originalPosition, finalPosition)
+      userActionUseCase.perform(UserAction(Protocol.NowPlayingListMove, data))
+    }
+
+    playingTrackLiveDataProvider.get().observe(this) {
+      if (it == null) {
+        return@observe
+      }
+      view().trackChanged(it)
+    }
+  }
 
   override fun reload(scrollToTrack: Boolean) {
     view().showLoading()
     scope.launch {
       try {
         onNowPlayingTracksLoaded(repository.getAndSaveRemote())
-        view().trackChanged(model.trackInfo, scrollToTrack)
       } catch (e: Exception) {
         view().failure(e)
       }
@@ -53,7 +65,6 @@ class NowPlayingPresenterImpl
     scope.launch {
       try {
         onNowPlayingTracksLoaded(repository.getAll())
-        view().trackChanged(model.trackInfo, true)
       } catch (e: Exception) {
         view().failure(e)
       }
@@ -66,30 +77,14 @@ class NowPlayingPresenterImpl
   }
 
   override fun moveTrack(from: Int, to: Int) {
-    val data = NowPlayingMoveRequest(from, to)
-    bus.post(UserAction(Protocol.NowPlayingListMove, data))
+    moveManager.move(from, to)
   }
 
   override fun play(position: Int) {
-    bus.post(UserAction(Protocol.NowPlayingListPlay, position))
-  }
-
-  override fun attach(view: NowPlayingView) {
-    super.attach(view)
-    bus.register(
-      this,
-      TrackInfoChangeEvent::class.java,
-      { this.view().trackChanged(it.trackInfo) },
-      true
-    )
-  }
-
-  override fun detach() {
-    super.detach()
-    bus.unregister(this)
+    userActionUseCase.perform(UserAction(Protocol.NowPlayingListPlay, position))
   }
 
   override fun removeTrack(position: Int) {
-    bus.post(UserAction(Protocol.NowPlayingListRemove, position))
+    userActionUseCase.perform(UserAction(Protocol.NowPlayingListRemove, position))
   }
 }

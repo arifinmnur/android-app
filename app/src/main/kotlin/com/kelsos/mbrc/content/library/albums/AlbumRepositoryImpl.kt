@@ -2,6 +2,8 @@ package com.kelsos.mbrc.content.library.albums
 
 import androidx.paging.DataSource
 import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.networking.ApiBase
+import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -12,7 +14,7 @@ class AlbumRepositoryImpl
 @Inject
 constructor(
   private val dao: AlbumDao,
-  private val remoteDataSource: RemoteAlbumDataSource,
+  private val api: ApiBase,
   private val dispatchers: AppDispatchers
 ) : AlbumRepository {
   private val mapper = AlbumDtoMapper()
@@ -30,7 +32,7 @@ constructor(
   override suspend fun getRemote() {
     val added = epoch()
     withContext(dispatchers.io) {
-      remoteDataSource.fetch()
+      api.getAllPages(Protocol.LibraryBrowseAlbums, AlbumDto::class)
         .onCompletion {
           dao.removePreviousEntries(added)
         }

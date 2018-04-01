@@ -14,7 +14,7 @@
   <uses-sdk tools:overrideLibrary="timber.log" />
 
   <application
-      android:name=".RemoteApplication"
+      android:name=".App"
       android:allowBackup="true"
       android:description="@string/application_description"
       android:icon="@mipmap/ic_launcher"

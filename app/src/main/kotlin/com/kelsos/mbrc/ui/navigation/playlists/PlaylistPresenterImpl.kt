@@ -6,8 +6,8 @@ import androidx.paging.PagedList
 import com.kelsos.mbrc.content.playlists.PlaylistEntity
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
 import com.kelsos.mbrc.events.UserAction
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.mvp.BasePresenter
+import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
@@ -16,10 +16,9 @@ import javax.inject.Inject
 class PlaylistPresenterImpl
 @Inject
 constructor(
-  private val bus: RxBus,
-  private val repository: PlaylistRepository
-) : BasePresenter<PlaylistView>(),
-  PlaylistPresenter {
+  private val repository: PlaylistRepository,
+  private val userActionUseCase: UserActionUseCase
+) : BasePresenter<PlaylistView>(), PlaylistPresenter {
 
   private lateinit var playlists: LiveData<PagedList<PlaylistEntity>>
 
@@ -45,7 +44,7 @@ constructor(
   }
 
   override fun play(path: String) {
-    bus.post(UserAction(Protocol.PlaylistPlay, path))
+    userActionUseCase.perform(UserAction(Protocol.PlaylistPlay, path))
   }
 
   override fun reload() {

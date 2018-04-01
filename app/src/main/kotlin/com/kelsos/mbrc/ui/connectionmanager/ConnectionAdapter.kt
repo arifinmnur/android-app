@@ -6,13 +6,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.extensions.gone
-import com.kelsos.mbrc.extensions.show
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import kotterknife.bindView
-import java.util.*
+import java.util.ArrayList
 
 class ConnectionAdapter : RecyclerView.Adapter<ConnectionAdapter.ConnectionViewHolder>() {
   private val data: MutableList<ConnectionSettingsEntity>
@@ -94,11 +93,7 @@ class ConnectionAdapter : RecyclerView.Adapter<ConnectionAdapter.ConnectionViewH
       computerName.text = entity.name
       hostname.text = "${entity.address} : ${entity.port}"
 
-      if (entity.id == selectionId) {
-        defaultSettings.show()
-      } else {
-        defaultSettings.gone()
-      }
+      defaultSettings.isVisible = entity.id == selectionId
     }
 
     fun onOverflow(action: (view: View) -> Unit) {

@@ -6,14 +6,10 @@ import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
-import com.kelsos.mbrc.events.LibraryRefreshCompleteEvent
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
-import com.kelsos.mbrc.utilities.SchedulerProvider
 import com.kelsos.mbrc.utilities.paged
-import io.reactivex.rxkotlin.plusAssign
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,12 +17,10 @@ import javax.inject.Inject
 class BrowseTrackPresenterImpl
 @Inject
 constructor(
-  private val bus: RxBus,
   private val repository: TrackRepository,
   private val librarySyncInteractor: LibrarySyncInteractor,
   private val queue: QueueHandler,
-  private val searchModel: LibrarySearchModel,
-  private val schedulerProvider: SchedulerProvider
+  private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseTrackView>(),
   BrowseTrackPresenter {
 
@@ -34,19 +28,6 @@ constructor(
 
   init {
     searchModel.term.observe(this) { term -> updateUi(term) }
-  }
-
-  override fun attach(view: BrowseTrackView) {
-    super.attach(view)
-    disposables += bus.observe(LibraryRefreshCompleteEvent::class)
-      .observeOn(schedulerProvider.main())
-      .subscribeOn(schedulerProvider.io())
-      .subscribe { load() }
-  }
-
-  override fun detach() {
-    super.detach()
-    bus.unregister(this)
   }
 
   override fun load() {

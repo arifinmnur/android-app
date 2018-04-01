@@ -14,13 +14,12 @@ import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.ui.drag.ItemTouchHelperAdapter
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.TouchHelperViewHolder
-import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import kotterknife.bindView
-import timber.log.Timber
 import javax.inject.Inject
 
 class NowPlayingAdapter
-@Inject constructor(context: Activity) : RecyclerView.Adapter<NowPlayingAdapter.TrackHolder>(),
+@Inject
+constructor(context: Activity) : RecyclerView.Adapter<NowPlayingAdapter.TrackHolder>(),
   ItemTouchHelperAdapter {
 
   private val dragStartListener: OnStartDragListener = context as OnStartDragListener
@@ -49,7 +48,7 @@ class NowPlayingAdapter
 
     this.currentTrack = path
     data?.forEachIndexed { index, (_, _, itemPath) ->
-      if (itemPath.equals(path)) {
+      if (itemPath == path) {
         setPlayingTrack(index)
       }
     }
@@ -96,7 +95,6 @@ class NowPlayingAdapter
   }
 
   override fun onItemMove(from: Int, to: Int): Boolean {
-    swapPositions(from, to)
     listener?.onMove(from, to)
     notifyItemMoved(from, to)
 
@@ -105,24 +103,6 @@ class NowPlayingAdapter
     }
 
     return true
-  }
-
-  private fun swapPositions(from: Int, to: Int) {
-    data?.let {
-      Timber.v("Swapping %d => %d", from, to)
-      ifNotNull(it[from], it[to]) { from, to ->
-        Timber.v("from => %s to => %s", from, to)
-        val position = to.position
-        to.position = from.position
-        from.position = position
-//        to.save()
-//        from.save()
-
-        // Before saving remove the listener to avoid interrupting the swapping functionality
-
-        Timber.v("after swap => from => %s to => %s", from, to)
-      }
-    }
   }
 
   override fun onItemDismiss(position: Int) {

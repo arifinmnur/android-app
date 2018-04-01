@@ -8,7 +8,6 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import com.kelsos.mbrc.utilities.Checks.ifNotNull
 import javax.inject.Inject
 
 class TrackEntryAdapter
@@ -17,9 +16,8 @@ constructor() : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CALLBACK) {
   private var listener: MenuItemSelectedListener<TrackEntity>? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {
-      ifNotNull(listener, getItem(position)) { listener, track ->
-        listener.onMenuItemSelected(it, track)
-      }
+      val listener = checkNotNull(listener)
+      listener.onMenuItemSelected(it, checkNotNull(getItem(position)))
     }
   }
 
