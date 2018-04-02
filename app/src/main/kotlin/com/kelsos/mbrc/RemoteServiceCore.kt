@@ -18,11 +18,7 @@ constructor(
 ) : SimpleLifecycle {
 
   init {
-    defaultSettingsLiveDataProvider.get().observe(this) {
-      if (it != null) {
-        return@observe
-      }
-
+    defaultSettingsLiveDataProvider.observe(this) {
       clientConnectionManager.run {
         stop()
         start()
@@ -46,6 +42,7 @@ constructor(
     Timber.v("Stopping remote core")
     sessionNotificationManager.cancelNotification()
     clientConnectionManager.stop()
+    defaultSettingsLiveDataProvider.removeObservers(this)
   }
 
   fun setSyncStartAction(action: SyncStartAction?) {
