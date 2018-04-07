@@ -58,7 +58,7 @@ class FeedbackFragment : Fragment() {
     if (deviceInfo.isChecked) {
       val device = Build.DEVICE
       val manufacturer = Build.MANUFACTURER
-      val appVersion = requireContext().getVersion()
+      val appVersion = getVersion()
       val androidVersion = Build.VERSION.RELEASE
 
       feedbackText += getString(

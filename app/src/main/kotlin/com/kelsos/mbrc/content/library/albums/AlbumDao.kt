@@ -3,6 +3,7 @@ package com.kelsos.mbrc.content.library.albums
 import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
@@ -10,7 +11,7 @@ interface AlbumDao {
   @Query("DELETE from album")
   fun deleteAll()
 
-  @Insert
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insert(list: List<AlbumEntity>)
 
   @Query("select * from album")

@@ -1,26 +1,26 @@
 package com.kelsos.mbrc.utilities
 
-import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.core.content.pm.PackageInfoCompat
+import com.kelsos.mbrc.BuildConfig
 import io.reactivex.Observable
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import timber.log.Timber
 import java.io.File
 
 object RemoteUtils {
 
-  @Throws(PackageManager.NameNotFoundException::class)
-  fun Context.getVersion(): String {
-    return packageManager.getPackageInfo(packageName, 0).versionName
+  fun getVersion(): String {
+    return BuildConfig.VERSION_NAME
   }
 
-  @Throws(PackageManager.NameNotFoundException::class)
-  fun Context.getVersionCode(): Long {
-    return PackageInfoCompat.getLongVersionCode(packageManager.getPackageInfo(packageName, 0))
+  fun getVersionCode(): Int {
+    return BuildConfig.VERSION_CODE
   }
 
-  fun bitmapFromFile(path: String): Observable<Bitmap> {
+  private fun bitmapFromFile(path: String): Observable<Bitmap> {
     return Observable.create({
       try {
         val options = BitmapFactory.Options()
@@ -38,7 +38,20 @@ object RemoteUtils {
     })
   }
 
-  fun coverBitmap(coverPath: String): Observable<Bitmap> {
+  fun loadBitmap(path: String): Deferred<Bitmap?> {
+    return GlobalScope.async {
+      try {
+        BitmapFactory.decodeFile(path, BitmapFactory.Options().apply {
+          inPreferredConfig = Bitmap.Config.RGB_565
+        })
+      } catch (ex: Exception) {
+        Timber.e(ex, "Failed to decode path")
+        null
+      }
+    }
+  }
+
+  private fun coverBitmap(coverPath: String): Observable<Bitmap> {
     val cover = File(coverPath)
     return bitmapFromFile(cover.absolutePath)
   }

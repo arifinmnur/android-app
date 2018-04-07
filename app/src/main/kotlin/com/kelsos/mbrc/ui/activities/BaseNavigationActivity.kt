@@ -20,10 +20,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.events.ConnectionStatusChangeEvent
+import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProvider
 import com.kelsos.mbrc.events.NotifyUser
 import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.networking.connections.Connection
+import com.kelsos.mbrc.networking.connections.ConnectionStatus
 import com.kelsos.mbrc.networking.protocol.VolumeInteractor
 import com.kelsos.mbrc.platform.RemoteService
 import com.kelsos.mbrc.platform.ServiceChecker
@@ -43,10 +44,15 @@ import kotlin.reflect.KClass
 
 abstract class BaseNavigationActivity : BaseActivity(),
   NavigationView.OnNavigationItemSelectedListener {
+
   @Inject
   lateinit var serviceChecker: ServiceChecker
+
   @Inject
   lateinit var volumeInteractor: VolumeInteractor
+
+  @Inject
+  lateinit var connectionStatusLiveDataProvider: ConnectionStatusLiveDataProvider
 
   private val toolbar: MaterialToolbar by bindView(R.id.toolbar)
   private val drawer: DrawerLayout by bindView(R.id.drawer_layout)
@@ -74,6 +80,7 @@ abstract class BaseNavigationActivity : BaseActivity(),
   override fun onDestroy() {
     super.onDestroy()
     drawer.removeDrawerListener(toggle!!)
+    connectionStatusLiveDataProvider.get().removeObservers(this)
   }
 
   override fun onBackPressed() {
@@ -91,6 +98,12 @@ abstract class BaseNavigationActivity : BaseActivity(),
 
   override fun onPostCreate(savedInstanceState: Bundle?) {
     super.onPostCreate(savedInstanceState)
+    connectionStatusLiveDataProvider.get().observe(this, {
+      if (it == null) {
+        return@observe
+      }
+      onConnection(it)
+    })
     toggle!!.syncState()
   }
 
@@ -102,11 +115,11 @@ abstract class BaseNavigationActivity : BaseActivity(),
     }
   }
 
-  private fun onConnection(event: ConnectionStatusChangeEvent) {
-    Timber.v("Handling new connection status %s", event.status)
+  private fun onConnection(connectionStatus: ConnectionStatus) {
+    Timber.v("Handling new connection status ${connectionStatus.status}")
     @StringRes val resId: Int
     @ColorRes val colorId: Int
-    when (event.status) {
+    when (connectionStatus.status) {
       Connection.OFF -> {
         resId = R.string.drawer_connection_status_off
         colorId = R.color.black
@@ -188,7 +201,7 @@ abstract class BaseNavigationActivity : BaseActivity(),
       R.id.nav_settings -> startActivity(SettingsActivity::class)
       R.id.nav_outputs -> {
         OutputSelectionDialog.create(supportFragmentManager)
-        .show()
+          .show()
       }
       R.id.nav_help -> startActivity(HelpFeedbackActivity::class)
       R.id.nav_exit -> exitApplication()
@@ -226,15 +239,17 @@ abstract class BaseNavigationActivity : BaseActivity(),
 
     toggle =
       ActionBarDrawerToggle(
-      this,
-      drawer,
-      toolbar,
-      R.string.drawer_open,
-      R.string.drawer_close
-    )
-    drawer.addDrawerListener(toggle!!)
-    drawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
-    toggle!!.syncState()
+        this,
+        drawer,
+        toolbar,
+        R.string.drawer_open,
+        R.string.drawer_close
+      ).apply {
+        drawer.addDrawerListener(this)
+        drawer.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START)
+        syncState()
+      }
+
     navigationView.setNavigationItemSelectedListener(this)
 
     val header = navigationView.getHeaderView(0)

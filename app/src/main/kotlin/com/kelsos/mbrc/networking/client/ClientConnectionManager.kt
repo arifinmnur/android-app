@@ -5,8 +5,10 @@ import com.kelsos.mbrc.networking.SocketActivityChecker.PingTimeoutListener
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.connections.InetAddressMapper
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -41,6 +43,8 @@ constructor(
   private val scope = CoroutineScope(context)
   private var connection: SocketConnection? = null
 
+  private var pendingConnection: Deferred<Unit>? = null
+
   init {
     messageQueue.setOnMessageAvailable { sendData(it) }
   }
@@ -54,11 +58,18 @@ constructor(
   }
 
   override fun start() {
+    pendingConnection?.cancel()
+    pendingConnection = scope.async {
+      stop()
+      delay(2000)
+      realStart()
+    }
+  }
 
+  private fun realStart() {
     if (executor.isShutdown) {
       executor = getExecutor()
     }
-
 
     if (connection?.isConnected() == true) {
       Timber.v("connection is already active")
@@ -87,6 +98,7 @@ constructor(
         }
       ) {
       }.apply {
+        messageHandler.start()
         messageQueue.start()
         executor.execute(this)
         activityChecker.start()
@@ -95,6 +107,7 @@ constructor(
   }
 
   override fun stop() {
+    messageHandler.stop()
     messageQueue.stop()
     activityChecker.stop()
     connection?.cleanupSocket()
@@ -155,8 +168,8 @@ constructor(
     }
 
     fun sendMessage(messageString: String) {
+      Timber.v("Sending (${isConnected()})")
       if (isConnected()) {
-        Timber.v("Sending -> $messageString")
         writeToSocket(messageString)
       }
     }
