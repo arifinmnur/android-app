@@ -44,7 +44,7 @@ class RatingDialogFragment : DialogFragment() {
       .show()
 
     ratingBar = dialog.findViewById(R.id.ratingBar)
-    ratingBar?.setOnRatingBarChangeListener { _, ratingValue, isUserInitiated ->
+    ratingBar?.setOnRatingBarChangeListener { _, _, isUserInitiated ->
       if (isUserInitiated) {
         userActionUseCase.perform(UserAction(Protocol.NowPlayingRating, rating))
       }

@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class NowPlayingPresenterImpl
-@Inject constructor(
+@Inject
+constructor(
   playingTrackLiveDataProvider: PlayingTrackLiveDataProvider,
   private val repository: NowPlayingRepository,
   private val moveManager: MoveManager,
@@ -40,14 +41,12 @@ class NowPlayingPresenterImpl
   }
 
   override fun reload(scrollToTrack: Boolean) {
-    view().showLoading()
     scope.launch {
       try {
         onNowPlayingTracksLoaded(repository.getAndSaveRemote())
       } catch (e: Exception) {
         view().failure(e)
       }
-      view().hideLoading()
     }
   }
 
@@ -61,14 +60,12 @@ class NowPlayingPresenterImpl
   }
 
   override fun load() {
-    view().showLoading()
     scope.launch {
       try {
         onNowPlayingTracksLoaded(repository.getAll())
       } catch (e: Exception) {
         view().failure(e)
       }
-      view().hideLoading()
     }
   }
 

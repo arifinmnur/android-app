@@ -17,8 +17,7 @@ class RadioPresenterImpl
 constructor(
   private val radioRepository: RadioRepository,
   private val queue: QueueHandler
-) : BasePresenter<RadioView>(),
-  RadioPresenter {
+) : BasePresenter<RadioView>(), RadioPresenter {
 
   private lateinit var radios: LiveData<PagedList<RadioStationEntity>>
 

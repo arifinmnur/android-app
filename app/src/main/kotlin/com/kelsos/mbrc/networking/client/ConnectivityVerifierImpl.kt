@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.networking.client
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.DeserializationAdapter
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.RequestManager
 import com.kelsos.mbrc.networking.protocol.Protocol
 import kotlinx.coroutines.withContext
@@ -9,19 +9,21 @@ import javax.inject.Inject
 
 class ConnectivityVerifierImpl
 @Inject constructor(
-  private val mapper: ObjectMapper,
+  private val deserializationAdapter: DeserializationAdapter,
   private val requestManager: RequestManager,
-  private val dispatchers: AppDispatchers
+  private val dispatchers: AppCoroutineDispatchers
 ) : ConnectivityVerifier {
 
-  private fun getMessage(response: String) =
-    mapper.readValue(response, SocketMessage::class.java)
+  private fun getMessage(response: String) = deserializationAdapter.objectify(
+    response,
+    SocketMessage::class
+  )
 
-  override suspend fun verify(): Boolean = withContext(dispatchers.io) {
+  override suspend fun verify(): Boolean = withContext(dispatchers.network) {
     try {
       val connection = requestManager.openConnection(false)
-      val response =
-        requestManager.request(connection, SocketMessage.create(Protocol.VerifyConnection))
+      val verifyMessage = SocketMessage.create(Protocol.VerifyConnection)
+      val response = requestManager.request(connection, verifyMessage)
       connection.close()
       val message = getMessage(response)
 

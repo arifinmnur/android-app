@@ -47,7 +47,7 @@ constructor() : MessageQueue {
   override fun run() {
     running = true
 
-    //noinspection InfiniteLoopStatement
+    // noinspection InfiniteLoopStatement
     while (true) {
       try {
         onMessageAvailable(messageQueue.take().also {
@@ -57,7 +57,5 @@ constructor() : MessageQueue {
         Timber.d(e, "Failed to execute command")
       }
     }
-
-
   }
 }

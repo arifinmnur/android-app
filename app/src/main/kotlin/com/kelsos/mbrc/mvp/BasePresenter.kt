@@ -30,9 +30,9 @@ open class BasePresenter<T : BaseView> : Presenter<T>, LifecycleOwner {
   }
 
   override fun detach() {
+    disposables.clear()
     lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     this.view = null
-    CompositeDisposable().clear()
     coroutineContext.cancelChildren()
   }
 

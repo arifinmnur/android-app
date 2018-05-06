@@ -84,7 +84,7 @@ internal constructor(
     }
 
   private fun discoveryObservable(): Observable<DiscoveryMessage> {
-    return Observable.using<DiscoveryMessage, MulticastSocket>({
+    return Observable.using({
       this.resource
     }, {
       this.getObservable(it)
@@ -107,15 +107,17 @@ internal constructor(
       .flatMap { getMessage(socket) }
       .filter { message -> NOTIFY == message.context }
       .doOnNext { Timber.v("discovery message -> $it") }
+      .firstElement()
+      .toObservable()
   }
 
-  private fun getMessage(socket: MulticastSocket): Observable<DiscoveryMessage>? {
+  private fun getMessage(socket: MulticastSocket): Observable<DiscoveryMessage> {
     return Observable.fromCallable {
       val buffer = ByteArray(512)
       return@fromCallable with(DatagramPacket(buffer, buffer.size)) {
         socket.receive(this)
         val incoming = String(data, Charsets.UTF_8)
-        mapper.readValue<DiscoveryMessage>(incoming, DiscoveryMessage::class.java)
+        mapper.readValue(incoming, DiscoveryMessage::class.java)
       }
     }
   }
@@ -135,9 +137,12 @@ internal constructor(
             mapper.writeValueAsBytes(this)
           }
 
-          send(DatagramPacket(message, message.size, group,
-            MULTICAST_PORT
-          ))
+          send(
+            DatagramPacket(
+              message, message.size, group,
+              MULTICAST_PORT
+            )
+          )
         }
       } catch (e: IOException) {
         Timber.v(e, "Failed to open multicast socket")
@@ -149,6 +154,6 @@ internal constructor(
     private const val NOTIFY = "notify"
     private const val SO_TIMEOUT = 15 * 1000
     private const val MULTICAST_PORT = 45345
-    private const val DISCOVERY_ADDRESS = "239.1.5.10" //NOPMD
+    private const val DISCOVERY_ADDRESS = "239.1.5.10" // NOPMD
   }
 }

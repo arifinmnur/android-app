@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.datastore.DataStore
 import androidx.datastore.createDataStore
 import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
-import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.store.Store
 import com.kelsos.mbrc.store.StoreSerializer
 import com.kelsos.mbrc.store.Track
@@ -20,7 +20,7 @@ class PlayingTrackCacheImpl
 @Inject
 constructor(
   context: Application,
-  private val dispatchers: AppDispatchers
+  private val dispatchers: AppCoroutineDispatchers
 ) : PlayingTrackCache {
 
   private val dataStore: DataStore<Store> =
@@ -36,7 +36,7 @@ constructor(
       }
     }
 
-  override suspend fun persistInfo(trackInfo: PlayingTrackModel) = withContext(dispatchers.io) {
+  override suspend fun persistInfo(trackInfo: PlayingTrackModel) = withContext(dispatchers.network) {
     dataStore.updateData { store ->
       val track = Track.newBuilder()
         .setAlbum(trackInfo.album)
@@ -53,7 +53,7 @@ constructor(
     return@withContext
   }
 
-  override suspend fun restoreInfo(): PlayingTrackModel = withContext(dispatchers.io) {
+  override suspend fun restoreInfo(): PlayingTrackModel = withContext(dispatchers.network) {
     val track = storeFlow.first().track
 
     return@withContext PlayingTrackModel(

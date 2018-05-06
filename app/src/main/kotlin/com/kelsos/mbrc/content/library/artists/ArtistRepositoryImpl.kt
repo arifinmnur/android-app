@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.content.library.artists
 
 import androidx.paging.DataSource
-import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.epoch
@@ -15,7 +15,7 @@ class ArtistRepositoryImpl
 constructor(
   private val dao: ArtistDao,
   private val api: ApiBase,
-  private val dispatchers: AppDispatchers
+  private val dispatchers: AppCoroutineDispatchers
 ) : ArtistRepository {
 
   private val mapper = ArtistDtoMapper()
@@ -31,7 +31,7 @@ constructor(
   }
 
   override suspend fun getRemote() {
-    withContext(dispatchers.io) {
+    withContext(dispatchers.network) {
       val added = epoch()
       api.getAllPages(Protocol.LibraryBrowseArtists, ArtistDto::class)
         .onCompletion {

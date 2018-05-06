@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -110,6 +111,7 @@ class NowPlayingActivity : BaseNavigationActivity(),
     adapter.setListener(this)
     swipeRefreshLayout.setOnRefreshListener { this.refresh() }
     presenter.attach(this)
+    presenter.load()
     refresh(true)
   }
 
@@ -137,9 +139,9 @@ class NowPlayingActivity : BaseNavigationActivity(),
     super.onDestroy()
   }
 
-  override fun update(data: List<NowPlayingEntity>) {
+  override fun update(data: PagedList<NowPlayingEntity>) {
     emptyGroup.isVisible = data.isEmpty()
-    adapter.update(data)
+    adapter.submitList(data)
     swipeRefreshLayout.isRefreshing = false
   }
 
@@ -155,12 +157,11 @@ class NowPlayingActivity : BaseNavigationActivity(),
     Snackbar.make(nowPlayingList, R.string.refresh_failed, Snackbar.LENGTH_SHORT).show()
   }
 
-  override fun showLoading() {
-  }
-
-  override fun hideLoading() {
-    emptyViewProgress.isVisible = false
-    swipeRefreshLayout.isRefreshing = false
+  override fun loading(show: Boolean) {
+    if (!show) {
+      emptyViewProgress.isVisible = false
+      swipeRefreshLayout.isRefreshing = false
+    }
   }
 
   override fun onBackPressed() {

@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.content.library.tracks
 
 import androidx.paging.DataSource
-import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.epoch
@@ -11,10 +11,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TrackRepositoryImpl
-@Inject constructor(
+@Inject
+constructor(
   private val dao: TrackDao,
   private val api: ApiBase,
-  private val dispatchers: AppDispatchers
+  private val dispatchers: AppCoroutineDispatchers
 ) : TrackRepository {
 
   private val mapper = TrackDtoMapper()
@@ -36,7 +37,7 @@ class TrackRepositoryImpl
   }
 
   override suspend fun getRemote() {
-    withContext(dispatchers.io) {
+    withContext(dispatchers.network) {
       val added = epoch()
       api.getAllPages(Protocol.LibraryBrowseTracks, TrackDto::class).onCompletion {
         dao.removePreviousEntries(added)

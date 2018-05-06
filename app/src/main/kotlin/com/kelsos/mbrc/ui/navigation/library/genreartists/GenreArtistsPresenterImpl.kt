@@ -17,8 +17,7 @@ class GenreArtistsPresenterImpl
 constructor(
   private val repository: ArtistRepository,
   private val queue: QueueHandler
-) : BasePresenter<GenreArtistsView>(),
-  GenreArtistsPresenter {
+) : BasePresenter<GenreArtistsView>(), GenreArtistsPresenter {
 
   private lateinit var artists: LiveData<PagedList<ArtistEntity>>
 

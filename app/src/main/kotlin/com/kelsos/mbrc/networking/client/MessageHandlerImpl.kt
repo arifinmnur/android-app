@@ -32,7 +32,6 @@ constructor(
 
   private fun process(message: String) {
 
-
     val node = messageDeserializer.deserialize(message)
     val context = node.path("context").textValue()
 
@@ -61,10 +60,10 @@ constructor(
         2
       }
 
-      //model.pluginProtocol = protocolVersion
+      // model.pluginProtocol = protocolVersion
       connectionStatusLiveDataProvider.active()
       handshakeComplete()
-      //bus.post(StartLibrarySyncEvent())
+      // bus.post(StartLibrarySyncEvent())
       return
     }
 
@@ -83,7 +82,7 @@ constructor(
 
   private fun clientNotAllowed() {
     uiMessageQueue.dispatch(NOT_ALLOWED)
-    //bus.post(ChangeConnectionStateEvent(STOP))
+    // bus.post(ChangeConnectionStateEvent(STOP))
     connectionStatusLiveDataProvider.disconnected()
   }
 

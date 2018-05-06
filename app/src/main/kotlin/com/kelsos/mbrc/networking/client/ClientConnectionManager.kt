@@ -91,7 +91,7 @@ constructor(
           onConnectionChange(connected)
 
           if (!connected) {
-            //activityChecker.stop()
+            // activityChecker.stop()
           } else {
             messageQueue.queue(SocketMessage.player())
           }

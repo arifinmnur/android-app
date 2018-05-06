@@ -6,7 +6,7 @@ import com.kelsos.mbrc.content.nowplaying.cover.CoverPayload
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.content.nowplaying.queue.QueuePayload
 import com.kelsos.mbrc.content.nowplaying.queue.QueueResponse
-import com.kelsos.mbrc.di.modules.AppDispatchers
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.preferences.DefaultActionPreferenceStore
@@ -20,14 +20,14 @@ constructor(
   private val settings: DefaultActionPreferenceStore,
   private val trackRepository: TrackRepository,
   private val service: ApiBase,
-  private val dispatchers: AppDispatchers
+  private val dispatchers: AppCoroutineDispatchers
 ) {
   private suspend fun queue(
     @LibraryPopup.Action type: String,
     tracks: List<String>,
     play: String? = null
   ): Boolean {
-    return withContext(dispatchers.io) {
+    return withContext(dispatchers.network) {
       Timber.v("Queueing ${tracks.size} $type")
       try {
         val response = service.getItem(

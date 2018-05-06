@@ -5,7 +5,6 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.discovery.ServiceDiscoveryUseCase
-import com.kelsos.mbrc.utilities.SchedulerProvider
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -14,29 +13,10 @@ class ConnectionManagerPresenterImpl
 @Inject
 constructor(
   private val repository: ConnectionRepository,
-  private val serviceDiscoveryUseCase: ServiceDiscoveryUseCase,
-  private val schedulerProvider: SchedulerProvider
+  private val serviceDiscoveryUseCase: ServiceDiscoveryUseCase
 ) : BasePresenter<ConnectionManagerView>(), ConnectionManagerPresenter {
 
   private lateinit var settings: LiveData<List<ConnectionSettingsEntity>>
-
-  override fun attach(view: ConnectionManagerView) {
-    super.attach(view)
-//    disposables += bus.observe(ConnectionSettingsChanged::class)
-//      .subscribeOn(schedulerProvider.io())
-//      .observeOn(schedulerProvider.main())
-//      .subscribe({ view().onConnectionSettingsChange(it) })
-
-//    disposables += bus.observe(DiscoveryStopped::class)
-//      .subscribeOn(schedulerProvider.io())
-//      .observeOn(schedulerProvider.main())
-//      .subscribe({ view().onDiscoveryStopped(it) })
-
-//    disposables += bus.observe(NotifyUser::class)
-//      .subscribeOn(schedulerProvider.io())
-//      .observeOn(schedulerProvider.main())
-//      .subscribe({ view().onUserNotification(it) })
-  }
 
   override fun startDiscovery() {
     serviceDiscoveryUseCase.discover {
@@ -67,7 +47,7 @@ constructor(
     checkIfAttached()
     scope.launch {
       repository.setDefault(settings)
-      //bus.post(DefaultSettingsChangedEvent())
+      // bus.post(DefaultSettingsChangedEvent())
       load()
     }
   }
@@ -80,7 +60,7 @@ constructor(
         repository.save(settings)
 
         if (settings.id == repository.defaultId) {
-          //bus.post(DefaultSettingsChangedEvent())
+          // bus.post(DefaultSettingsChangedEvent())
         }
 
         load()
@@ -97,7 +77,7 @@ constructor(
       repository.delete(settings)
 
       if (settings.id == repository.defaultId) {
-        //bus.post(DefaultSettingsChangedEvent())
+        // bus.post(DefaultSettingsChangedEvent())
       }
     }
   }
