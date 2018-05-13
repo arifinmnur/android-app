@@ -1,6 +1,6 @@
 package com.kelsos.mbrc.networking
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.kelsos.mbrc.DeserializationAdapter
 import com.kelsos.mbrc.interfaces.data.RemoteDataSource.Companion.LIMIT
 import com.kelsos.mbrc.networking.client.GenericSocketMessage
 import com.kelsos.mbrc.networking.client.SocketMessage
@@ -13,9 +13,9 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 class ApiBase
-  @Inject
+@Inject
 constructor(
-  private val mapper: ObjectMapper,
+  private val deserializationAdapter: DeserializationAdapter,
   private val apiRequestManager: RequestManager
 ) {
 
@@ -24,16 +24,16 @@ constructor(
     kClazz: KClass<T>,
     payload: Any = ""
   ): T where T : Any {
-    val factory = mapper.typeFactory
+    val factory = deserializationAdapter.typeFactory()
     val type = factory.constructParametricType(GenericSocketMessage::class.java, kClazz.java)
     val connection = apiRequestManager.openConnection()
     val response = apiRequestManager.request(connection, SocketMessage.create(request, payload))
     connection.close()
-    return mapper.readValue<GenericSocketMessage<T>>(response, type).data
+    return deserializationAdapter.objectify<GenericSocketMessage<T>>(response, type).data
   }
 
   suspend fun <T : Any> getAllPages(request: String, clazz: KClass<T>): Flow<List<T>> {
-    val factory = mapper.typeFactory
+    val factory = deserializationAdapter.typeFactory()
     val inner = factory.constructParametricType(Page::class.java, clazz.java)
     val type = factory.constructParametricType(GenericSocketMessage::class.java, inner)
 
@@ -47,7 +47,7 @@ constructor(
         Timber.v("fetching $request offset $offset [$LIMIT]")
         val message = SocketMessage.create(request, range ?: "")
         val response = apiRequestManager.request(connection, message)
-        val socketMessage = mapper.readValue<GenericSocketMessage<Page<T>>>(response, type)
+        val socketMessage = deserializationAdapter.objectify<GenericSocketMessage<Page<T>>>(response, type)
 
         Timber.v("duration ${now() - pageStart} ms")
         val page = socketMessage.data
