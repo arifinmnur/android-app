@@ -34,101 +34,74 @@ interface AlbumDao {
   )
   fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.album asc"
-  )
+  @Query(BY_ALBUM_ASC)
   fun getSortedByAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.album desc"
-  )
+  @Query(BY_ALBUM_DESC)
   fun getSortedByAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.artist asc, album.album asc"
-  )
+  @Query(BY_ARTIST_ALBUM_ASC)
   fun getSortedByAlbumArtistAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.artist desc, album.album desc"
-  )
+  @Query(BY_ARTIST_ALBUM_DESC)
   fun getSortedByAlbumArtistAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.artist asc, track.year asc, album.album asc"
-  )
+  @Query(BY_ARTIST_YEAR_ALBUM_ASC)
   fun getSortedByAlbumArtistAndYearAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by album.artist desc, track.year desc, album.album desc"
-  )
+  @Query(BY_ARTIST_YEAR_ALBUM_DESC)
   fun getSortedByAlbumArtistAndYearAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.artist asc, album.album asc"
-  )
+  @Query(BY_ARTIST_AND_ALBUM_ASC)
   fun getSortedByArtistAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.artist desc, album.album desc"
-  )
+  @Query(BY_ARTIST_AND_ALBUM_DESC)
   fun getSortedByArtistAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.genre asc, album.artist asc, album.album asc"
-  )
+  @Query(BY_GENRE_ALBUMARTIST_ALBUM_ASC)
   fun getSortedByGenreAndAlbumArtistAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.genre desc, album.artist desc, album.album desc"
-  )
+  @Query(BY_GENRE_ALBUMARTIST_ALBUM_DESC)
   fun getSortedByGenreAndAlbumArtistAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.year asc, album.album asc"
-  )
+  @Query(BY_YEAR_ALBUM_ASC)
   fun getSortedByYearAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.year desc, album.album desc"
-  )
+  @Query(BY_YEAR_ALBUM_DESC)
   fun getSortedByYearAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.year asc, album.artist asc, album.album asc"
-  )
+  @Query(BY_YEAR_ALBUMARTIST_ALBUM_ASC)
   fun getSortedByYearAndAlbumArtistAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(
-    "select distinct album.album, album.artist, album.id, album.date_added from album " +
-      "inner join track on album.album = track.album and album.artist = track.album_artist " +
-      "order by track.year desc, album.artist desc, album.album desc"
-  )
+  @Query(BY_YEAR_ALBUMARTIST_ALBUM_DESC)
   fun getSortedByYearAndAlbumArtistAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
+
+  companion object {
+    private const val BASE =
+      "select distinct album.album, album.artist, track.album_artist, track.year, track.genre," +
+        " album.id, album.date_added " +
+        "from album inner join track on album.album = track.album " +
+        "and album.artist = track.album_artist "
+
+    const val BY_ALBUM_ASC = "$BASE order by album.album asc"
+    const val BY_ALBUM_DESC = "$BASE order by album.album desc"
+    const val BY_ARTIST_ALBUM_ASC = "$BASE order by album.artist asc, album.album asc"
+    const val BY_ARTIST_ALBUM_DESC = "$BASE order by album.artist desc, album.album desc"
+    const val BY_ARTIST_YEAR_ALBUM_ASC =
+      "$BASE order by album.artist asc, track.year asc, album.album asc"
+    const val BY_ARTIST_YEAR_ALBUM_DESC =
+      "$BASE order by album.artist desc, track.year desc, album.album desc"
+    const val BY_ARTIST_AND_ALBUM_ASC = "$BASE order by track.artist asc, album.album asc"
+    const val BY_ARTIST_AND_ALBUM_DESC = "$BASE order by track.artist desc, album.album desc"
+    const val BY_GENRE_ALBUMARTIST_ALBUM_ASC =
+      "$BASE order by track.genre asc, album.artist asc, album.album asc"
+    const val BY_GENRE_ALBUMARTIST_ALBUM_DESC =
+      "$BASE order by track.genre desc, album.artist desc, album.album desc"
+    const val BY_YEAR_ALBUM_ASC = "$BASE order by track.year asc, album.album asc"
+    const val BY_YEAR_ALBUM_DESC = "$BASE order by track.year desc, album.album desc"
+    const val BY_YEAR_ALBUMARTIST_ALBUM_ASC =
+      "$BASE order by track.year asc, album.artist asc, album.album asc"
+    const val BY_YEAR_ALBUMARTIST_ALBUM_DESC =
+      "$BASE order by track.year desc, album.artist desc, album.album desc"
+  }
 }
