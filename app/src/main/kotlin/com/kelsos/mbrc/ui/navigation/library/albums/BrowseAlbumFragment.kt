@@ -95,12 +95,9 @@ class BrowseAlbumFragment : Fragment(),
   }
 
   override fun showSorting(order: Int, selection: Int) {
-    SortingDialog.create(parentFragmentManager, order, selection, {
-      presenter.order(it)
-    }, {
-      presenter.sortBy(it)
+    with(parentFragmentManager) {
+      SortingDialog.create(this, selection, order, presenter::order, presenter::sortBy).show()
     }
-    ).show()
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -22,7 +22,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProvider
 import com.kelsos.mbrc.events.NotifyUser
-import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.networking.connections.ConnectionStatus
 import com.kelsos.mbrc.networking.protocol.VolumeInteractor
@@ -187,7 +186,7 @@ abstract class BaseNavigationActivity : BaseActivity(),
 
     when (itemId) {
       R.id.nav_home -> {
-        val upIntent = NavUtils.getParentActivityIntent(this) ?: fail("couldn't get intent")
+        val upIntent = NavUtils.getParentActivityIntent(this) ?: error("couldn't get intent")
         if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
           startActivity(MainActivity::class)
         } else {

@@ -40,16 +40,16 @@ interface AlbumDao {
   @Query(BY_ALBUM_DESC)
   fun getSortedByAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(BY_ARTIST_ALBUM_ASC)
+  @Query(BY_ALBUMARTIST_ALBUM_ASC)
   fun getSortedByAlbumArtistAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(BY_ARTIST_ALBUM_DESC)
+  @Query(BY_ALBUMARTIST_ALBUM_DESC)
   fun getSortedByAlbumArtistAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(BY_ARTIST_YEAR_ALBUM_ASC)
+  @Query(BY_ALBUMARTIST_YEAR_ALBUM_ASC)
   fun getSortedByAlbumArtistAndYearAndAlbumAsc(): DataSource.Factory<Int, AlbumEntity>
 
-  @Query(BY_ARTIST_YEAR_ALBUM_DESC)
+  @Query(BY_ALBUMARTIST_YEAR_ALBUM_DESC)
   fun getSortedByAlbumArtistAndYearAndAlbumDesc(): DataSource.Factory<Int, AlbumEntity>
 
   @Query(BY_ARTIST_AND_ALBUM_ASC)
@@ -78,18 +78,18 @@ interface AlbumDao {
 
   companion object {
     private const val BASE =
-      "select distinct album.album, album.artist, track.album_artist, track.year, track.genre," +
-        " album.id, album.date_added " +
+      "select distinct album.album, album.artist, track.album_artist, track.sortable_year," +
+        " track.genre, album.id, album.date_added " +
         "from album inner join track on album.album = track.album " +
         "and album.artist = track.album_artist "
 
     const val BY_ALBUM_ASC = "$BASE order by album.album asc"
     const val BY_ALBUM_DESC = "$BASE order by album.album desc"
-    const val BY_ARTIST_ALBUM_ASC = "$BASE order by album.artist asc, album.album asc"
-    const val BY_ARTIST_ALBUM_DESC = "$BASE order by album.artist desc, album.album desc"
-    const val BY_ARTIST_YEAR_ALBUM_ASC =
+    const val BY_ALBUMARTIST_ALBUM_ASC = "$BASE order by album.artist asc, album.album asc"
+    const val BY_ALBUMARTIST_ALBUM_DESC = "$BASE order by album.artist desc, album.album desc"
+    const val BY_ALBUMARTIST_YEAR_ALBUM_ASC =
       "$BASE order by album.artist asc, track.year asc, album.album asc"
-    const val BY_ARTIST_YEAR_ALBUM_DESC =
+    const val BY_ALBUMARTIST_YEAR_ALBUM_DESC =
       "$BASE order by album.artist desc, track.year desc, album.album desc"
     const val BY_ARTIST_AND_ALBUM_ASC = "$BASE order by track.artist asc, album.album asc"
     const val BY_ARTIST_AND_ALBUM_DESC = "$BASE order by track.artist desc, album.album desc"
@@ -97,11 +97,11 @@ interface AlbumDao {
       "$BASE order by track.genre asc, album.artist asc, album.album asc"
     const val BY_GENRE_ALBUMARTIST_ALBUM_DESC =
       "$BASE order by track.genre desc, album.artist desc, album.album desc"
-    const val BY_YEAR_ALBUM_ASC = "$BASE order by track.year asc, album.album asc"
-    const val BY_YEAR_ALBUM_DESC = "$BASE order by track.year desc, album.album desc"
+    const val BY_YEAR_ALBUM_ASC = "$BASE order by track.sortable_year asc, album.album asc"
+    const val BY_YEAR_ALBUM_DESC = "$BASE order by track.sortable_year desc, album.album desc"
     const val BY_YEAR_ALBUMARTIST_ALBUM_ASC =
-      "$BASE order by track.year asc, album.artist asc, album.album asc"
+      "$BASE order by track.sortable_year asc, album.artist asc, album.album asc"
     const val BY_YEAR_ALBUMARTIST_ALBUM_DESC =
-      "$BASE order by track.year desc, album.artist desc, album.album desc"
+      "$BASE order by track.sortable_year desc, album.artist desc, album.album desc"
   }
 }

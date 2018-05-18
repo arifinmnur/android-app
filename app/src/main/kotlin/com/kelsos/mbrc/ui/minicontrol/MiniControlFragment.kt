@@ -15,7 +15,6 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.activestatus.PlayerState.State
 import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
-import com.kelsos.mbrc.extensions.fail
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.ui.navigation.main.MainActivity
 import com.squareup.picasso.Picasso
@@ -39,7 +38,6 @@ class MiniControlFragment : Fragment(), MiniControlView {
   lateinit var presenter: MiniControlPresenter
 
   private fun onControlClick() {
-    val context = context ?: fail("null context")
     val builder = TaskStackBuilder.create(requireContext())
     builder.addNextIntentWithParentStack(Intent(context, MainActivity::class.java))
     builder.startActivities()

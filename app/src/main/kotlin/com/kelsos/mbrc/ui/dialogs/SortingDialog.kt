@@ -17,7 +17,6 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.Sorting
 import com.kelsos.mbrc.content.library.albums.Sorting.Fields
 import com.kelsos.mbrc.content.library.albums.Sorting.Order
-import com.kelsos.mbrc.extensions.fail
 
 class SortingDialog : DialogFragment() {
   private lateinit var orderButton: Button
@@ -65,14 +64,13 @@ class SortingDialog : DialogFragment() {
       .setNegativeButton(android.R.string.cancel) { _, _ -> }
       .show()
 
-    orderButton = dialog.findViewById(R.id.sorting_dialog__order) ?: fail("invalid view")
-    sortingOption =
-      dialog.findViewById(R.id.sorting_dialog__sorting_options) ?: fail("invalid view")
+    orderButton = checkNotNull(dialog.findViewById(R.id.sorting_dialog__order))
+    sortingOption = checkNotNull(dialog.findViewById(R.id.sorting_dialog__sorting_options))
     orderButton.setOnClickListener {
       this.order = when (order) {
         Sorting.ORDER_DESCENDING -> Sorting.ORDER_ASCENDING
         Sorting.ORDER_ASCENDING -> Sorting.ORDER_DESCENDING
-        else -> fail("unknown order value: $order")
+        else -> error("unknown order value: $order")
       }
 
       setOrder(this.order)
