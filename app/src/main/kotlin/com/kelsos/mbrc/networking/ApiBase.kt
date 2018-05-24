@@ -6,6 +6,7 @@ import com.kelsos.mbrc.networking.client.GenericSocketMessage
 import com.kelsos.mbrc.networking.client.SocketMessage
 import com.kelsos.mbrc.networking.protocol.Page
 import com.kelsos.mbrc.networking.protocol.PageRange
+import com.squareup.moshi.Types
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -24,8 +25,7 @@ constructor(
     kClazz: KClass<T>,
     payload: Any = ""
   ): T where T : Any {
-    val factory = deserializationAdapter.typeFactory()
-    val type = factory.constructParametricType(GenericSocketMessage::class.java, kClazz.java)
+    val type = Types.newParameterizedType(GenericSocketMessage::class.java, kClazz.java)
     val connection = apiRequestManager.openConnection()
     val response = apiRequestManager.request(connection, SocketMessage.create(request, payload))
     connection.close()
@@ -33,9 +33,8 @@ constructor(
   }
 
   suspend fun <T : Any> getAllPages(request: String, clazz: KClass<T>): Flow<List<T>> {
-    val factory = deserializationAdapter.typeFactory()
-    val inner = factory.constructParametricType(Page::class.java, clazz.java)
-    val type = factory.constructParametricType(GenericSocketMessage::class.java, inner)
+    val inner = Types.newParameterizedType(Page::class.java, clazz.java)
+    val type = Types.newParameterizedType(GenericSocketMessage::class.java, inner)
 
     return flow {
       val start = now()

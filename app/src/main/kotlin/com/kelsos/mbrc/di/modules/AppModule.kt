@@ -1,8 +1,5 @@
 package com.kelsos.mbrc.di.modules
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.kelsos.mbrc.DatabaseTransactionRunner
 import com.kelsos.mbrc.DatabaseTransactionRunnerImpl
 import com.kelsos.mbrc.DeserializationAdapter
@@ -61,6 +58,8 @@ import com.kelsos.mbrc.di.providers.NowPlayingDaoProvider
 import com.kelsos.mbrc.di.providers.PlaylistDaoProvider
 import com.kelsos.mbrc.di.providers.RadioStationDaoProvider
 import com.kelsos.mbrc.di.providers.TrackDaoProvider
+import com.kelsos.mbrc.networking.ClientConnectionUseCase
+import com.kelsos.mbrc.networking.ClientConnectionUseCaseImpl
 import com.kelsos.mbrc.networking.RequestManager
 import com.kelsos.mbrc.networking.RequestManagerImpl
 import com.kelsos.mbrc.networking.client.ClientConnectionManager
@@ -100,6 +99,7 @@ import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.preferences.SettingsManagerImpl
 import com.kelsos.mbrc.utilities.AppRxSchedulers
+import com.squareup.moshi.Moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import toothpick.config.Module
@@ -109,10 +109,8 @@ class AppModule : Module() {
   init {
 
     bindInstance {
-      ObjectMapper().apply {
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        registerModule(KotlinModule())
-      }
+      val moshi = Moshi.Builder().build()
+      return@bindInstance moshi
     }
 
     bindClass<ConnectionRepository> { ConnectionRepositoryImpl::class }
@@ -169,6 +167,7 @@ class AppModule : Module() {
     bindSingletonClass<CommandExecutor> { CommandExecutorImpl::class }
     bindClass<UserActionUseCase> { UserActionUseCaseImpl::class }
     bindSingletonClass<IClientConnectionManager> { ClientConnectionManager::class }
+    bindClass<ClientConnectionUseCase> { ClientConnectionUseCaseImpl::class }
     bindSingletonClass<CommandFactory> { CommandFactoryImpl::class }
     bindSingletonClass<MessageDeserializer> { MessageDeserializerImpl::class }
     bindSingletonClass<UiMessageQueue> { UiMessageQueueImpl::class }

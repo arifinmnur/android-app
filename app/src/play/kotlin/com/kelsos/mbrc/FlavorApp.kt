@@ -5,7 +5,7 @@ import com.kelsos.mbrc.di.scope
 import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncMetricsImpl
 
-class PlayRemoteApplication : RemoteApplication() {
+class FlavorApp : RemoteApplication() {
   override fun onCreate() {
     super.onCreate()
 

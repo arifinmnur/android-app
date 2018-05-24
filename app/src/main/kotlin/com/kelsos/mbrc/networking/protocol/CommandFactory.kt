@@ -5,6 +5,7 @@ import com.kelsos.mbrc.interfaces.ICommand
 import com.kelsos.mbrc.networking.protocol.commands.ProtocolPingHandle
 import com.kelsos.mbrc.networking.protocol.commands.ProtocolPongHandle
 import com.kelsos.mbrc.networking.protocol.commands.UpdateCover
+
 import com.kelsos.mbrc.networking.protocol.commands.UpdateLastFm
 import com.kelsos.mbrc.networking.protocol.commands.UpdateLfmRating
 import com.kelsos.mbrc.networking.protocol.commands.UpdateLyrics

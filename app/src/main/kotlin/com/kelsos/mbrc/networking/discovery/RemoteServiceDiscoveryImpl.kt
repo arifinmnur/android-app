@@ -2,10 +2,10 @@ package com.kelsos.mbrc.networking.discovery
 
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.kelsos.mbrc.networking.connections.ConnectionMapper
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.protocol.Protocol
+import com.squareup.moshi.Moshi
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -23,12 +23,13 @@ class RemoteServiceDiscoveryImpl
 internal constructor(
   private val manager: WifiManager,
   private val connectivityManager: ConnectivityManager,
-  private val mapper: ObjectMapper
+  private val moshi: Moshi
 ) : RemoteServiceDiscovery {
   private var mLock: WifiManager.MulticastLock? = null
   private var group: InetAddress? = null
 
   private val disposables = CompositeDisposable()
+  private val adapter by lazy { moshi.adapter(DiscoveryMessage::class.java) }
 
   override fun discover(callback: (status: Int, setting: ConnectionSettingsEntity?) -> Unit) {
     if (!isWifiConnected) {
@@ -116,8 +117,8 @@ internal constructor(
       val buffer = ByteArray(512)
       return@fromCallable with(DatagramPacket(buffer, buffer.size)) {
         socket.receive(this)
-        val incoming = String(data, Charsets.UTF_8)
-        mapper.readValue(incoming, DiscoveryMessage::class.java)
+        val message = String(data.copyOfRange(0, length), Charsets.UTF_8)
+        adapter.fromJson(message)
       }
     }
   }
@@ -134,7 +135,7 @@ internal constructor(
           val message = with(DiscoveryMessage()) {
             context = Protocol.DISCOVERY
             address = wifiAddress
-            mapper.writeValueAsBytes(this)
+            adapter.toJson(this).toByteArray()
           }
 
           send(
@@ -154,6 +155,6 @@ internal constructor(
     private const val NOTIFY = "notify"
     private const val SO_TIMEOUT = 15 * 1000
     private const val MULTICAST_PORT = 45345
-    private const val DISCOVERY_ADDRESS = "239.1.5.10" // NOPMD
+    private const val DISCOVERY_ADDRESS = "239.1.5.10"
   }
 }

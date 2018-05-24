@@ -36,22 +36,23 @@ constructor(
       }
     }
 
-  override suspend fun persistInfo(trackInfo: PlayingTrackModel) = withContext(dispatchers.network) {
-    dataStore.updateData { store ->
-      val track = Track.newBuilder()
-        .setAlbum(trackInfo.album)
-        .setArtist(trackInfo.artist)
-        .setPath(trackInfo.path)
-        .setTitle(trackInfo.title)
-        .setYear(trackInfo.year)
-        .build()
+  override suspend fun persistInfo(trackInfo: PlayingTrackModel) =
+    withContext(dispatchers.network) {
+      dataStore.updateData { store ->
+        val track = Track.newBuilder()
+          .setAlbum(trackInfo.album)
+          .setArtist(trackInfo.artist)
+          .setPath(trackInfo.path)
+          .setTitle(trackInfo.title)
+          .setYear(trackInfo.year)
+          .build()
 
-      store.toBuilder()
-        .setTrack(track)
-        .build()
+        store.toBuilder()
+          .setTrack(track)
+          .build()
+      }
+      return@withContext
     }
-    return@withContext
-  }
 
   override suspend fun restoreInfo(): PlayingTrackModel = withContext(dispatchers.network) {
     val track = storeFlow.first().track

@@ -33,7 +33,7 @@ constructor(
   private fun process(message: String) {
 
     val node = messageDeserializer.deserialize(message)
-    val context = node.path("context").textValue()
+    val context = node.context
 
     Timber.v("received message with context -> $context")
 
@@ -47,7 +47,7 @@ constructor(
 
     val connectionStatus = connectionStatusLiveDataProvider.requireValue()
 
-    val dataPayload = node.path("data")
+    val dataPayload = node.data
 
     if (context == Protocol.Player) {
       sendProtocolPayload()
@@ -55,7 +55,7 @@ constructor(
     } else if (context == Protocol.ProtocolTag) {
 
       val protocolVersion: Int = try {
-        dataPayload.asText().toInt()
+        dataPayload.toString().toInt()
       } catch (ignore: Exception) {
         2
       }
