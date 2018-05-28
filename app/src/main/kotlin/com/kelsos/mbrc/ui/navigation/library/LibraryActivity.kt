@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
+import com.kelsos.mbrc.metrics.SyncedData
 import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import kotterknife.bindView
 import toothpick.Scope
@@ -139,7 +140,7 @@ class LibraryActivity : BaseNavigationActivity(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun showStats(stats: LibraryStats) {
+  override fun showStats(stats: SyncedData) {
     val dialog = MaterialAlertDialogBuilder(this)
       .setTitle(R.string.library_stats__title)
       .setView(R.layout.library_stats__layout)
@@ -153,7 +154,7 @@ class LibraryActivity : BaseNavigationActivity(),
     dialog.findViewById<TextView>(R.id.library_stats__playlist_value)?.text = "${stats.playlists}"
   }
 
-  override fun syncComplete(stats: LibraryStats) {
+  override fun syncComplete(stats: SyncedData) {
     val message = getString(
       R.string.library__sync_complete,
       stats.genres,

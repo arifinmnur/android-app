@@ -6,7 +6,8 @@ import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
-import com.kelsos.mbrc.ui.navigation.library.LibraryStats
+import com.kelsos.mbrc.metrics.SyncMetrics
+import com.kelsos.mbrc.metrics.SyncedData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -21,7 +22,8 @@ constructor(
   private val albumRepository: AlbumRepository,
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
-  dispatchers: AppCoroutineDispatchers
+  dispatchers: AppCoroutineDispatchers,
+  private val metrics: SyncMetrics,
 ) : LibrarySyncInteractor {
 
   private var running: Boolean = false
@@ -40,8 +42,7 @@ constructor(
     running = true
     scope.launch {
       Timber.v("Starting library metadata sync")
-      val start = System.currentTimeMillis()
-
+      metrics.librarySyncStarted()
       onStartListener?.onStart()
 
       val shouldSync = checkIfShouldSync(auto)
@@ -58,17 +59,16 @@ constructor(
         trackRepository.getRemote()
         playlistRepository.getRemote()
 
-        onCompleteListener?.onSuccess(
-          LibraryStats(
-            genres = genreRepository.count(),
-            artists = artistRepository.count(),
-            albums = albumRepository.count(),
-            tracks = trackRepository.count(),
-            playlists = playlistRepository.count()
-          )
+        val stats = SyncedData(
+          genres = genreRepository.count(),
+          artists = artistRepository.count(),
+          albums = albumRepository.count(),
+          tracks = trackRepository.count(),
+          playlists = playlistRepository.count()
         )
+        onCompleteListener?.onSuccess(stats)
+        metrics.librarySyncComplete(stats)
         running = false
-        Timber.v("Library refresh complete after ${System.currentTimeMillis() - start} ms")
       } catch (e: Exception) {
         Timber.e(e, "Refresh couldn't complete")
         onCompleteListener?.onFailure(e)
@@ -78,8 +78,8 @@ constructor(
     }
   }
 
-  override suspend fun syncStats(): LibraryStats {
-    return LibraryStats(
+  override suspend fun syncStats(): SyncedData {
+    return SyncedData(
       genres = genreRepository.count(),
       artists = artistRepository.count(),
       albums = albumRepository.count(),
