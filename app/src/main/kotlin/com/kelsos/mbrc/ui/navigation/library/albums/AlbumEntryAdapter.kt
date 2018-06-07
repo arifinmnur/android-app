@@ -28,6 +28,7 @@ constructor() : PagedListAdapter<AlbumEntity, AlbumViewHolder>(DIFF_CALLBACK) {
       listener.onItemClicked(this)
     }
   }
+
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
     return AlbumViewHolder.create(parent, indicatorPressed, pressed)
   }

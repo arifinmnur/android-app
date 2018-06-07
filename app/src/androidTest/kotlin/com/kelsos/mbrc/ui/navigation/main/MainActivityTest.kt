@@ -12,10 +12,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.filters.LargeTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.activestatus.MainDataModel
 import com.kelsos.mbrc.content.activestatus.PlayingTrackCache
 import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
-import com.kelsos.mbrc.events.bus.RxBus
 import com.kelsos.mbrc.platform.ServiceChecker
 import com.kelsos.mbrc.preferences.SettingsManager
 import io.reactivex.Completable
@@ -113,8 +111,6 @@ class MainActivityTest {
 
   inner class TestModule : Module() {
     init {
-      bind(MainDataModel::class.java).toProviderInstance { model }.providesSingletonInScope()
-      bind(RxBus::class.java).toProviderInstance { mockBus }.providesSingletonInScope()
       bind(SettingsManager::class.java)
         .toProviderInstance { mockSettingsManager }
         .providesSingletonInScope()

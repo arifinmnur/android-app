@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
 import android.media.AudioManager
+import android.media.session.PlaybackState
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
@@ -32,7 +33,7 @@ constructor(
   private val userActionUseCase: UserActionUseCase,
   private val manager: AudioManager
 ) : AudioManager.OnAudioFocusChangeListener {
-  private val mediaSession: MediaSessionCompat?
+  private val mediaSession: MediaSessionCompat
 
   @Inject
   lateinit var handler: MediaIntentHandler
@@ -46,9 +47,12 @@ constructor(
       PendingIntent.FLAG_UPDATE_CURRENT
     )
 
-    mediaSession = MediaSessionCompat(context, "Session", myEventReceiver, mediaPendingIntent)
-    mediaSession.setPlaybackToRemote(volumeProvider)
-    mediaSession.setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS)
+    mediaSession = MediaSessionCompat(context, "Session").apply {
+      setMediaButtonReceiver(mediaPendingIntent)
+      setPlaybackToRemote(volumeProvider)
+      setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS)
+    }
+
     mediaSession.setCallback(object : MediaSessionCompat.Callback() {
       override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
         val success = handler.handleMediaIntent(mediaButtonEvent)
@@ -82,16 +86,20 @@ constructor(
   }
 
   private fun onConnectionStatusChanged(event: ConnectionStatusChangeEvent) {
-    if (event.status == Connection.OFF) {
-      if (mediaSession != null) {
-        val builder = PlaybackStateCompat.Builder()
-        builder.setState(PlaybackStateCompat.STATE_STOPPED, -1, 0f)
-        val playbackState = builder.build()
-        mediaSession.isActive = false
-        mediaSession.setPlaybackState(playbackState)
-      }
-      abandonFocus()
+    if (event.status != Connection.OFF) {
+      return
     }
+
+    val playbackState = PlaybackStateCompat.Builder()
+      .setState(PlaybackState.STATE_STOPPED, -1, 0f)
+      .build()
+
+    with(mediaSession) {
+      isActive = false
+      setPlaybackState(playbackState)
+    }
+
+    abandonFocus()
   }
 
   private fun postAction(action: UserAction) {
@@ -99,13 +107,9 @@ constructor(
   }
 
   val mediaSessionToken: MediaSessionCompat.Token
-    get() = mediaSession!!.sessionToken
+    get() = mediaSession.sessionToken
 
   private fun metadataUpdate(data: RemoteClientMetaData) {
-    if (mediaSession == null) {
-      return
-    }
-
     val trackInfo = data.track
     val bitmap = RemoteUtils.coverBitmapSync(data.coverPath)
 
@@ -119,15 +123,6 @@ constructor(
   }
 
   private fun updateState(change: PlayStateChange) {
-    when (change.state) {
-      PlayerState.PLAYING -> requestFocus()
-      else -> abandonFocus()
-    }
-
-    if (mediaSession == null) {
-      return
-    }
-
     val builder = PlaybackStateCompat.Builder()
     builder.setActions(PLAYBACK_ACTIONS)
     when (change.state) {
