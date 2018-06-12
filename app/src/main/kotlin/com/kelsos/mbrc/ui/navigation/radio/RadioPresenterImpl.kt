@@ -11,7 +11,6 @@ import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@RadioActivity.Presenter
 class RadioPresenterImpl
 @Inject
 constructor(

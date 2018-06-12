@@ -1,10 +1,12 @@
 package com.kelsos.mbrc.ui.navigation.library.albumtracks
 
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
-import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,17 +15,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
-import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter
 import kotterknife.bindView
-import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class AlbumTracksActivity : BaseActivity(),
+class AlbumTracksFragment : Fragment(),
   AlbumTracksView,
   MenuItemSelectedListener<TrackEntity> {
 
@@ -40,59 +39,42 @@ class AlbumTracksActivity : BaseActivity(),
   @Inject
   lateinit var presenter: AlbumTracksPresenter
 
-  private var album: AlbumInfo? = null
-  private lateinit var scope: Scope
+  private lateinit var album: AlbumInfo
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, this)
-    scope.installModules(SmoothieActivityModule(this), AlbumTracksModule())
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_album_tracks, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    adapter.setMenuItemSelectedListener(this)
+    listTracks.layoutManager = LinearLayoutManager(requireContext())
+    listTracks.adapter = adapter
+
+    presenter.attach(this)
+    presenter.load(album)
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    val scope = Toothpick.openScopes(this)
+    scope.installModules(AlbumTracksModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
-    setContentView(R.layout.activity_album_tracks)
-    val extras = intent.extras
 
-    if (extras != null) {
-      album = extras.getParcelable(ALBUM)
+    album = AlbumTracksFragmentArgs.fromBundle(requireArguments()).run {
+      AlbumInfo(album, artist)
     }
 
-    val selectedAlbum = album
-    if (selectedAlbum == null) {
-      finish()
-      return
-    }
-
-    val albumTitle = album?.album ?: ""
+    val albumTitle = album.album
     val title = if (albumTitle.isBlank()) {
       getString(R.string.non_album_tracks)
     } else {
       albumTitle
     }
-
-    setupToolbar(title, subtitle = selectedAlbum.artist)
-
-    adapter.setMenuItemSelectedListener(this)
-    listTracks.layoutManager = LinearLayoutManager(baseContext)
-    listTracks.adapter = adapter
-
-    val fab = findViewById<FloatingActionButton>(R.id.play_album)
-    fab.isVisible = true
-    fab.setOnClickListener {
-      presenter.queueAlbum(selectedAlbum.artist, selectedAlbum.album)
-    }
-
-    presenter.attach(this)
-    presenter.load(album!!)
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val itemId = item.itemId
-
-    if (itemId == android.R.id.home) {
-      onBackPressed()
-      return true
-    }
-
-    return super.onOptionsItemSelected(item)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: TrackEntity) {
@@ -122,13 +104,5 @@ class AlbumTracksActivity : BaseActivity(),
     presenter.detach()
     Toothpick.closeScope(this)
     super.onDestroy()
-  }
-
-  override fun onBackPressed() {
-    finish()
-  }
-
-  companion object {
-    const val ALBUM = "albumName"
   }
 }

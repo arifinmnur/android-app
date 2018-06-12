@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
+import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
@@ -109,14 +111,19 @@ class BrowseArtistFragment : Fragment(),
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: ArtistEntity) {
-    val action = actionHandler.artistSelected(itemId, item, requireActivity())
-    if (action != LibraryPopup.PROFILE) {
+    val action = actionHandler.artistSelected(itemId)
+    if (action == LibraryPopup.PROFILE) {
+      onItemClicked(item)
+    } else {
       presenter.queue(action, item)
     }
   }
 
   override fun onItemClicked(item: ArtistEntity) {
-    actionHandler.artistSelected(item, requireActivity())
+    val directions = LibraryFragmentDirections.actionLibraryFragmentToArtistAlbumsFragment(
+      item.artist
+    )
+    findNavController().navigate(directions)
   }
 
   override fun update(pagedList: PagedList<ArtistEntity>) {

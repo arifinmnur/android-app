@@ -1,27 +1,29 @@
 package com.kelsos.mbrc.ui.navigation.playlists
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
-import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.playlists.Playlist
-import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
+import com.kelsos.mbrc.extensions.snackbar
 import com.kelsos.mbrc.ui.navigation.playlists.PlaylistAdapter.OnPlaylistPressedListener
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import java.net.ConnectException
 import javax.inject.Inject
 
-class PlaylistActivity : BaseNavigationActivity(),
+class PlaylistFragment : Fragment(),
   PlaylistView,
   OnPlaylistPressedListener,
   OnRefreshListener {
@@ -34,21 +36,24 @@ class PlaylistActivity : BaseNavigationActivity(),
 
   @Inject
   lateinit var adapter: PlaylistAdapter
+
   @Inject
   lateinit var presenter: PlaylistPresenter
 
   private lateinit var scope: Scope
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
-    scope.installTestModules(SmoothieActivityModule(this), PlaylistModule())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
-    setContentView(R.layout.activity_playlists)
-    super.setup()
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_playlists, container, false)
+  }
 
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     adapter.setPlaylistPressedListener(this)
-    playlistList.layoutManager = LinearLayoutManager(this)
+    playlistList.layoutManager = LinearLayoutManager(requireContext())
     playlistList.adapter = adapter
     swipeLayout.setOnRefreshListener(this)
     emptyViewTitle.setText(R.string.playlists_list_empty)
@@ -56,19 +61,21 @@ class PlaylistActivity : BaseNavigationActivity(),
     presenter.load()
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
+    scope.installTestModules(PlaylistModule())
+    super.onCreate(savedInstanceState)
+    Toothpick.inject(this, scope)
+  }
+
   override fun playlistPressed(path: String) {
     presenter.play(path)
   }
 
-  override fun active(): Int = R.id.nav_playlists
-
   override fun onDestroy() {
     presenter.detach()
     Toothpick.closeScope(this)
-
-    if (isFinishing) {
-      Toothpick.closeScope(PRESENTER_SCOPE)
-    }
+    Toothpick.closeScope(PRESENTER_SCOPE)
     super.onDestroy()
   }
 
@@ -89,9 +96,9 @@ class PlaylistActivity : BaseNavigationActivity(),
   override fun failure(throwable: Throwable) {
     swipeLayout.isRefreshing = false
     if (throwable.cause is ConnectException) {
-      Snackbar.make(swipeLayout, R.string.service_connection_error, Snackbar.LENGTH_SHORT).show()
+      snackbar(R.string.service_connection_error)
     } else {
-      Snackbar.make(swipeLayout, R.string.playlists_load_failed, Snackbar.LENGTH_SHORT).show()
+      snackbar(R.string.playlists_load_failed)
     }
   }
 

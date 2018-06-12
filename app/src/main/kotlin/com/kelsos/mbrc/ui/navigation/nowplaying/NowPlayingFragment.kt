@@ -1,13 +1,18 @@
 package com.kelsos.mbrc.ui.navigation.nowplaying
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,16 +22,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
 import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
-import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class NowPlayingActivity : BaseNavigationActivity(),
+class NowPlayingFragment : Fragment(),
   NowPlayingView,
   OnQueryTextListener,
   OnStartDragListener,
@@ -37,8 +40,7 @@ class NowPlayingActivity : BaseNavigationActivity(),
   private val emptyGroup: Group by bindView(R.id.now_playing__empty_group)
   private val emptyViewProgress: ProgressBar by bindView(R.id.now_playing__loading_bar)
 
-  @Inject
-  lateinit var adapter: NowPlayingAdapter
+  private val adapter: NowPlayingAdapter by lazy { NowPlayingAdapter(this@NowPlayingFragment) }
 
   @Inject
   lateinit var presenter: NowPlayingPresenter
@@ -72,30 +74,43 @@ class NowPlayingActivity : BaseNavigationActivity(),
     return true
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.nowplaying_search, menu)
-    searchMenuItem = menu.findItem(R.id.now_playing_search)
-    searchView = searchMenuItem?.actionView as SearchView
-    searchView?.queryHint = getString(R.string.now_playing_search_hint)
-    searchView?.setIconifiedByDefault(true)
-    searchView?.setOnQueryTextListener(this)
-    return super.onCreateOptionsMenu(menu)
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.nowplaying_search, menu)
+    searchMenuItem = menu.findItem(R.id.now_playing_search)?.apply {
+      searchView = actionView as SearchView
+    }
+
+    searchView?.apply {
+      queryHint = getString(R.string.now_playing_search_hint)
+      setIconifiedByDefault(true)
+      setOnQueryTextListener(this@NowPlayingFragment)
+    }
+
+    super.onCreateOptionsMenu(menu, inflater)
   }
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, this)
-    scope.installModules(SmoothieActivityModule(this), NowPlayingModule.create())
+  override fun onCreate(savedInstanceState: Bundle?) {
+    scope = Toothpick.openScopes(requireActivity().application, this)
+    scope.installModules(NowPlayingModule.create())
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_nowplaying)
-
     Toothpick.inject(this, scope)
-    super.setup()
+  }
 
-    val manager = LinearLayoutManager(this)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_nowplaying, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    val manager = LinearLayoutManager(requireContext())
     nowPlayingList.layoutManager = manager
     nowPlayingList.adapter = adapter
     nowPlayingList.itemAnimator?.changeDuration = 0
-    touchListener = NowPlayingTouchListener(this) {
+    touchListener = NowPlayingTouchListener(requireContext()) {
       if (it) {
         swipeRefreshLayout.isRefreshing = false
         swipeRefreshLayout.isEnabled = false
@@ -131,8 +146,6 @@ class NowPlayingActivity : BaseNavigationActivity(),
     presenter.removeTrack(position)
   }
 
-  override fun active(): Int = R.id.nav_now_playing
-
   override fun onDestroy() {
     presenter.detach()
     Toothpick.closeScope(this)
@@ -162,13 +175,6 @@ class NowPlayingActivity : BaseNavigationActivity(),
       emptyViewProgress.isVisible = false
       swipeRefreshLayout.isRefreshing = false
     }
-  }
-
-  override fun onBackPressed() {
-    if (closeSearch()) {
-      return
-    }
-    super.onBackPressed()
   }
 
   override fun onStartDrag(viewHolder: RecyclerView.ViewHolder) {

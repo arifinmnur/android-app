@@ -1,26 +1,29 @@
 package com.kelsos.mbrc.ui.navigation.radio
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioStationEntity
-import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
+import com.kelsos.mbrc.extensions.snackbar
 import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter.OnRadioPressedListener
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class RadioActivity : BaseNavigationActivity(),
+class RadioFragment : Fragment(),
   RadioView,
   SwipeRefreshLayout.OnRefreshListener,
   OnRadioPressedListener {
@@ -34,21 +37,29 @@ class RadioActivity : BaseNavigationActivity(),
 
   @Inject
   lateinit var presenter: RadioPresenter
+
   @Inject
   lateinit var adapter: RadioAdapter
-
-  override fun active(): Int = R.id.nav_radio
 
   private lateinit var scope: Scope
 
   override fun onCreate(savedInstanceState: Bundle?) {
     Toothpick.openScope(PRESENTER_SCOPE).installModules(RadioModule())
-    scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
-    scope.installModules(SmoothieActivityModule(this))
+    scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_radio)
     Toothpick.inject(this, scope)
-    super.setup()
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_radio, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     setupEmptyView()
     setupRecycler()
     presenter.attach(this)
@@ -58,7 +69,7 @@ class RadioActivity : BaseNavigationActivity(),
   private fun setupRecycler() {
     swipeLayout.setOnRefreshListener(this)
     radioView.adapter = adapter
-    radioView.layoutManager = LinearLayoutManager(this)
+    radioView.layoutManager = LinearLayoutManager(requireContext())
     adapter.setOnRadioPressedListener(this)
   }
 
@@ -70,10 +81,7 @@ class RadioActivity : BaseNavigationActivity(),
   override fun onDestroy() {
     presenter.detach()
     adapter.setOnRadioPressedListener(null)
-
-    if (isFinishing) {
-      Toothpick.closeScope(PRESENTER_SCOPE)
-    }
+    Toothpick.closeScope(PRESENTER_SCOPE)
     Toothpick.closeScope(this)
     super.onDestroy()
   }
@@ -84,7 +92,7 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun error(error: Throwable) {
-    showSnackbar(R.string.radio__loading_failed)
+    snackbar(R.string.radio__loading_failed)
   }
 
   override fun onRadioPressed(path: String) {
@@ -96,11 +104,11 @@ class RadioActivity : BaseNavigationActivity(),
   }
 
   override fun radioPlayFailed(error: Throwable?) {
-    showSnackbar(R.string.radio__play_failed)
+    snackbar(R.string.radio__play_failed)
   }
 
   override fun radioPlaySuccessful() {
-    showSnackbar(R.string.radio__play_successful)
+    snackbar(R.string.radio__play_successful)
   }
 
   override fun loading(visible: Boolean) {

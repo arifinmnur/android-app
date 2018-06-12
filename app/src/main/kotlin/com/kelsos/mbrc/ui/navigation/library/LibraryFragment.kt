@@ -1,12 +1,17 @@
 package com.kelsos.mbrc.ui.navigation.library
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.core.view.isGone
+import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.ProgressIndicator
@@ -15,14 +20,12 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.metrics.SyncedData
-import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class LibraryActivity : BaseNavigationActivity(),
+class LibraryFragment : Fragment(),
   LibraryView,
   OnQueryTextListener {
 
@@ -44,13 +47,8 @@ class LibraryActivity : BaseNavigationActivity(),
     val search = query.trim()
     if (search.isNotEmpty()) {
       closeSearch()
-      presenter.search(search)
-      supportActionBar?.title = search
-      supportActionBar?.setSubtitle(R.string.library_search_subtitle)
       searchMenuItem?.isVisible = false
       searchClear?.isVisible = true
-    } else {
-      presenter.search("")
     }
 
     return true
@@ -71,43 +69,59 @@ class LibraryActivity : BaseNavigationActivity(),
 
   override fun onQueryTextChange(newText: String): Boolean = false
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?) {
     Toothpick.openScope(PRESENTER_SCOPE).installModules(LibraryModule())
-    scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
-    scope.installModules(SmoothieActivityModule(this))
+    scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
-    setContentView(R.layout.activity_library)
+  }
 
-    super.setup()
-    pagerAdapter = LibraryPagerAdapter(this)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_library, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    pagerAdapter = LibraryPagerAdapter(requireActivity())
     pager.apply {
       adapter = pagerAdapter
     }
+    pager.adapter = pagerAdapter
+    pager.offscreenPageLimit = 4
 
     TabLayoutMediator(tabs, pager) { currentTab, currentPosition ->
       currentTab.text = when (currentPosition) {
-        Search.SECTION_ALBUM -> getString(R.string.label_albums)
-        Search.SECTION_ARTIST -> getString(R.string.label_artists)
-        Search.SECTION_GENRE -> getString(R.string.label_genres)
-        Search.SECTION_TRACK -> getString(R.string.label_tracks)
+        Category.SECTION_ALBUM -> getString(R.string.label_albums)
+        Category.SECTION_ARTIST -> getString(R.string.label_artists)
+        Category.SECTION_GENRE -> getString(R.string.label_genres)
+        Category.SECTION_TRACK -> getString(R.string.label_tracks)
         else -> throw IllegalArgumentException("invalid position")
       }
     }.attach()
     presenter.attach(this)
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.library_search, menu)
-    searchMenuItem = menu.findItem(R.id.library_search_item)
-    searchClear = menu.findItem(R.id.library_search_clear)
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(R.menu.library_search, menu)
+    searchMenuItem = menu.findItem(R.id.library_search_item)?.apply {
+      searchView = actionView as SearchView
+    }
+
     albumArtistOnly = menu.findItem(R.id.library_album_artist)
-    searchView = searchMenuItem?.actionView as SearchView
-    searchView!!.queryHint = getString(R.string.library_search_hint)
-    searchView!!.setIconifiedByDefault(true)
-    searchView!!.setOnQueryTextListener(this)
+
+    searchView?.apply {
+      queryHint = getString(R.string.library_search_hint)
+      setIconifiedByDefault(true)
+      setOnQueryTextListener(this@LibraryFragment)
+    }
+
     presenter.loadArtistPreference()
-    return super.onCreateOptionsMenu(menu)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -125,8 +139,6 @@ class LibraryActivity : BaseNavigationActivity(),
         return true
       }
       R.id.library_search_clear -> {
-        supportActionBar?.setTitle(R.string.nav_library)
-        supportActionBar?.subtitle = ""
         presenter.search("")
         searchMenuItem?.isVisible = true
         searchClear?.isVisible = false
@@ -141,7 +153,7 @@ class LibraryActivity : BaseNavigationActivity(),
   }
 
   override fun showStats(stats: SyncedData) {
-    val dialog = MaterialAlertDialogBuilder(this)
+    val dialog = MaterialAlertDialogBuilder(requireContext())
       .setTitle(R.string.library_stats__title)
       .setView(R.layout.library_stats__layout)
       .setPositiveButton(android.R.string.ok) { md, _ -> md.dismiss() }
@@ -172,36 +184,13 @@ class LibraryActivity : BaseNavigationActivity(),
     presenter.detach()
     pagerAdapter = null
     Toothpick.closeScope(this)
+    Toothpick.closeScope(PRESENTER_SCOPE)
 
-    if (isFinishing) {
-      Toothpick.closeScope(PRESENTER_SCOPE)
-    }
     super.onDestroy()
-  }
-
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
-  }
-
-  override fun onBackPressed() {
-    if (closeSearch()) {
-      return
-    }
-    super.onBackPressed()
   }
 
   override fun updateArtistOnlyPreference(albumArtistOnly: Boolean?) {
     this.albumArtistOnly?.isChecked = albumArtistOnly ?: false
-  }
-
-  override fun active(): Int {
-    return R.id.nav_library
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -209,8 +198,9 @@ class LibraryActivity : BaseNavigationActivity(),
     outState.putInt(PAGER_POSITION, pager.currentItem)
   }
 
-  override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-    pager.currentItem = savedInstanceState.getInt(PAGER_POSITION, 0)
+  override fun onViewStateRestored(savedInstanceState: Bundle?) {
+    super.onViewStateRestored(savedInstanceState)
+    pager.currentItem = savedInstanceState?.getInt(PAGER_POSITION, 0) ?: 0
   }
 
   override fun syncFailure() {
@@ -218,13 +208,17 @@ class LibraryActivity : BaseNavigationActivity(),
   }
 
   override fun showSyncProgress() {
-    findViewById<ProgressIndicator>(R.id.sync_progress).isGone = false
-    findViewById<TextView>(R.id.sync_progress_text).isGone = false
+    view?.apply {
+      findViewById<ProgressIndicator>(R.id.sync_progress).isGone = false
+      findViewById<TextView>(R.id.sync_progress_text).isGone = false
+    }
   }
 
   override fun hideSyncProgress() {
-    findViewById<ProgressIndicator>(R.id.sync_progress).isGone = true
-    findViewById<TextView>(R.id.sync_progress_text).isGone = true
+    view?.apply {
+      findViewById<ProgressIndicator>(R.id.sync_progress).isGone = true
+      findViewById<TextView>(R.id.sync_progress_text).isGone = true
+    }
   }
 
   @javax.inject.Scope

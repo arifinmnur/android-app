@@ -31,7 +31,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/mini_control_height"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.kelsos.mbrc.ui.navigation.radio.RadioActivity">
+        tools:context="com.kelsos.mbrc.ui.navigation.radio.RadioFragment">
 
       <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
           android:id="@+id/radio_stations__refresh_layout"

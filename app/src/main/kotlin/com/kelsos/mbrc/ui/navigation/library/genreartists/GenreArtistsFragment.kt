@@ -1,9 +1,13 @@
 package com.kelsos.mbrc.ui.navigation.library.genreartists
 
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,17 +15,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
-import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
 import kotterknife.bindView
-import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class GenreArtistsActivity : BaseActivity(),
+class GenreArtistsFragment : Fragment(),
   GenreArtistsView,
   MenuItemSelectedListener<ArtistEntity> {
 
@@ -37,53 +38,55 @@ class GenreArtistsActivity : BaseActivity(),
   @Inject
   lateinit var presenter: GenreArtistsPresenter
 
-  private var genre: String? = null
-  private lateinit var scope: Scope
+  private lateinit var genre: String
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, this)
-    scope.installModules(SmoothieActivityModule(this), GenreArtistsModule())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
-    setContentView(R.layout.activity_genre_artists)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.activity_genre_artists, container, false)
+  }
 
-    genre = intent?.extras?.getString(GENRE_NAME)
-
-    if (genre == null) {
-      finish()
-      return
-    }
-
-    val title = genre ?: getString(R.string.empty)
-    setupToolbar(title)
-
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     adapter.setMenuItemSelectedListener(this)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(recyclerView.context)
     presenter.attach(this)
-    presenter.load(genre!!)
+    presenter.load(genre)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val itemId = item.itemId
 
-    if (itemId == android.R.id.home) {
-      onBackPressed()
-      return true
+  override fun onCreate(savedInstanceState: Bundle?) {
+    val scope = Toothpick.openScopes(requireActivity().application, this)
+    scope.installModules(GenreArtistsModule())
+    super.onCreate(savedInstanceState)
+    Toothpick.inject(this, scope)
+
+    genre = GenreArtistsFragmentArgs.fromBundle(requireArguments()).genre
+
+    val title = if (genre.isEmpty()) {
+      getString(R.string.empty)
+    } else {
+      genre
     }
-
-    return super.onOptionsItemSelected(item)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: ArtistEntity) {
-    val action = actionHandler.artistSelected(itemId, item, this)
-    if (action != LibraryPopup.PROFILE) {
+    val action = actionHandler.artistSelected(itemId)
+    if (action == LibraryPopup.PROFILE) {
+      onItemClicked(item)
+    } else {
       presenter.queue(action, item)
     }
   }
 
   override fun onItemClicked(item: ArtistEntity) {
-    actionHandler.artistSelected(item, this)
+    val directions = GenreArtistsFragmentDirections.actionGenreArtistsFragmentToArtistAlbumsFragment(
+      artist = item.artist
+    )
+    findNavController(this).navigate(directions)
   }
 
   override fun update(pagedList: PagedList<ArtistEntity>) {
@@ -105,13 +108,5 @@ class GenreArtistsActivity : BaseActivity(),
     presenter.detach()
     Toothpick.closeScope(this)
     super.onDestroy()
-  }
-
-  override fun onBackPressed() {
-    finish()
-  }
-
-  companion object {
-    const val GENRE_NAME = "genre_name"
   }
 }

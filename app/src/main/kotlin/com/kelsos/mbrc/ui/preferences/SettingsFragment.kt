@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
-import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.core.os.HandlerCompat
 import androidx.preference.CheckBoxPreference
@@ -19,8 +18,8 @@ import com.kelsos.mbrc.BuildConfig
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.logging.FileLoggingTree
 import com.kelsos.mbrc.platform.RemoteService
-import com.kelsos.mbrc.ui.connectionmanager.ConnectionManagerActivity
-import com.kelsos.mbrc.ui.dialogs.WebViewDialog
+import com.kelsos.mbrc.ui.connectionmanager.ConnectionManagerFragment
+import com.kelsos.mbrc.ui.dialogs.webDialog
 import com.kelsos.mbrc.utilities.RemoteUtils.getVersion
 import timber.log.Timber
 
@@ -29,16 +28,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     addPreferencesFromResource(R.xml.application_settings)
 
-    val reduceOnIncoming =
-      findPreference<ListPreference>(getString(R.string.settings_key_incoming_call_action))
+    val reduceOnIncoming = findPreference<ListPreference>(
+      getString(R.string.settings_key_incoming_call_action)
+    )
     val mOpenSource = findPreference<Preference>(getString(R.string.preferences_open_source))
-    val mManager =
-      findPreference<Preference>(resources.getString(R.string.preferences_key_connection_manager))
+    val mManager = findPreference<Preference>(
+      resources.getString(R.string.preferences_key_connection_manager)
+    )
     val mVersion = findPreference<Preference>(resources.getString(R.string.settings_version))
     val mBuild = findPreference<Preference>(resources.getString(R.string.pref_key_build_time))
     val mRevision = findPreference<Preference>(resources.getString(R.string.pref_key_revision))
-    val debugLogging =
-      findPreference<CheckBoxPreference>(resources.getString(R.string.settings_key_debug_logging))
+    val debugLogging = findPreference<CheckBoxPreference>(
+      resources.getString(R.string.settings_key_debug_logging)
+    )
 
     debugLogging?.setOnPreferenceChangeListener { _, newValue ->
       if (newValue as Boolean) {
@@ -64,7 +66,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     mManager?.setOnPreferenceClickListener {
-      startActivity(Intent(requireContext(), ConnectionManagerActivity::class.java))
+      startActivity(Intent(requireContext(), ConnectionManagerFragment::class.java))
       false
     }
 
@@ -97,30 +99,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
   }
 
   private fun showLicenseDialog() {
-    showWebViewDialog(
-      "file:///android_asset/license.html",
+    webDialog(
       R.string.musicbee_remote_license_title,
-      "license_dialog"
+      "file:///android_asset/license.html"
     )
   }
 
   private fun showOpenSourceLicenseDialog() {
-    showWebViewDialog(
-      "file:///android_asset/licenses.html",
+    webDialog(
       R.string.open_source_licenses_title,
-      "licenses_dialogs"
+      "file:///android_asset/licenses.html"
     )
-  }
-
-  private fun showWebViewDialog(url: String, @StringRes titleResId: Int, tag: String) {
-    val dialog = WebViewDialog()
-    dialog.arguments = Bundle().apply {
-      putString(WebViewDialog.ARG_URL, url)
-      putInt(WebViewDialog.ARG_TITLE, titleResId)
-    }
-    requireActivity().let {
-      dialog.show(it.supportFragmentManager, tag)
-    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -160,7 +149,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
   companion object {
     private const val REQUEST_CODE = 15
-
-    fun newInstance(): SettingsFragment = SettingsFragment()
   }
 }

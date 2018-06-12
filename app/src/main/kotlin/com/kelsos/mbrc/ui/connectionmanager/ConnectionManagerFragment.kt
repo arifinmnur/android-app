@@ -1,9 +1,12 @@
 package com.kelsos.mbrc.ui.connectionmanager
 
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.view.isGone
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.ProgressIndicator
@@ -13,15 +16,13 @@ import com.kelsos.mbrc.events.ConnectionSettingsChanged
 import com.kelsos.mbrc.events.NotifyUser
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.discovery.DiscoveryStop
-import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
 import kotterknife.bindView
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class ConnectionManagerActivity : BaseActivity(),
+class ConnectionManagerFragment : Fragment(),
   ConnectionManagerView,
   SettingsDialogFragment.SettingsSaveListener,
   ConnectionAdapter.ConnectionChangeListener {
@@ -38,29 +39,29 @@ class ConnectionManagerActivity : BaseActivity(),
   private val scanButton: Button by bindView(R.id.connection_manager__scan)
 
   private fun onAddButtonClick() {
-    val settingsDialog = SettingsDialogFragment.create(supportFragmentManager)
-    settingsDialog.show()
+    SettingsDialogFragment.create(parentFragmentManager).show()
   }
 
   private fun onScanButtonClick() {
-    findViewById<ProgressIndicator>(R.id.connection_manager__progress).isGone = false
+    view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = false
     presenter.startDiscovery()
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, this)
-    scope.installModules(SmoothieActivityModule(this), ConnectionManagerModule.create())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
-    setContentView(R.layout.ui_activity_connection_manager)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_connection_manager, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     addButton.setOnClickListener { onAddButtonClick() }
     scanButton.setOnClickListener { onScanButtonClick() }
 
-    setupToolbar(getString(R.string.connection_manager_title))
-
     recyclerView.setHasFixedSize(true)
-    val mLayoutManager = LinearLayoutManager(this)
-    recyclerView.layoutManager = mLayoutManager
+    recyclerView.layoutManager = LinearLayoutManager(requireContext())
     adapter = ConnectionAdapter()
     adapter.setChangeListener(this)
     recyclerView.adapter = adapter
@@ -68,18 +69,17 @@ class ConnectionManagerActivity : BaseActivity(),
     presenter.load()
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    scope = Toothpick.openScopes(requireActivity().application, this)
+    scope.installModules(ConnectionManagerModule.create())
+    super.onCreate(savedInstanceState)
+    Toothpick.inject(this, scope)
+  }
+
   override fun onDestroy() {
     presenter.detach()
     Toothpick.closeScope(this)
     super.onDestroy()
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      android.R.id.home -> onBackPressed()
-      else -> return false
-    }
-    return true
   }
 
   override fun onSave(settings: ConnectionSettingsEntity) {
@@ -91,7 +91,7 @@ class ConnectionManagerActivity : BaseActivity(),
   }
 
   override fun onDiscoveryStopped(status: Int) {
-    findViewById<ProgressIndicator>(R.id.connection_manager__progress).isGone = true
+    view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = true
 
     val message: String = when (status) {
       DiscoveryStop.NO_WIFI -> getString(R.string.con_man_no_wifi)
@@ -116,7 +116,7 @@ class ConnectionManagerActivity : BaseActivity(),
   }
 
   override fun onEdit(settings: ConnectionSettingsEntity) {
-    val settingsDialog = SettingsDialogFragment.newInstance(settings, supportFragmentManager)
+    val settingsDialog = SettingsDialogFragment.newInstance(settings, parentFragmentManager)
     settingsDialog.show()
   }
 

@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
+import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
@@ -102,15 +103,20 @@ class BrowseGenreFragment : Fragment(),
     presenter.load()
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: GenreEntity) {
-    val action = actionHandler.genreSelected(itemId, item, requireActivity())
-    if (action != LibraryPopup.PROFILE) {
+  override fun onMenuItemSelected(itemId: Int, item: GenreEntity) {
+    val action = actionHandler.genreSelected(itemId)
+    if (action === LibraryPopup.PROFILE) {
+      onItemClicked(item)
+    } else {
       presenter.queue(action, item)
     }
   }
 
   override fun onItemClicked(item: GenreEntity) {
-    actionHandler.genreSelected(item, requireActivity())
+    val directions = LibraryFragmentDirections.actionLibraryFragmentToGenreArtistsActivity(
+      item.genre
+    )
+    findNavController(this).navigate(directions)
   }
 
   override fun onDestroy() {

@@ -16,7 +16,7 @@ import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.activestatus.PlayerState.State
 import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
 import com.kelsos.mbrc.extensions.getDimens
-import com.kelsos.mbrc.ui.navigation.main.MainActivity
+import com.kelsos.mbrc.ui.navigation.main.MainFragment
 import com.squareup.picasso.Picasso
 import kotterknife.bindView
 import toothpick.Toothpick
@@ -39,7 +39,7 @@ class MiniControlFragment : Fragment(), MiniControlView {
 
   private fun onControlClick() {
     val builder = TaskStackBuilder.create(requireContext())
-    builder.addNextIntentWithParentStack(Intent(context, MainActivity::class.java))
+    builder.addNextIntentWithParentStack(Intent(context, MainFragment::class.java))
     builder.startActivities()
   }
 

@@ -5,9 +5,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.SeekBar
@@ -15,8 +18,10 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.changelog.ChangelogDialog
@@ -32,19 +37,17 @@ import com.kelsos.mbrc.events.ShuffleMode
 import com.kelsos.mbrc.events.ShuffleMode.Shuffle
 import com.kelsos.mbrc.extensions.getDimens
 import com.kelsos.mbrc.networking.connections.Connection
-import com.kelsos.mbrc.ui.activities.BaseNavigationActivity
 import com.kelsos.mbrc.ui.dialogs.RatingDialogFragment
 import com.kelsos.mbrc.ui.navigation.main.ProgressSeekerHelper.ProgressUpdate
 import com.squareup.picasso.Picasso
 import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
+class MainFragment : Fragment(), MainView, ProgressUpdate {
 
   // Injects
   @Inject
@@ -78,52 +81,63 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
   private lateinit var scope: Scope
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, PRESENTER_SCOPE, this)
-    scope.installModules(SmoothieActivityModule(this), MainModule())
+    scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
+    scope.installModules(MainModule())
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
     Toothpick.inject(this, scope)
-    artistLabel = findViewById(R.id.main_artist_label)
-    titleLabel = findViewById(R.id.main_title_label)
-    albumLabel = findViewById(R.id.main_label_album)
-    trackProgressCurrent = findViewById(R.id.main_track_progress_current)
-    trackDuration = findViewById(R.id.main_track_duration_total)
-    playPauseButton = findViewById(R.id.main_button_play_pause)
-    volumeBar = findViewById(R.id.main_volume_seeker)
-    progressBar = findViewById(R.id.main_track_progress_seeker)
-    muteButton = findViewById(R.id.main_mute_button)
-    shuffleButton = findViewById(R.id.main_shuffle_button)
-    repeatButton = findViewById(R.id.main_repeat_button)
-    albumCover = findViewById(R.id.main_album_cover_image_view)
+  }
 
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.fragment_main, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    artistLabel = view.findViewById(R.id.main_artist_label)
+    titleLabel = view.findViewById(R.id.main_title_label)
+    albumLabel = view.findViewById(R.id.main_label_album)
+    trackProgressCurrent = view.findViewById(R.id.main_track_progress_current)
+    trackDuration = view.findViewById(R.id.main_track_duration_total)
+    playPauseButton = view.findViewById(R.id.main_button_play_pause)
+    volumeBar = view.findViewById(R.id.main_volume_seeker)
+    progressBar = view.findViewById(R.id.main_track_progress_seeker)
+    muteButton = view.findViewById(R.id.main_mute_button)
+    shuffleButton = view.findViewById(R.id.main_shuffle_button)
+    repeatButton = view.findViewById(R.id.main_repeat_button)
+    albumCover = view.findViewById(R.id.main_album_cover_image_view)
+
+    playPauseButton.setOnClickListener { presenter.play() }
+    playPauseButton.setOnLongClickListener { presenter.stop() }
     muteButton.setOnClickListener { presenter.mute() }
     shuffleButton.setOnClickListener { presenter.shuffle() }
     repeatButton.setOnClickListener { presenter.repeat() }
 
-    playPauseButton.setOnClickListener { presenter.play() }
-    playPauseButton.setOnLongClickListener { presenter.stop() }
-    findViewById<ImageButton>(R.id.main_button_previous).setOnClickListener { presenter.previous() }
-    findViewById<ImageButton>(R.id.main_button_next).setOnClickListener { presenter.next() }
-    findViewById<View>(R.id.track_info_area).setOnClickListener { navigate(R.id.nav_now_playing) }
+    view.findViewById<ImageButton>(R.id.main_button_previous).setOnClickListener { presenter.previous() }
+    view.findViewById<ImageButton>(R.id.main_button_next).setOnClickListener { presenter.next() }
+    view.findViewById<View>(R.id.track_info_area).setOnClickListener {  }
 
-    super.setup()
+    progressHelper.setProgressListener(this)
+    volumeChangeListener = SeekBarThrottler { presenter.changeVolume(it) }
+    positionChangeListener = SeekBarThrottler { presenter.seek(it) }
+    volumeBar.setOnSeekBarChangeListener(volumeChangeListener)
+    progressBar.setOnSeekBarChangeListener(positionChangeListener)
+    artistLabel.isSelected = true
+    titleLabel.isSelected = true
+    albumLabel.isSelected = true
+
     presenter.attach(this)
   }
 
-  override fun onNewIntent(intent: Intent?) {
-    super.onNewIntent(intent)
-    if (intent?.getBooleanExtra(EXIT_APP, false) == true) {
-      exitApplication()
-      return
-    }
-  }
-
   override fun showChangeLog() {
-    changeLogDialog = ChangelogDialog.show(this, R.raw.changelog)
+    changeLogDialog = ChangelogDialog.show(requireContext(), R.raw.changelog)
   }
 
   override fun notifyPluginOutOfDate() {
-    outOfDateDialog = MaterialAlertDialogBuilder(this)
+    outOfDateDialog = MaterialAlertDialogBuilder(requireContext())
       .setTitle(R.string.main__dialog_plugin_outdated_title)
       .setMessage(R.string.main__dialog_plugin_outdated_message)
       .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -159,7 +173,7 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
         true
       }
       R.id.menu_rating_dialog -> {
-        RatingDialogFragment.create(this).show()
+        RatingDialogFragment.create(requireActivity() as AppCompatActivity).show()
         true
       }
       R.id.menu_lastfm_love -> {
@@ -181,14 +195,10 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
     progressBar.setOnSeekBarChangeListener(null)
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.menu, menu)
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    inflater.inflate(R.menu.menu, menu)
     this.menu = menu
-//    val shareItem = menu.findItem(R.id.actionbar_share)
-//    mShareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
-//    mShareActionProvider!!.setShareIntent(shareIntent)
-    //bus.post(OnMainFragmentOptionsInflated())
-    return super.onCreateOptionsMenu(menu)
   }
 
   private val shareIntent: Intent
@@ -235,7 +245,7 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
 
     albumCover.tag = path
 
-    val dimens = getDimens()
+    val dimens = requireActivity().getDimens()
 
     Picasso.get()
       .load(file)
@@ -255,7 +265,7 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
     val iconResId =
       if (autoDj) R.drawable.ic_headset_black_24dp else R.drawable.ic_shuffle_black_24dp
 
-    val color = ContextCompat.getColor(this, colorResId)
+    val color = ContextCompat.getColor(requireContext(), colorResId)
     shuffleButton.setColorFilter(color)
     shuffleButton.setImageResource(iconResId)
   }
@@ -271,13 +281,13 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
       else -> colorId = R.color.button_dark
     }
 
-    val color = ContextCompat.getColor(this, colorId)
+    val color = ContextCompat.getColor(requireContext(), colorId)
     repeatButton.setImageResource(resId)
     repeatButton.setColorFilter(color)
   }
 
   private fun updateVolume(volume: Int, mute: Boolean) {
-    val color = ContextCompat.getColor(this, R.color.button_dark)
+    val color = ContextCompat.getColor(requireContext(), R.color.button_dark)
     val iconResId = if (mute) {
       R.drawable.ic_volume_off_black_24dp
     } else {
@@ -291,7 +301,7 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
   }
 
   private fun updatePlayState(@State state: String) {
-    val accentColor = ContextCompat.getColor(this, R.color.accent)
+    val accentColor = ContextCompat.getColor(requireContext(), R.color.accent)
     val tag = tag(state)
 
     if (playPauseButton.tag == tag) {
@@ -411,10 +421,6 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
     scrobbleMenuItem.isChecked = active
   }
 
-  override fun active(): Int {
-    return R.id.nav_home
-  }
-
   override fun progress(position: Long, duration: Long) {
     val currentProgress = progressBar.progress / 1000
     val currentMinutes = currentProgress / 60
@@ -428,18 +434,8 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
     )
   }
 
-  override fun onBackPressed() {
-    super.onBackPressed()
-    finishAfterTransition()
-  }
-
   override fun onDestroy() {
     Toothpick.closeScope(this)
-    if (isFinishing) {
-      //when we leave the presenter flow,
-      //we close its scope
-      Toothpick.closeScope(PRESENTER_SCOPE)
-    }
     outOfDateDialog?.dismiss()
     changeLogDialog?.dismiss()
     super.onDestroy()
@@ -453,7 +449,7 @@ class MainActivity : BaseNavigationActivity(), MainView, ProgressUpdate {
   companion object {
     fun start(context: Context) {
       with(context) {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, MainFragment::class.java))
       }
     }
 

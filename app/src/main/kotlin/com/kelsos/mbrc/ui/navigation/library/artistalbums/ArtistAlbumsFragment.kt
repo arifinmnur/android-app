@@ -1,9 +1,12 @@
 package com.kelsos.mbrc.ui.navigation.library.artistalbums
 
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.annotation.IdRes
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.Group
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,17 +14,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
-import com.kelsos.mbrc.ui.activities.BaseActivity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import kotterknife.bindView
-import toothpick.Scope
 import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
 import javax.inject.Inject
 
-class ArtistAlbumsActivity : BaseActivity(),
+class ArtistAlbumsFragment : Fragment(),
   ArtistAlbumsView,
   MenuItemSelectedListener<AlbumEntity> {
 
@@ -30,61 +30,63 @@ class ArtistAlbumsActivity : BaseActivity(),
 
   @Inject
   lateinit var actionHandler: PopupActionHandler
+
   @Inject
   lateinit var adapter: AlbumEntryAdapter
+
   @Inject
   lateinit var presenter: ArtistAlbumsPresenter
 
-  private var artist: String? = null
-  private lateinit var scope: Scope
+  private lateinit var artist: String
 
-  public override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(application, this)
-    scope.installModules(SmoothieActivityModule(this), ArtistAlbumsModule())
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    return inflater.inflate(R.layout.activity_artist_albums, container, false)
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    adapter.setMenuItemSelectedListener(this)
+
+    recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    recyclerView.adapter = adapter
+
+    presenter.attach(this)
+    presenter.load(artist)
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    val scope = Toothpick.openScopes(requireActivity().application, this)
+    scope.installModules(ArtistAlbumsModule())
     super.onCreate(savedInstanceState)
     Toothpick.inject(this, scope)
-    setContentView(R.layout.activity_artist_albums)
 
-    val extras = intent.extras
-    if (extras != null) {
-      artist = extras.getString(ARTIST_NAME)
+    artist = ArtistAlbumsFragmentArgs.fromBundle(requireArguments()).artist
+    val title = if (artist.isEmpty()) {
+      getString(R.string.empty)
+    } else {
+      artist
     }
-
-    if (artist == null) {
-      finish()
-      return
-    }
-
-    val title = artist ?: getString(R.string.empty)
-    setupToolbar(title)
-
-    adapter.setMenuItemSelectedListener(this)
-    recyclerView.layoutManager = LinearLayoutManager(this)
-    recyclerView.adapter = adapter
-    presenter.attach(this)
-    presenter.load(artist!!)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val itemId = item.itemId
-
-    if (itemId == android.R.id.home) {
-      onBackPressed()
-      return true
-    }
-
-    return super.onOptionsItemSelected(item)
-  }
-
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: AlbumEntity) {
-    val action = actionHandler.albumSelected(itemId, item, this)
-    if (action != LibraryPopup.PROFILE) {
+  override fun onMenuItemSelected(itemId: Int, item: AlbumEntity) {
+    val action = actionHandler.albumSelected(itemId)
+    if (action == LibraryPopup.PROFILE) {
+      onItemClicked(item)
+    } else {
       presenter.queue(action, item)
     }
   }
 
   override fun onItemClicked(item: AlbumEntity) {
-    actionHandler.albumSelected(item, this)
+    val directions = ArtistAlbumsFragmentDirections.actionArtistAlbumsFragmentToAlbumTracksFragment(
+        album = item.album,
+        artist = item.artist
+      )
+    findNavController(this).navigate(directions)
   }
 
   override fun update(albums: PagedList<AlbumEntity>) {
@@ -106,13 +108,5 @@ class ArtistAlbumsActivity : BaseActivity(),
     presenter.detach()
     Toothpick.closeScope(this)
     super.onDestroy()
-  }
-
-  override fun onBackPressed() {
-    finish()
-  }
-
-  companion object {
-    const val ARTIST_NAME = "artist_name"
   }
 }

@@ -48,12 +48,12 @@ import java.net.SocketTimeoutException
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class RadioActivityTest : DbTest() {
+class RadioFragmentTest : DbTest() {
 
   @Rule
   @JvmField
-  val activityRule: IntentsTestRule<RadioActivity> = IntentsTestRule<RadioActivity>(
-    RadioActivity::class.java,
+  val activityRule: IntentsTestRule<RadioFragment> = IntentsTestRule<RadioFragment>(
+    RadioFragment::class.java,
     true,
     false
   )
@@ -89,7 +89,7 @@ class RadioActivityTest : DbTest() {
   fun setUp() {
 
     MockitoAnnotations.initMocks(this)
-    val radioActivityScope = Toothpick.openScope(RadioActivity.Presenter::class.java)
+    val radioActivityScope = Toothpick.openScope(RadioFragment.Presenter::class.java)
     radioActivityScope.installTestModules(TestModule(db.radioStationDao()))
     val miniControlFragmentScope = Toothpick.openScope(MiniControlFragment.Presenter::class.java)
     miniControlFragmentScope.installTestModules(TestModule(db.radioStationDao()))
@@ -208,7 +208,7 @@ class RadioActivityTest : DbTest() {
   }
 
   private fun mockLoadingError(
-    view: RadioActivity,
+    view: RadioFragment,
     countingIdlingResource: CountingIdlingResource
   ): Disposable? {
     countingIdlingResource.increment()

@@ -38,11 +38,11 @@ import toothpick.testing.ToothPickRule
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainActivityTest {
+class MainFragmentTest {
 
   private var toothPickRule = ToothPickRule(this)
   private val activityRule = IntentsTestRule(
-    MainActivity::class.java,
+    MainFragment::class.java,
     true,
     false
   )
