@@ -3,8 +3,10 @@ package com.kelsos.mbrc
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Debug
 import android.view.KeyEvent
 import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -15,7 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI.navigateUp
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.NavigationUI.setupWithNavController
@@ -133,10 +134,7 @@ class NavigationActivity : AppCompatActivity() {
   }
 
   override fun onSupportNavigateUp(): Boolean {
-    return navigateUp(
-      findNavController(R.id.main_navigation_fragment),
-      findViewById(R.id.drawer_layout)
-    )
+    return findNavController(R.id.main_navigation_fragment).navigateUp()
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,6 +145,22 @@ class NavigationActivity : AppCompatActivity() {
     scopes.inject(this)
     setupNavigation()
     setupConnectionIndicator()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (!BuildConfig.DEBUG) {
+      return
+    }
+
+    // don't even consider it otherwise
+    if (Debug.isDebuggerConnected()) {
+      Timber.d("Keeping screen on for debugging.")
+      window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    } else {
+      window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      Timber.d("Keeping screen on for debugging is now deactivated.")
+    }
   }
 
   override fun onDestroy() {
