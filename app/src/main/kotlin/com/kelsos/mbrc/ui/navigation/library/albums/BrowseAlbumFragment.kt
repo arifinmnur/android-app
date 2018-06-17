@@ -128,9 +128,9 @@ class BrowseAlbumFragment : Fragment(),
 
   override fun onItemClicked(item: AlbumEntity) {
     val directions = LibraryFragmentDirections.actionLibraryFragmentToAlbumTracksFragment(
-        artist = item.artist,
-        album = item.album
-      )
+      artist = item.artist,
+      album = item.album
+    )
     findNavController(this).navigate(directions)
   }
 

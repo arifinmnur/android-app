@@ -1,6 +1,6 @@
-package com.kelsos.mbrc.ui.navigation.main
+package com.kelsos.mbrc.ui.navigation.player
 
-import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProvider
+import com.jakewharton.rxrelay2.PublishRelay
 import com.kelsos.mbrc.content.activestatus.livedata.PlayerStatusLiveDataProvider
 import com.kelsos.mbrc.content.activestatus.livedata.PlayingTrackLiveDataProvider
 import com.kelsos.mbrc.content.activestatus.livedata.TrackPositionLiveDataProvider
@@ -10,56 +10,65 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.preferences.SettingsManager
+import com.kelsos.mbrc.utilities.AppRxSchedulers
+import io.reactivex.rxkotlin.plusAssign
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class MainViewPresenterImpl
+class PlayerPresenterImpl
 @Inject
 constructor(
   private val settingsManager: SettingsManager,
   private val userActionUseCase: UserActionUseCase,
-  connectionStatusLiveDataProvider: ConnectionStatusLiveDataProvider,
+  private val appRxSchedulers: AppRxSchedulers,
   playingTrackLiveDataProvider: PlayingTrackLiveDataProvider,
   playerStatusLiveDataProvider: PlayerStatusLiveDataProvider,
   trackRatingLiveDataProvider: TrackRatingLiveDataProvider,
   trackPositionLiveDataProvider: TrackPositionLiveDataProvider
-) : BasePresenter<MainView>(), MainViewPresenter {
+) : BasePresenter<PlayerView>(), PlayerPresenter {
+
+  private val progressRelay: PublishRelay<Int> = PublishRelay.create()
+  private val volumeRelay: PublishRelay<Int> = PublishRelay.create()
 
   init {
-    playingTrackLiveDataProvider.get().observe(this) { activeTrack ->
-      if (activeTrack == null) {
-        return@observe
-      }
+    playingTrackLiveDataProvider.observe(this) { activeTrack ->
       view().updateTrackInfo(activeTrack)
     }
 
-    playerStatusLiveDataProvider.get().observe(this) { playerStatus ->
-      if (playerStatus == null) {
-        return@observe
-      }
+    playerStatusLiveDataProvider.observe(this) { playerStatus ->
       view().updateStatus(playerStatus)
     }
 
-    trackRatingLiveDataProvider.get().observe(this) { rating ->
-      if (rating == null) {
-        return@observe
-      }
+    trackRatingLiveDataProvider.observe(this) { rating ->
       view().updateRating(rating)
     }
 
-    connectionStatusLiveDataProvider.get().observe(this) { status ->
-      if (status == null) {
-        return@observe
-      }
-      view().updateConnection(status.status)
-    }
-
-    trackPositionLiveDataProvider.get().observe(this) {
-      if (it == null) {
-        return@observe
-      }
-
+    trackPositionLiveDataProvider.observe(this) {
       view().updateProgress(it)
     }
+  }
+
+  override fun attach(view: PlayerView) {
+    super.attach(view)
+    disposables += progressRelay.throttleLast(
+      800,
+      TimeUnit.MILLISECONDS,
+      appRxSchedulers.network
+    )
+      .subscribeOn(appRxSchedulers.network)
+      .subscribe { position ->
+        userActionUseCase.perform(UserAction.create(Protocol.NowPlayingPosition, position))
+      }
+
+    disposables += volumeRelay.throttleLast(
+      800,
+      TimeUnit.MILLISECONDS,
+      appRxSchedulers.network
+    )
+      .subscribeOn(appRxSchedulers.network)
+      .subscribe { volume ->
+        userActionUseCase.perform(UserAction.create(Protocol.PlayerVolume, volume))
+      }
   }
 
   override fun stop(): Boolean {
@@ -80,15 +89,17 @@ constructor(
   }
 
   override fun changeVolume(value: Int) {
-    userActionUseCase.perform(UserAction.create(Protocol.PlayerVolume, value))
+    volumeRelay.accept(value)
   }
 
   override fun seek(position: Int) {
-    userActionUseCase.perform(UserAction.create(Protocol.NowPlayingPosition, position))
+    progressRelay.accept(position)
   }
 
-  override fun requestNowPlayingPosition() {
-    userActionUseCase.perform(UserAction.create(Protocol.NowPlayingPosition))
+  override fun load() {
+    if (settingsManager.shouldShowChangeLog()) {
+      view().showChangeLog()
+    }
   }
 
   override fun toggleScrobbling() {

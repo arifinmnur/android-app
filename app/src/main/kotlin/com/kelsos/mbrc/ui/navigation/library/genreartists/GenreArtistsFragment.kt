@@ -45,7 +45,7 @@ class GenreArtistsFragment : Fragment(),
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    return inflater.inflate(R.layout.activity_genre_artists, container, false)
+    return inflater.inflate(R.layout.fragment_genre_artists, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

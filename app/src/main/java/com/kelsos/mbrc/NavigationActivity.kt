@@ -2,6 +2,7 @@ package com.kelsos.mbrc
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Debug
 import android.view.KeyEvent
@@ -11,14 +12,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
-import androidx.navigation.NavController
-import androidx.navigation.Navigation.findNavController
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProvider
@@ -52,7 +50,8 @@ class NavigationActivity : AppCompatActivity() {
 
   private lateinit var connectText: TextView
   private lateinit var connect: ImageView
-
+  private lateinit var drawerLayout: DrawerLayout
+  private lateinit var drawerToggle: ActionBarDrawerToggle
   private fun onConnectLongClick(): Boolean {
     serviceChecker.startServiceIfNotRunning()
     clientConnectionUseCase.connect()
@@ -101,28 +100,34 @@ class NavigationActivity : AppCompatActivity() {
     }
   }
 
-  private fun setupNavigation() {
+  private fun setupToolbar() {
     setSupportActionBar(findViewById(R.id.toolbar))
-    val navController = findNavController(R.id.main_navigation_fragment)
-    setupWithNavController(findViewById<NavigationView>(R.id.nav_view), navController)
-    setupActionBarWithNavController(this, navController, findViewById(R.id.drawer_layout))
-    setupNavigationMenu(navController)
+    supportActionBar?.run {
+      setDisplayHomeAsUpEnabled(true)
+      setHomeButtonEnabled(true)
+    }
   }
 
-  private fun setupNavigationMenu(navController: NavController) {
-    findViewById<NavigationView>(R.id.nav_view)?.let { navigationView ->
-      setupWithNavController(navigationView, navController)
-    }
+  private fun setupNavigationDrawer() {
+    drawerLayout = findViewById(R.id.drawer_layout)
+    drawerToggle = ActionBarDrawerToggle(
+      this,
+      drawerLayout,
+      R.string.drawer_open,
+      R.string.drawer_close
+    )
+    drawerLayout.addDrawerListener(drawerToggle)
+
+    val navController = findNavController(R.id.main_navigation_fragment)
+    setupWithNavController(findViewById<NavigationView>(R.id.nav_view), navController)
   }
 
   override fun onPostCreate(savedInstanceState: Bundle?) {
     super.onPostCreate(savedInstanceState)
-    connectionStatusLiveDataProvider.get().observe(this, Observer {
-      if (it == null) {
-        return@Observer
-      }
+    drawerToggle.syncState()
+    connectionStatusLiveDataProvider.observe(this) {
       onConnection(it)
-    })
+    }
   }
 
   override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
@@ -133,17 +138,14 @@ class NavigationActivity : AppCompatActivity() {
     }
   }
 
-  override fun onSupportNavigateUp(): Boolean {
-    return findNavController(R.id.main_navigation_fragment).navigateUp()
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     val scopes = Toothpick.openScopes(application, this)
     scopes.installModules(SmoothieActivityModule(this))
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_navigation)
     scopes.inject(this)
-    setupNavigation()
+    setupToolbar()
+    setupNavigationDrawer()
     setupConnectionIndicator()
   }
 
@@ -163,9 +165,13 @@ class NavigationActivity : AppCompatActivity() {
     }
   }
 
+  override fun onNavigateUp(): Boolean {
+    return findNavController(R.id.main_navigation_fragment).navigateUp()
+  }
+
   override fun onDestroy() {
     super.onDestroy()
-    connectionStatusLiveDataProvider.get().removeObservers(this)
+    connectionStatusLiveDataProvider.removeObservers(this)
   }
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -183,15 +189,18 @@ class NavigationActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Have the NavHelper look for an action or destination matching the menu
-    // item id and navigate there if found.
-    // Otherwise, bubble up to the parent.
-    return onNavDestinationSelected(
-      item, findNavController(
-        this,
-        R.id.main_navigation_fragment
-      )
-    ) || super.onOptionsItemSelected(item)
+    // The action bar home/up action should open or close the drawer.
+    // [ActionBarDrawerToggle] will take care of this.
+    if (drawerToggle.onOptionsItemSelected(item)) {
+      return true
+    }
+    return super.onOptionsItemSelected(item)
+  }
+
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    super.onConfigurationChanged(newConfig)
+    // Pass any configuration change to the drawer toggle.
+    drawerToggle.onConfigurationChanged(newConfig)
   }
 
   companion object {

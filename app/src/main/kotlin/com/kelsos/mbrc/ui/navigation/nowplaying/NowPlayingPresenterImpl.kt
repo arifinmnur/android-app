@@ -11,6 +11,7 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.NowPlayingMoveRequest
 import com.kelsos.mbrc.networking.protocol.Protocol
+import com.kelsos.mbrc.utilities.nonNullObserver
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,10 +33,7 @@ constructor(
       userActionUseCase.perform(UserAction(Protocol.NowPlayingListMove, data))
     }
 
-    playingTrackLiveDataProvider.get().observe(this) {
-      if (it == null) {
-        return@observe
-      }
+    playingTrackLiveDataProvider.observe(this) {
       view().trackChanged(it)
     }
   }
@@ -52,11 +50,9 @@ constructor(
 
   private fun onNowPlayingTracksLoaded(it: DataSource.Factory<Int, NowPlayingEntity>) {
     nowPlayingTracks = it.paged()
-    nowPlayingTracks.observe(this@NowPlayingPresenterImpl, {
-      if (it != null) {
-        view().update(it)
-      }
-    })
+    nowPlayingTracks.nonNullObserver(this) {
+      view().update(it)
+    }
   }
 
   override fun load() {

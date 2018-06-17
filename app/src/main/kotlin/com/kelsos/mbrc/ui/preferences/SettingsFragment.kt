@@ -10,6 +10,7 @@ import android.os.Looper
 import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.os.HandlerCompat
+import androidx.navigation.findNavController
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -18,7 +19,6 @@ import com.kelsos.mbrc.BuildConfig
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.logging.FileLoggingTree
 import com.kelsos.mbrc.platform.RemoteService
-import com.kelsos.mbrc.ui.connectionmanager.ConnectionManagerFragment
 import com.kelsos.mbrc.ui.dialogs.webDialog
 import com.kelsos.mbrc.utilities.RemoteUtils.getVersion
 import timber.log.Timber
@@ -66,7 +66,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     mManager?.setOnPreferenceClickListener {
-      startActivity(Intent(requireContext(), ConnectionManagerFragment::class.java))
+      requireView().findNavController().navigate(R.id.action_settingsFragment_to_connectionManagerFragment)
       false
     }
 
@@ -136,9 +136,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val handler = Handler(Looper.getMainLooper())
         HandlerCompat.postDelayed(handler, {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(Intent(this, RemoteService::class.java))
+            requireActivity().startForegroundService(Intent(this, RemoteService::class.java))
           } else {
-            startService(Intent(this, RemoteService::class.java))
+            requireActivity().startService(Intent(this, RemoteService::class.java))
           }
         }, null, 600)
       }

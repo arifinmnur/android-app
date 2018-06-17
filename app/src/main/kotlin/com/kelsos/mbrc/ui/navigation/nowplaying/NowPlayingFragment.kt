@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
+import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
@@ -158,7 +158,7 @@ class NowPlayingFragment : Fragment(),
     swipeRefreshLayout.isRefreshing = false
   }
 
-  override fun trackChanged(track: PlayingTrackModel, scrollToTrack: Boolean) {
+  override fun trackChanged(track: PlayingTrack, scrollToTrack: Boolean) {
     adapter.setPlayingTrack(track.path)
     if (scrollToTrack) {
       nowPlayingList.scrollToPosition(adapter.getPlayingTrackIndex())

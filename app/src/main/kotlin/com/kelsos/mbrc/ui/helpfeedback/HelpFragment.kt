@@ -35,11 +35,14 @@ class HelpFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    // Inflate the layout for this fragment
     val view = inflater.inflate(R.layout.fragment_help, container, false)
     helpView = view.findViewById(R.id.help_webview)
-    helpView.webViewClient = RemoteWebViewClient()
     return view
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    helpView.webViewClient = RemoteWebViewClient()
   }
 
   private class RemoteWebViewClient : WebViewClient() {

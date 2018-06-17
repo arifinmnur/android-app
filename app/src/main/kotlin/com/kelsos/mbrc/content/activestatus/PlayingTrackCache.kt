@@ -3,7 +3,7 @@ package com.kelsos.mbrc.content.activestatus
 import android.app.Application
 import androidx.datastore.DataStore
 import androidx.datastore.createDataStore
-import com.kelsos.mbrc.content.library.tracks.PlayingTrackModel
+import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.store.Store
 import com.kelsos.mbrc.store.StoreSerializer
@@ -36,7 +36,7 @@ constructor(
       }
     }
 
-  override suspend fun persistInfo(trackInfo: PlayingTrackModel) =
+  override suspend fun persistInfo(trackInfo: PlayingTrack) =
     withContext(dispatchers.network) {
       dataStore.updateData { store ->
         val track = Track.newBuilder()
@@ -54,10 +54,10 @@ constructor(
       return@withContext
     }
 
-  override suspend fun restoreInfo(): PlayingTrackModel = withContext(dispatchers.network) {
+  override suspend fun restoreInfo(): PlayingTrack = withContext(dispatchers.network) {
     val track = storeFlow.first().track
 
-    return@withContext PlayingTrackModel(
+    return@withContext PlayingTrack(
       track.artist,
       track.title,
       track.album,
@@ -78,8 +78,8 @@ constructor(
 }
 
 interface PlayingTrackCache {
-  suspend fun persistInfo(trackInfo: PlayingTrackModel)
-  suspend fun restoreInfo(): PlayingTrackModel
+  suspend fun persistInfo(trackInfo: PlayingTrack)
+  suspend fun restoreInfo(): PlayingTrack
   suspend fun persistCover(cover: String)
   suspend fun restoreCover(): String
 }
