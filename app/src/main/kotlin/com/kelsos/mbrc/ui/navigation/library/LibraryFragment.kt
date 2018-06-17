@@ -81,6 +81,7 @@ class LibraryFragment : Fragment(),
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
+    setHasOptionsMenu(true)
     return inflater.inflate(R.layout.fragment_library, container, false)
   }
 
