@@ -87,6 +87,10 @@ class PlayerFragment : Fragment(), PlayerView {
     }
   }
 
+  override fun showVolumeDialog() {
+    VolumeDialog.create(requireActivity()).show()
+  }
+
   override fun onStop() {
     presenter.detach()
     super.onStop()
@@ -108,7 +112,7 @@ class PlayerFragment : Fragment(), PlayerView {
   }
 
   override fun updateRating(rating: TrackRating) {
-    dataBinding.rating = rating
+
   }
 
   override fun updateStatus(playerStatus: PlayerStatusModel) {

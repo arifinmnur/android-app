@@ -11,6 +11,10 @@ data class PlayingPosition(val current: Duration = 0, val total: Duration = 0) {
 
   val currentInt get() = current.toInt()
   val totalInt get() = total.toInt()
+
+  fun progress(): String {
+    return "${currentMinutes()} / ${totalMinutes()}"
+  }
 }
 
 typealias Duration = Long
