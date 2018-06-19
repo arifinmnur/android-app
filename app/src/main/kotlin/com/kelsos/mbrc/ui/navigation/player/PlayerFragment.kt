@@ -9,6 +9,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.ShareActionProvider
+import androidx.core.view.MenuItemCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.kelsos.mbrc.R
@@ -18,7 +20,6 @@ import com.kelsos.mbrc.content.activestatus.PlayingPosition
 import com.kelsos.mbrc.content.activestatus.TrackRating
 import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.databinding.FragmentPlayerBinding
-import com.kelsos.mbrc.ui.dialogs.RatingDialogFragment
 import toothpick.Toothpick
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,6 +31,9 @@ class PlayerFragment : Fragment(), PlayerView {
   lateinit var presenter: PlayerPresenter
 
   private lateinit var dataBinding: FragmentPlayerBinding
+
+  private var menu: Menu? = null
+  private var shareActionProvider: ShareActionProvider? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val scope = Toothpick.openScopes(requireActivity().application, requireActivity(), this)
@@ -75,12 +79,16 @@ class PlayerFragment : Fragment(), PlayerView {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.menu_lastfm_scrobble -> {
+      R.id.player_screen__action_scrobbling -> {
         presenter.toggleScrobbling()
         true
       }
-      R.id.menu_rating_dialog -> {
+      R.id.player_screen__action_rating -> {
         RatingDialogFragment.create(requireActivity() as AppCompatActivity).show()
+        true
+      }
+      R.id.player_screen__action_favorite -> {
+        presenter.favorite()
         true
       }
       else -> false
@@ -98,8 +106,11 @@ class PlayerFragment : Fragment(), PlayerView {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.menu, menu)
-    //todo fix rating.
+    inflater.inflate(R.menu.player_screen__actions, menu)
+    this.menu = menu
+    this.menu?.findItem(R.id.player_screen__action_share)?.let {
+      shareActionProvider = MenuItemCompat.getActionProvider(it) as ShareActionProvider
+    }
   }
 
   private fun getShareIntent(): Intent {
@@ -112,23 +123,31 @@ class PlayerFragment : Fragment(), PlayerView {
   }
 
   override fun updateRating(rating: TrackRating) {
-
+    menu?.findItem(R.id.player_screen__action_favorite)?.let {
+      val iconResId = if (rating.isFavorite()) {
+        R.drawable.ic_favorite_black_24dp
+      } else {
+        R.drawable.ic_favorite_border_black_24dp
+      }
+      it.setIcon(iconResId)
+    }
   }
 
   override fun updateStatus(playerStatus: PlayerStatusModel) {
     dataBinding.status = playerStatus
+    menu?.findItem(R.id.player_screen__action_scrobbling)?.isChecked = playerStatus.scrobbling
   }
 
   override fun updateTrackInfo(playingTrack: PlayingTrack) {
     dataBinding.track = playingTrack
-    //shareActionProvider?.setShareIntent(getShareIntent())
+    shareActionProvider?.setShareIntent(getShareIntent())
   }
 
   override fun updateProgress(position: PlayingPosition) {
     dataBinding.position = position
   }
 
-  //todo move scrobble to some menu/dialog
+  //todo move scrobble to some player_screen__actions/dialog
 
   override fun onDestroy() {
     Toothpick.closeScope(this)
