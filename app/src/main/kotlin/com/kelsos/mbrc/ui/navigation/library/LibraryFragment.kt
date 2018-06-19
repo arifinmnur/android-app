@@ -110,7 +110,7 @@ class LibraryFragment : Fragment(),
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.library_search, menu)
-    searchMenuItem = menu.findItem(R.id.library_search_item)?.apply {
+    searchMenuItem = menu.findItem(R.id.library_screen__action_search)?.apply {
       searchView = actionView as SearchView
     }
 
@@ -127,7 +127,7 @@ class LibraryFragment : Fragment(),
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
-      R.id.library_refresh_item -> {
+      R.id.library_screen__action_refresh -> {
         presenter.refresh()
         return true
       }
@@ -181,7 +181,7 @@ class LibraryFragment : Fragment(),
       .show()
   }
 
-  public override fun onDestroy() {
+  override fun onDestroy() {
     presenter.detach()
     pagerAdapter = null
     Toothpick.closeScope(this)
