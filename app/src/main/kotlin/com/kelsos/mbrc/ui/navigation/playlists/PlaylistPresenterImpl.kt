@@ -11,11 +11,8 @@ import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class PlaylistPresenterImpl
-@Inject
-constructor(
+class PlaylistPresenterImpl(
   private val repository: PlaylistRepository,
   private val userActionUseCase: UserActionUseCase
 ) : BasePresenter<PlaylistView>(), PlaylistPresenter {

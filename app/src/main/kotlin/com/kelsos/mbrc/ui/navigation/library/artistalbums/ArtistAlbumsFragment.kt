@@ -18,8 +18,6 @@ import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import kotterknife.bindView
-import toothpick.Toothpick
-import javax.inject.Inject
 
 class ArtistAlbumsFragment : Fragment(),
   ArtistAlbumsView,
@@ -28,13 +26,10 @@ class ArtistAlbumsFragment : Fragment(),
   private val recyclerView: RecyclerView by bindView(R.id.artist_albums__album_list)
   private val emptyView: Group by bindView(R.id.artist_albums__empty_view)
 
-  @Inject
   lateinit var actionHandler: PopupActionHandler
 
-  @Inject
   lateinit var adapter: AlbumEntryAdapter
 
-  @Inject
   lateinit var presenter: ArtistAlbumsPresenter
 
   private lateinit var artist: String
@@ -59,10 +54,7 @@ class ArtistAlbumsFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val scope = Toothpick.openScopes(requireActivity().application, this)
-    scope.installModules(ArtistAlbumsModule())
     super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
 
     artist = ArtistAlbumsFragmentArgs.fromBundle(requireArguments()).artist
     val title = if (artist.isEmpty()) {
@@ -106,7 +98,6 @@ class ArtistAlbumsFragment : Fragment(),
 
   override fun onDestroy() {
     presenter.detach()
-    Toothpick.closeScope(this)
     super.onDestroy()
   }
 }

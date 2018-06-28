@@ -8,11 +8,8 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import javax.inject.Inject
 
-class GenreEntryAdapter
-@Inject
-constructor() : PagedListAdapter<GenreEntity, GenreViewHolder>(DIFF_CALLBACK) {
+class GenreEntryAdapter : PagedListAdapter<GenreEntity, GenreViewHolder>(DIFF_CALLBACK) {
 
   private var listener: MenuItemSelectedListener<GenreEntity>? = null
 

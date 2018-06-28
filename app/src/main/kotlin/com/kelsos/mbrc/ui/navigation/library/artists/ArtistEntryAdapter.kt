@@ -8,10 +8,8 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import javax.inject.Inject
 
-class ArtistEntryAdapter
-@Inject constructor() : PagedListAdapter<ArtistEntity, ArtistViewHolder>(DIFF_CALLBACK) {
+class ArtistEntryAdapter : PagedListAdapter<ArtistEntity, ArtistViewHolder>(DIFF_CALLBACK) {
 
   private var listener: MenuItemSelectedListener<ArtistEntity>? = null
 

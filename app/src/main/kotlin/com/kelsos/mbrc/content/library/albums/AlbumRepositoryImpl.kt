@@ -8,11 +8,8 @@ import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class AlbumRepositoryImpl
-@Inject
-constructor(
+class AlbumRepositoryImpl(
   private val dao: AlbumDao,
   private val api: ApiBase,
   private val dispatchers: AppCoroutineDispatchers

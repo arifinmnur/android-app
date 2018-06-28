@@ -13,8 +13,7 @@ import org.junit.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import toothpick.config.Module
-import toothpick.testing.ToothPickRule
+
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader

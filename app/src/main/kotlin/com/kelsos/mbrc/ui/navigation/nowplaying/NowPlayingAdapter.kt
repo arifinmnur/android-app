@@ -21,10 +21,9 @@ import kotterknife.bindView
 
 class NowPlayingAdapter(
   private val dragStartListener: OnStartDragListener
-  ) : PagedListAdapter<NowPlayingEntity, NowPlayingAdapter.NowPlayingTrackViewHolder>(
+) : PagedListAdapter<NowPlayingEntity, NowPlayingAdapter.NowPlayingTrackViewHolder>(
     DIFF_CALLBACK
   ), ItemTouchHelperAdapter {
-
 
   private var currentTrack = ""
   private var playingTrackIndex = -1

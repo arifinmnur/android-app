@@ -25,9 +25,7 @@ import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
 import kotterknife.bindView
-import toothpick.Scope
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class NowPlayingFragment : Fragment(),
   NowPlayingView,
@@ -42,11 +40,10 @@ class NowPlayingFragment : Fragment(),
 
   private val adapter: NowPlayingAdapter by lazy { NowPlayingAdapter(this@NowPlayingFragment) }
 
-  @Inject
-  lateinit var presenter: NowPlayingPresenter
+  private val presenter: NowPlayingPresenter by inject()
+
   private var searchView: SearchView? = null
   private var searchMenuItem: MenuItem? = null
-  private lateinit var scope: Scope
   private lateinit var touchListener: NowPlayingTouchListener
   private var itemTouchHelper: ItemTouchHelper? = null
 
@@ -87,13 +84,6 @@ class NowPlayingFragment : Fragment(),
     }
 
     super.onCreateOptionsMenu(menu, inflater)
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(requireActivity().application, this)
-    scope.installModules(NowPlayingModule.create())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
   }
 
   override fun onCreateView(
@@ -148,7 +138,6 @@ class NowPlayingFragment : Fragment(),
 
   override fun onDestroy() {
     presenter.detach()
-    Toothpick.closeScope(this)
     super.onDestroy()
   }
 

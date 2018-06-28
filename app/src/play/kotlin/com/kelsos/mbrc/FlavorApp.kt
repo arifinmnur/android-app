@@ -1,18 +1,18 @@
 package com.kelsos.mbrc
 
-import com.kelsos.mbrc.di.module
-import com.kelsos.mbrc.di.scope
 import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncMetricsImpl
+import org.koin.dsl.module.Module
 
-class FlavorApp : RemoteApplication() {
+class FlavorApp : App() {
   override fun onCreate() {
     super.onCreate()
+  }
 
-    scope(applicationContext, {
-      module {
-        bindSingletonClass<SyncMetrics> { SyncMetricsImpl::class }
-      }
-    })
+  override fun modules(): List<Module> {
+    val playModule = org.koin.dsl.module.applicationContext {
+      bean<SyncMetrics> { SyncMetricsImpl() }
+    }
+    return super.modules().plus(playModule)
   }
 }

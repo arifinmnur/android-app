@@ -6,7 +6,7 @@ import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
-import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
+import com.kelsos.mbrc.content.sync.LibrarySyncUseCase
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.preferences.AlbumSortingStore
@@ -14,14 +14,11 @@ import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-class BrowseAlbumPresenterImpl
-@Inject
-constructor(
+class BrowseAlbumPresenterImpl(
   private val repository: AlbumRepository,
   private val albumSortingStore: AlbumSortingStore,
-  private val librarySyncInteractor: LibrarySyncInteractor,
+  private val syncUseCase: LibrarySyncUseCase,
   private val queueHandler: QueueHandler,
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseAlbumView>(),
@@ -97,7 +94,7 @@ constructor(
 
   override fun sync() {
     scope.launch {
-      librarySyncInteractor.sync()
+      syncUseCase.sync()
     }
   }
 

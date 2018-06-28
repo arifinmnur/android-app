@@ -21,8 +21,7 @@ import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class BrowseTrackFragment : Fragment(),
   BrowseTrackView,
@@ -34,14 +33,10 @@ class BrowseTrackFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  @Inject
-  lateinit var adapter: TrackEntryAdapter
+  private val adapter: TrackEntryAdapter by inject()
 
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var presenter: BrowseTrackPresenter
+  private val actionHandler: PopupActionHandler by inject()
+  private val presenter: BrowseTrackPresenter by inject()
 
   private lateinit var syncButton: Button
 
@@ -66,14 +61,6 @@ class BrowseTrackFragment : Fragment(),
     Snackbar.make(recycler, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-
-    val scope = Toothpick.openScopes(requireActivity().application, this)
-    scope.installModules(BrowseTrackModule())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
   }
 
   override fun onDestroyView() {

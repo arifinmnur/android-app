@@ -28,9 +28,7 @@ import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
-import toothpick.Toothpick
-import toothpick.smoothie.module.SmoothieActivityModule
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class BrowseAlbumFragment : Fragment(),
   BrowseAlbumView,
@@ -42,14 +40,10 @@ class BrowseAlbumFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  @Inject
-  lateinit var adapter: AlbumEntryAdapter
+  private val adapter: AlbumEntryAdapter by inject()
 
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var presenter: BrowseAlbumPresenter
+  private val actionHandler: PopupActionHandler by inject()
+  private val presenter: BrowseAlbumPresenter by inject()
 
   private lateinit var syncButton: Button
 
@@ -66,10 +60,7 @@ class BrowseAlbumFragment : Fragment(),
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    val scope = Toothpick.openScopes(requireActivity().application, this)
-    scope.installModules(SmoothieActivityModule(activity), BrowseAlbumModule())
     super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
     setHasOptionsMenu(true)
   }
 
@@ -152,10 +143,5 @@ class BrowseAlbumFragment : Fragment(),
 
   override fun hideLoading() {
     emptyViewProgress.isVisible = false
-  }
-
-  override fun onDestroy() {
-    Toothpick.closeScope(this)
-    super.onDestroy()
   }
 }

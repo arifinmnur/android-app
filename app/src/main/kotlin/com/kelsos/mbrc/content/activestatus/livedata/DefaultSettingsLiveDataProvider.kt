@@ -5,7 +5,6 @@ import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.utilities.AppRxSchedulers
 import io.reactivex.disposables.Disposable
 import java.util.WeakHashMap
-import javax.inject.Inject
 
 interface DefaultSettingsLiveDataProvider {
 
@@ -18,9 +17,7 @@ interface DefaultSettingsLiveDataProvider {
 
 typealias OnDefaultConnectionChanged = (ConnectionSettingsEntity) -> Unit
 
-class DefaultSettingsLiveDataProviderImpl
-@Inject
-constructor(
+class DefaultSettingsLiveDataProviderImpl(
   private val appRxSchedulers: AppRxSchedulers
 ) : DefaultSettingsLiveDataProvider {
   private val settingsRelay: BehaviorRelay<ConnectionSettingsEntity> = BehaviorRelay.create()

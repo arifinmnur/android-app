@@ -24,9 +24,7 @@ import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
-import toothpick.Scope
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class BrowseArtistFragment : Fragment(),
   BrowseArtistView,
@@ -38,16 +36,10 @@ class BrowseArtistFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  @Inject
-  lateinit var adapter: ArtistEntryAdapter
+  private val adapter: ArtistEntryAdapter by inject()
+  private val actionHandler: PopupActionHandler by inject()
+  private val presenter: BrowseArtistPresenter by inject()
 
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var presenter: BrowseArtistPresenter
-
-  private var scope: Scope? = null
   private lateinit var syncButton: Button
 
   override fun search(term: String) {
@@ -63,18 +55,6 @@ class BrowseArtistFragment : Fragment(),
     Snackbar.make(recycler, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    scope = Toothpick.openScopes(requireActivity().application, this)
-    scope?.installModules(BrowseArtistModule())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
-  }
-
-  override fun onDestroy() {
-    Toothpick.closeScope(this)
-    super.onDestroy()
   }
 
   override fun onStart() {

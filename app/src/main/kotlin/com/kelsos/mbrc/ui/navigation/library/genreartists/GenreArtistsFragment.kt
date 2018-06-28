@@ -19,8 +19,7 @@ import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
 import kotterknife.bindView
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class GenreArtistsFragment : Fragment(),
   GenreArtistsView,
@@ -29,14 +28,9 @@ class GenreArtistsFragment : Fragment(),
   private val recyclerView: RecyclerView by bindView(R.id.genre_artists__artist_list)
   private val emptyView: Group by bindView(R.id.genre_artists__empty_view)
 
-  @Inject
-  lateinit var adapter: ArtistEntryAdapter
-
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var presenter: GenreArtistsPresenter
+  private val adapter: ArtistEntryAdapter by inject()
+  private val actionHandler: PopupActionHandler by inject()
+  private val presenter: GenreArtistsPresenter by inject()
 
   private lateinit var genre: String
 
@@ -57,12 +51,8 @@ class GenreArtistsFragment : Fragment(),
     presenter.load(genre)
   }
 
-
   override fun onCreate(savedInstanceState: Bundle?) {
-    val scope = Toothpick.openScopes(requireActivity().application, this)
-    scope.installModules(GenreArtistsModule())
     super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
 
     genre = GenreArtistsFragmentArgs.fromBundle(requireArguments()).genre
 
@@ -106,7 +96,6 @@ class GenreArtistsFragment : Fragment(),
 
   override fun onDestroy() {
     presenter.detach()
-    Toothpick.closeScope(this)
     super.onDestroy()
   }
 }

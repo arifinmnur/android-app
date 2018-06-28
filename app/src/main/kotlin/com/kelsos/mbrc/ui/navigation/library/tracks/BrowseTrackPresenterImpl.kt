@@ -5,20 +5,17 @@ import androidx.paging.DataSource
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
-import com.kelsos.mbrc.content.sync.LibrarySyncInteractor
+import com.kelsos.mbrc.content.sync.LibrarySyncUseCase
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.ui.navigation.library.LibrarySearchModel
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-class BrowseTrackPresenterImpl
-@Inject
-constructor(
+class BrowseTrackPresenterImpl(
   private val repository: TrackRepository,
-  private val librarySyncInteractor: LibrarySyncInteractor,
+  private val syncUseCase: LibrarySyncUseCase,
   private val queue: QueueHandler,
   private val searchModel: LibrarySearchModel
 ) : BasePresenter<BrowseTrackView>(),
@@ -56,7 +53,7 @@ constructor(
 
   override fun sync() {
     scope.launch {
-      librarySyncInteractor.sync()
+      syncUseCase.sync()
     }
   }
 

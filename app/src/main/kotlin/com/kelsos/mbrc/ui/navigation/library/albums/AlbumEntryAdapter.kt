@@ -8,11 +8,8 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import javax.inject.Inject
 
-class AlbumEntryAdapter
-@Inject
-constructor() : PagedListAdapter<AlbumEntity, AlbumViewHolder>(DIFF_CALLBACK) {
+class AlbumEntryAdapter : PagedListAdapter<AlbumEntity, AlbumViewHolder>(DIFF_CALLBACK) {
 
   private var listener: MenuItemSelectedListener<AlbumEntity>? = null
 

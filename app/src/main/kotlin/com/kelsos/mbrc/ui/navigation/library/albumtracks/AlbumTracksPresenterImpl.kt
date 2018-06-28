@@ -11,11 +11,8 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-class AlbumTracksPresenterImpl
-@Inject
-constructor(
+class AlbumTracksPresenterImpl(
   private val repository: TrackRepository,
   private val queue: QueueHandler
 ) : BasePresenter<AlbumTracksView>(),

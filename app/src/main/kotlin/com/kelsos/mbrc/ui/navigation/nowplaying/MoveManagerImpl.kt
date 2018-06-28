@@ -6,11 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import javax.inject.Inject
 
-class MoveManagerImpl
-@Inject
-constructor() : MoveManager {
+class MoveManagerImpl : MoveManager {
   private val job = SupervisorJob()
   private val scope = CoroutineScope(Dispatchers.Default + job)
   private var originalPosition: Int = -1

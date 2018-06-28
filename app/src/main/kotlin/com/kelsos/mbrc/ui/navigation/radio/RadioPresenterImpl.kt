@@ -9,11 +9,8 @@ import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class RadioPresenterImpl
-@Inject
-constructor(
+class RadioPresenterImpl(
   private val radioRepository: RadioRepository,
   private val queue: QueueHandler
 ) : BasePresenter<RadioView>(), RadioPresenter {

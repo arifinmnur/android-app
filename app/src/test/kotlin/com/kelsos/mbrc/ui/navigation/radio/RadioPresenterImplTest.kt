@@ -22,8 +22,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import toothpick.config.Module
-import toothpick.testing.ToothPickRule
+
 import java.net.SocketTimeoutException
 
 class RadioPresenterImplTest {
@@ -48,7 +47,6 @@ class RadioPresenterImplTest {
 
   @Before
   fun setUp() {
-    toothpickRule.scope.installModules(RadioModule(), TestModule())
     presenter = toothpickRule.getInstance(RadioPresenter::class.java)
   }
 

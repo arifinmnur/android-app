@@ -21,9 +21,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.metrics.SyncedData
 import kotterknife.bindView
-import toothpick.Scope
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class LibraryFragment : Fragment(),
   LibraryView,
@@ -38,10 +36,7 @@ class LibraryFragment : Fragment(),
   private var searchClear: MenuItem? = null
   private var pagerAdapter: LibraryPagerAdapter? = null
 
-  private lateinit var scope: Scope
-
-  @Inject
-  lateinit var presenter: LibraryPresenter
+  private val presenter: LibraryPresenter by inject()
 
   override fun onQueryTextSubmit(query: String): Boolean {
     val search = query.trim()
@@ -68,13 +63,6 @@ class LibraryFragment : Fragment(),
   }
 
   override fun onQueryTextChange(newText: String): Boolean = false
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    Toothpick.openScope(PRESENTER_SCOPE).installModules(LibraryModule())
-    scope = Toothpick.openScopes(requireActivity().application, PRESENTER_SCOPE, this)
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -105,7 +93,6 @@ class LibraryFragment : Fragment(),
     }.attach()
     presenter.attach(this)
   }
-
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
@@ -184,9 +171,6 @@ class LibraryFragment : Fragment(),
   override fun onDestroy() {
     presenter.detach()
     pagerAdapter = null
-    Toothpick.closeScope(this)
-    Toothpick.closeScope(PRESENTER_SCOPE)
-
     super.onDestroy()
   }
 
@@ -222,12 +206,7 @@ class LibraryFragment : Fragment(),
     }
   }
 
-  @javax.inject.Scope
-  @Retention(AnnotationRetention.RUNTIME)
-  annotation class Presenter
-
   companion object {
     private const val PAGER_POSITION = "com.kelsos.mbrc.ui.activities.nav.PAGER_POSITION"
-    private val PRESENTER_SCOPE: Class<*> = Presenter::class.java
   }
 }

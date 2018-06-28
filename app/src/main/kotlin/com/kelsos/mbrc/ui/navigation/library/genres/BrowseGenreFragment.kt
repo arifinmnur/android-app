@@ -23,8 +23,7 @@ import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
-import toothpick.Toothpick
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class BrowseGenreFragment : Fragment(),
   BrowseGenreView,
@@ -36,14 +35,9 @@ class BrowseGenreFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  @Inject
-  lateinit var adapter: GenreEntryAdapter
-
-  @Inject
-  lateinit var actionHandler: PopupActionHandler
-
-  @Inject
-  lateinit var presenter: BrowseGenrePresenter
+  private val adapter: GenreEntryAdapter by inject()
+  private val actionHandler: PopupActionHandler by inject()
+  private val presenter: BrowseGenrePresenter by inject()
 
   private lateinit var syncButton: Button
 
@@ -68,13 +62,6 @@ class BrowseGenreFragment : Fragment(),
     Snackbar.make(recycler, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    val scope = Toothpick.openScopes(requireActivity().application, requireActivity(), this)
-    scope.installModules(BrowseGenreModule())
-    super.onCreate(savedInstanceState)
-    Toothpick.inject(this, scope)
   }
 
   override fun onDestroyView() {
@@ -117,11 +104,6 @@ class BrowseGenreFragment : Fragment(),
       item.genre
     )
     findNavController(this).navigate(directions)
-  }
-
-  override fun onDestroy() {
-    Toothpick.closeScope(this)
-    super.onDestroy()
   }
 
   override fun hideLoading() {

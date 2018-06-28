@@ -13,11 +13,8 @@ import com.kelsos.mbrc.content.playlists.Playlist
 import com.kelsos.mbrc.ui.BindableViewHolder
 import com.kelsos.mbrc.ui.OnViewItemPressed
 import kotterknife.bindView
-import javax.inject.Inject
 
-class PlaylistAdapter
-@Inject
-constructor() : ListAdapter<Playlist, PlaylistAdapter.ViewHolder>(DIFF_CALLBACK) {
+class PlaylistAdapter : ListAdapter<Playlist, PlaylistAdapter.ViewHolder>(DIFF_CALLBACK) {
 
   private var playlistPressedListener: OnPlaylistPressedListener? = null
 

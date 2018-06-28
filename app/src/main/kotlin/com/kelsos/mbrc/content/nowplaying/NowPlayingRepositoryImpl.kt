@@ -8,10 +8,8 @@ import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class NowPlayingRepositoryImpl
-@Inject constructor(
+class NowPlayingRepositoryImpl(
   private val dao: NowPlayingDao,
   private val api: ApiBase,
   private val dispatchers: AppCoroutineDispatchers

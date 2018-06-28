@@ -14,11 +14,8 @@ import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.nonNullObserver
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class NowPlayingPresenterImpl
-@Inject
-constructor(
+class NowPlayingPresenterImpl(
   playingTrackLiveDataProvider: PlayingTrackLiveDataProvider,
   private val repository: NowPlayingRepository,
   private val moveManager: MoveManager,

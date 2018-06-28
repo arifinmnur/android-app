@@ -8,11 +8,8 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.TrackEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
-import javax.inject.Inject
 
-class TrackEntryAdapter
-@Inject
-constructor() : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CALLBACK) {
+class TrackEntryAdapter : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CALLBACK) {
   private var listener: MenuItemSelectedListener<TrackEntity>? = null
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {

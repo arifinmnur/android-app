@@ -6,11 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ProgressBar
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -18,11 +14,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.di.modules.obtainViewModel
 import com.kelsos.mbrc.features.output.OutputSelectionResult
 import com.kelsos.mbrc.features.output.OutputSelectionViewModel
-import toothpick.Scope
-import toothpick.Toothpick
 
 class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
 
@@ -33,8 +26,6 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
   private lateinit var availableOutputs: Spinner
   private lateinit var loadingProgress: ProgressBar
   private lateinit var errorMessage: TextView
-
-  private var scope: Scope? = null
 
   private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -52,12 +43,6 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
   }
 
   private lateinit var viewModel: OutputSelectionViewModel
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    scope = Toothpick.openScopes(requireActivity().application, this)
-    Toothpick.inject(this, scope)
-  }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
@@ -99,7 +84,7 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
     loadingProgress = view.findViewById(R.id.output_selection__loading_outputs)
     errorMessage = view.findViewById(R.id.output_selection__error_message)
 
-    viewModel = obtainViewModel(OutputSelectionViewModel::class.java)
+    // viewModel = obtainViewModel(OutputSelectionViewModel::class.java)
 
     dialog = MaterialAlertDialogBuilder(context)
       .setTitle(R.string.output_selection__select_output)
@@ -110,11 +95,6 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
       .create()
 
     return dialog
-  }
-
-  override fun onDestroy() {
-    Toothpick.closeScope(this)
-    super.onDestroy()
   }
 
   override fun onTouch(view: View?, event: MotionEvent?): Boolean {

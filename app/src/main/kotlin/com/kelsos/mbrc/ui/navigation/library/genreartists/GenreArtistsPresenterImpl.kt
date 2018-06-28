@@ -10,11 +10,8 @@ import com.kelsos.mbrc.mvp.BasePresenter
 import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-class GenreArtistsPresenterImpl
-@Inject
-constructor(
+class GenreArtistsPresenterImpl(
   private val repository: ArtistRepository,
   private val queue: QueueHandler
 ) : BasePresenter<GenreArtistsView>(), GenreArtistsPresenter {

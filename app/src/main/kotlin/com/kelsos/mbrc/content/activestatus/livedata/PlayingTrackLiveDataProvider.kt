@@ -4,13 +4,10 @@ import com.kelsos.mbrc.content.activestatus.PlayingTrackCache
 import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 interface PlayingTrackLiveDataProvider : LiveDataProvider<PlayingTrack>
 
-class PlayingTrackLiveDataProviderImpl
-@Inject
-constructor(
+class PlayingTrackLiveDataProviderImpl(
   private val playingTrackCache: PlayingTrackCache,
   appCoroutineDispatchers: AppCoroutineDispatchers
 ) : BaseLiveDataProvider<PlayingTrack>(),
@@ -26,7 +23,6 @@ constructor(
 
           update(trackInfo.copy(coverUrl = coverUrl))
         } catch (ex: Exception) {
-
         }
       }
     }

@@ -20,13 +20,8 @@ import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.utilities.RemoteUtils
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RemoteSessionManager
-@Inject
-constructor(
+class RemoteSessionManager(
   context: Application,
   volumeProvider: RemoteVolumeProvider,
   private val userActionUseCase: UserActionUseCase,
@@ -34,7 +29,6 @@ constructor(
 ) : AudioManager.OnAudioFocusChangeListener {
   private val mediaSession: MediaSessionCompat
 
-  @Inject
   lateinit var handler: MediaIntentHandler
 
   init {
@@ -129,24 +123,21 @@ constructor(
           PlayerState.PLAYING -> {
             setState(
               PlaybackStateCompat.STATE_PLAYING, -1
-              /**change.position**/
-              , 1f
+              /**change.position**/, 1f
             )
             mediaSession.isActive = true
           }
           PlayerState.PAUSED -> {
             setState(
               PlaybackStateCompat.STATE_PAUSED, -1
-              /**change.position**/
-              , 0f
+              /**change.position**/, 0f
             )
             mediaSession.isActive = true
           }
           else -> {
             setState(
               PlaybackStateCompat.STATE_STOPPED, -1
-              /**change.position**/
-              , 0f
+              /**change.position**/, 0f
             )
             mediaSession.isActive = false
           }

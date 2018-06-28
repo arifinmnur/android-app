@@ -4,12 +4,10 @@ import android.app.Application
 import android.content.Intent
 import android.os.Build
 import timber.log.Timber
-import javax.inject.Inject
 
-class ServiceCheckerImpl
-@Inject constructor(
-  private val application: Application
-) : ServiceChecker {
+class ServiceCheckerImpl(
+   private val application: Application
+ ) : ServiceChecker {
 
   override fun startServiceIfNotRunning() {
     if (RemoteService.SERVICE_RUNNING) {
