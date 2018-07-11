@@ -17,15 +17,19 @@ class ArtistRepositoryImpl(
 
   private val mapper = ArtistDtoMapper()
 
-  override suspend fun getArtistByGenre(genre: String): DataSource.Factory<Int, ArtistEntity> =
-    dao.getArtistByGenre(genre)
-
-  override suspend fun getAll(): DataSource.Factory<Int, ArtistEntity> = dao.getAll()
-
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, ArtistEntity> {
-    getRemote()
-    return dao.getAll()
+  override suspend fun count(): Long = withContext(dispatchers.database) {
+    dao.count()
   }
+
+  override suspend fun getArtistByGenre(genre: String): DataSource.Factory<Int, ArtistEntity> =
+    withContext(dispatchers.database) {
+      dao.getArtistByGenre(genre)
+    }
+
+  override suspend fun getAll(): DataSource.Factory<Int, ArtistEntity> =
+    withContext(dispatchers.database) {
+      dao.getAll()
+    }
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -35,23 +39,27 @@ class ArtistRepositoryImpl(
           dao.removePreviousEntries(added)
         }
         .collect {
-          dao.insertAll(it.map { mapper.map(it) })
+          dao.insertAll(it.map { mapper.map(it).apply { dateAdded = added } })
         }
     }
   }
 
   override suspend fun search(term: String): DataSource.Factory<Int, ArtistEntity> =
-    dao.search(term)
+    withContext(dispatchers.database) {
+      dao.search(term)
+    }
 
   override suspend fun getAlbumArtistsOnly(): DataSource.Factory<Int, ArtistEntity> =
     dao.getAlbumArtists()
 
   override suspend fun getAllRemoteAndShowAlbumArtist(): DataSource.Factory<Int, ArtistEntity> {
     getRemote()
-    return dao.getAlbumArtists()
+    return withContext(dispatchers.database) {
+      dao.getAlbumArtists()
+    }
   }
 
-  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
-
-  override suspend fun count(): Long = dao.count()
+  override suspend fun cacheIsEmpty(): Boolean = withContext(dispatchers.database) {
+    dao.count() == 0L
+  }
 }

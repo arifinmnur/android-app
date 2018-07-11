@@ -26,9 +26,7 @@ import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseArtistFragment : Fragment(),
-  BrowseArtistView,
-  MenuItemSelectedListener<ArtistEntity> {
+class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<ArtistEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -38,15 +36,15 @@ class BrowseArtistFragment : Fragment(),
 
   private val adapter: ArtistEntryAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseArtistPresenter by inject()
+  private val presenter: BrowseArtistViewModel by inject()
 
   private lateinit var syncButton: Button
 
-  override fun search(term: String) {
+  fun search(term: String) {
     syncButton.isGone = term.isNotEmpty()
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -55,16 +53,6 @@ class BrowseArtistFragment : Fragment(),
     Snackbar.make(recycler, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
   }
 
   override fun onCreateView(
@@ -80,22 +68,17 @@ class BrowseArtistFragment : Fragment(),
     emptyViewTitle.setText(R.string.artists_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
-      presenter.sync()
     }
     recycler.setHasFixedSize(true)
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     adapter.setMenuItemSelectedListener(this)
-    presenter.attach(this)
-    presenter.load()
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: ArtistEntity) {
     val action = actionHandler.artistSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
-    } else {
-      presenter.queue(action, item)
     }
   }
 
@@ -106,12 +89,12 @@ class BrowseArtistFragment : Fragment(),
     findNavController().navigate(directions)
   }
 
-  override fun update(pagedList: PagedList<ArtistEntity>) {
+  fun update(pagedList: PagedList<ArtistEntity>) {
     emptyView.isVisible = pagedList.isEmpty()
     adapter.submitList(pagedList)
   }
 
-  override fun hideLoading() {
+  fun hideLoading() {
     emptyViewProgress.isVisible = false
   }
 }

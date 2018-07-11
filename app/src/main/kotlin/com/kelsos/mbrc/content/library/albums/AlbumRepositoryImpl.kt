@@ -16,15 +16,15 @@ class AlbumRepositoryImpl(
 ) : AlbumRepository {
   private val mapper = AlbumDtoMapper()
 
+  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
+
   override suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity> =
-    dao.getAlbumsByArtist(artist)
+    withContext(dispatchers.database) { dao.getAlbumsByArtist(artist) }
 
-  override suspend fun getAll(): DataSource.Factory<Int, AlbumEntity> = dao.getAll()
-
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, AlbumEntity> {
-    getRemote()
-    return dao.getAll()
-  }
+  override suspend fun getAll(): DataSource.Factory<Int, AlbumEntity> =
+    withContext(dispatchers.database) {
+      dao.getAll()
+    }
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -39,17 +39,17 @@ class AlbumRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, AlbumEntity> = dao.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, AlbumEntity> =
+    withContext(dispatchers.database) { dao.search(term) }
 
-  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
-
-  override suspend fun count(): Long = dao.count()
+  override suspend fun cacheIsEmpty(): Boolean =
+    withContext(dispatchers.database) { dao.count() == 0L }
 
   override suspend fun getAlbumsSorted(
     @Sorting.Fields order: Int,
     ascending: Boolean
-  ): DataSource.Factory<Int, AlbumEntity> {
-    return when (order) {
+  ): DataSource.Factory<Int, AlbumEntity> = withContext(dispatchers.database) {
+    return@withContext when (order) {
       Sorting.ALBUM -> {
         if (ascending) {
           dao.getSortedByAlbumAsc()

@@ -17,12 +17,7 @@ class RadioRepositoryImpl(
   private val mapper = RadioDtoMapper()
 
   override suspend fun getAll(): DataSource.Factory<Int, RadioStationEntity> =
-    dao.getAll()
-
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, RadioStationEntity> {
-    getRemote()
-    return dao.getAll()
-  }
+    withContext(dispatchers.database) { dao.getAll() }
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -37,9 +32,10 @@ class RadioRepositoryImpl(
   }
 
   override suspend fun search(term: String): DataSource.Factory<Int, RadioStationEntity> =
-    dao.search(term)
+    withContext(dispatchers.database) { dao.search(term) }
 
-  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
+  override suspend fun cacheIsEmpty(): Boolean =
+    withContext(dispatchers.database) { dao.count() == 0L }
 
-  override suspend fun count(): Long = dao.count()
+  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 }

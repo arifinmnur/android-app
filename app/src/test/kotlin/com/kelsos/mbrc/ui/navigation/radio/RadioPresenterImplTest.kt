@@ -8,7 +8,6 @@ import com.kelsos.mbrc.content.nowplaying.queue.QueueResponse
 import com.kelsos.mbrc.content.radios.RadioRepository
 import com.kelsos.mbrc.content.radios.RadioStationEntity
 import com.kelsos.mbrc.rules.MockitoInitializerRule
-import com.kelsos.mbrc.ui.navigation.radio.RadioFragment.Presenter
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -25,9 +24,9 @@ import org.mockito.Mockito.verify
 
 import java.net.SocketTimeoutException
 
-class RadioPresenterImplTest {
+class RadioViewModelTest {
 
-  private val toothpickRule: ToothPickRule = ToothPickRule(this, Presenter::class.java)
+  private val toothpickRule: ToothPickRule = ToothPickRule(this, ViewModel::class.java)
     .setRootRegistryPackage("com.kelsos.mbrc")
   @Rule
   @JvmField
@@ -43,7 +42,7 @@ class RadioPresenterImplTest {
   @Mock
   private lateinit var result: DataSource.Factory<Int, RadioStationEntity>
 
-  private lateinit var presenter: RadioPresenter
+  private lateinit var presenter: RadioViewModel
 
   @Before
   fun setUp() {

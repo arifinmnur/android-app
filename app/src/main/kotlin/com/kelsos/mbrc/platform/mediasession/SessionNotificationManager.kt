@@ -22,12 +22,13 @@ import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.utilities.RemoteUtils
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 
 class SessionNotificationManager(
   private val context: Application,
   private val sessionManager: RemoteSessionManager,
   private val settings: SettingsManager,
-  private val appCoroutineDispatchers: AppCoroutineDispatchers,
+  private val dispatchers: AppCoroutineDispatchers,
   private val notificationManager: NotificationManager
 ) : INotificationManager {
 
@@ -36,19 +37,21 @@ class SessionNotificationManager(
   private val next: String by lazy { context.getString(R.string.notification_action_next) }
 
   private var notification: Notification? = null
-
   private var notificationData: NotificationData = NotificationData()
 
   init {
     createNotificationChannels()
   }
 
-  fun update(notificationData: NotificationData) {
+  private suspend fun update(notificationData: NotificationData) {
     notification = createBuilder(notificationData).build()
-    notificationManager.notify(INotificationManager.NOW_PLAYING_PLACEHOLDER, notification)
+
+    withContext(dispatchers.main) {
+      notificationManager.notify(NOW_PLAYING_PLACEHOLDER, notification)
+    }
   }
 
-  private fun connectionChanged(connected: Boolean) {
+  private suspend fun connectionChanged(connected: Boolean) {
     if (!connected) {
       cancel(NOW_PLAYING_PLACEHOLDER)
     } else {

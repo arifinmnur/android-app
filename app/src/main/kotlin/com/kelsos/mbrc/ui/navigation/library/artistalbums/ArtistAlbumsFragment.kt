@@ -18,19 +18,16 @@ import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
 import kotterknife.bindView
+import org.koin.android.ext.android.inject
 
-class ArtistAlbumsFragment : Fragment(),
-  ArtistAlbumsView,
-  MenuItemSelectedListener<AlbumEntity> {
+class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
 
   private val recyclerView: RecyclerView by bindView(R.id.artist_albums__album_list)
   private val emptyView: Group by bindView(R.id.artist_albums__empty_view)
 
-  lateinit var actionHandler: PopupActionHandler
-
-  lateinit var adapter: AlbumEntryAdapter
-
-  lateinit var presenter: ArtistAlbumsPresenter
+  private val actionHandler: PopupActionHandler by inject()
+  private val adapter: AlbumEntryAdapter by inject()
+  private val viewModel: ArtistAlbumsViewModel by inject()
 
   private lateinit var artist: String
 
@@ -48,9 +45,6 @@ class ArtistAlbumsFragment : Fragment(),
 
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
     recyclerView.adapter = adapter
-
-    presenter.attach(this)
-    presenter.load(artist)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +63,6 @@ class ArtistAlbumsFragment : Fragment(),
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
     } else {
-      presenter.queue(action, item)
     }
   }
 
@@ -81,11 +74,11 @@ class ArtistAlbumsFragment : Fragment(),
     findNavController(this).navigate(directions)
   }
 
-  override fun update(albums: PagedList<AlbumEntity>) {
+  fun update(albums: PagedList<AlbumEntity>) {
     adapter.submitList(albums)
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -94,10 +87,5 @@ class ArtistAlbumsFragment : Fragment(),
     Snackbar.make(recyclerView, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onDestroy() {
-    presenter.detach()
-    super.onDestroy()
   }
 }

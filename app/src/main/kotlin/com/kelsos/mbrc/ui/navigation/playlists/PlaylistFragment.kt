@@ -22,7 +22,6 @@ import org.koin.android.ext.android.inject
 import java.net.ConnectException
 
 class PlaylistFragment : Fragment(),
-  PlaylistView,
   OnPlaylistPressedListener,
   OnRefreshListener {
 
@@ -33,7 +32,7 @@ class PlaylistFragment : Fragment(),
   private val emptyViewProgress: ProgressBar by bindView(R.id.playlists__loading_bar)
 
   private val adapter: PlaylistAdapter by lazy { PlaylistAdapter() }
-  private val presenter: PlaylistPresenter by inject()
+  private val presenter: PlaylistViewModel by inject()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -50,17 +49,10 @@ class PlaylistFragment : Fragment(),
     playlistList.adapter = adapter
     swipeLayout.setOnRefreshListener(this)
     emptyViewTitle.setText(R.string.playlists_list_empty)
-    presenter.attach(this)
-    presenter.load()
   }
 
   override fun playlistPressed(path: String) {
     presenter.play(path)
-  }
-
-  override fun onDestroy() {
-    presenter.detach()
-    super.onDestroy()
   }
 
   override fun onRefresh() {
@@ -71,13 +63,13 @@ class PlaylistFragment : Fragment(),
     presenter.reload()
   }
 
-  override fun update(cursor: List<Playlist>) {
+  fun update(cursor: List<Playlist>) {
     emptyView.isVisible = cursor.isEmpty()
     adapter.submitList(cursor)
     swipeLayout.isRefreshing = false
   }
 
-  override fun failure(throwable: Throwable) {
+  fun failure(throwable: Throwable) {
     swipeLayout.isRefreshing = false
     if (throwable.cause is ConnectException) {
       snackbar(R.string.service_connection_error)
@@ -86,10 +78,7 @@ class PlaylistFragment : Fragment(),
     }
   }
 
-  override fun showLoading() {
-  }
-
-  override fun hideLoading() {
+  fun hideLoading() {
     emptyViewProgress.isVisible = false
     swipeLayout.isRefreshing = false
   }

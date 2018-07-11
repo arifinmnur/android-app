@@ -15,15 +15,15 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.discovery.DiscoveryStop
 import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class ConnectionManagerFragment : Fragment(),
-  ConnectionManagerView,
   SettingsDialogFragment.SettingsSaveListener,
   ConnectionAdapter.ConnectionChangeListener {
 
-  private val presenter: ConnectionManagerPresenter by inject()
+  private val connectionManagerViewModel: ConnectionManagerViewModel by inject()
 
   private val recyclerView: RecyclerView by bindView(R.id.connection_manager__connections)
 
@@ -38,7 +38,7 @@ class ConnectionManagerFragment : Fragment(),
 
   private fun onScanButtonClick() {
     view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = false
-    presenter.startDiscovery()
+    connectionManagerViewModel.startDiscovery()
   }
 
   override fun onCreateView(
@@ -59,37 +59,32 @@ class ConnectionManagerFragment : Fragment(),
     adapter = ConnectionAdapter()
     adapter.setChangeListener(this)
     recyclerView.adapter = adapter
-    presenter.attach(this)
-    presenter.load()
-  }
-
-  override fun onDestroy() {
-    presenter.detach()
-    super.onDestroy()
+    connectionManagerViewModel.settings.nonNullObserver(this) {
+      adapter.submitList(it)
+    }
   }
 
   override fun onSave(settings: ConnectionSettingsEntity) {
-    presenter.save(settings)
+    connectionManagerViewModel.save(settings)
   }
 
-  override fun onDiscoveryStopped(status: Int) {
+  fun onDiscoveryStopped(status: Int) {
     view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = true
 
     val message: String = when (status) {
       DiscoveryStop.NO_WIFI -> getString(R.string.con_man_no_wifi)
       DiscoveryStop.NOT_FOUND -> getString(R.string.con_man_not_found)
       DiscoveryStop.COMPLETE -> {
-        presenter.load()
         getString(R.string.con_man_success)
       }
-      else -> throw IllegalArgumentException(status.toString())
+      else -> getString(R.string.unknown_reason)
     }
 
     Snackbar.make(recyclerView, message, Snackbar.LENGTH_SHORT).show()
   }
 
   override fun onDelete(settings: ConnectionSettingsEntity) {
-    presenter.delete(settings)
+    connectionManagerViewModel.delete(settings)
   }
 
   override fun onEdit(settings: ConnectionSettingsEntity) {
@@ -98,14 +93,10 @@ class ConnectionManagerFragment : Fragment(),
   }
 
   override fun onDefault(settings: ConnectionSettingsEntity) {
-    presenter.setDefault(settings)
+    connectionManagerViewModel.setDefault(settings)
   }
 
-  override fun updateData(data: List<ConnectionSettingsEntity>) {
-    adapter.submitList(data)
-  }
-
-  override fun updateDefault(defaultId: Long) {
+  fun updateDefault(defaultId: Long) {
     adapter.setSelectionId(defaultId)
   }
 }

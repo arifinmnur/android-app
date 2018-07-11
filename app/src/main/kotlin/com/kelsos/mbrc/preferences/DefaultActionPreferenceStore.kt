@@ -4,7 +4,10 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import com.kelsos.mbrc.R
 
-class DefaultActionPreferenceStore(private val preferences: SharedPreferences, private var resources: Resources) {
+class DefaultActionPreferenceStore(
+  private val preferences: SharedPreferences,
+  private var resources: Resources
+) {
 
   val defaultAction: String
     get() {

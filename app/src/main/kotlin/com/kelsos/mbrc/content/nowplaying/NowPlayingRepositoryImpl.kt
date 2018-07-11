@@ -10,18 +10,16 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 
 class NowPlayingRepositoryImpl(
-  private val dao: NowPlayingDao,
   private val api: ApiBase,
+  private val dao: NowPlayingDao,
   private val dispatchers: AppCoroutineDispatchers
 ) : NowPlayingRepository {
   private val mapper = NowPlayingDtoMapper()
 
-  override suspend fun getAll(): DataSource.Factory<Int, NowPlayingEntity> = dao.getAll()
+  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, NowPlayingEntity> {
-    getRemote()
-    return dao.getAll()
-  }
+  override suspend fun getAll(): DataSource.Factory<Int, NowPlayingEntity> =
+    withContext(dispatchers.database) { dao.getAll() }
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -38,11 +36,10 @@ class NowPlayingRepositoryImpl(
   }
 
   override suspend fun search(term: String): DataSource.Factory<Int, NowPlayingEntity> =
-    dao.search(term)
+    withContext(dispatchers.database) { dao.search(term) }
 
-  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
-
-  override suspend fun count(): Long = dao.count()
+  override suspend fun cacheIsEmpty(): Boolean =
+    withContext(dispatchers.database) { dao.count() == 0L }
 
   override fun move(from: Int, to: Int) {
     TODO("implement move")

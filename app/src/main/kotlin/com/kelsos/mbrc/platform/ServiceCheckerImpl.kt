@@ -6,8 +6,8 @@ import android.os.Build
 import timber.log.Timber
 
 class ServiceCheckerImpl(
-   private val application: Application
- ) : ServiceChecker {
+  private val application: Application
+) : ServiceChecker {
 
   override fun startServiceIfNotRunning() {
     if (RemoteService.SERVICE_RUNNING) {

@@ -2,8 +2,8 @@ package com.kelsos.mbrc.ui.navigation.library.artists
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.paging.PagedListAdapter
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener

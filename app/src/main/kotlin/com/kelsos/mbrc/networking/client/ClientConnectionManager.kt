@@ -81,7 +81,7 @@ class ClientConnectionManager(
       Timber.v("Attempting connection on $connectionSettings")
       val onConnection: (Boolean) -> Unit = { connected ->
         if (!connected) {
-          // activityChecker.stop()
+          activityChecker.stop()
           connectionStatusLiveDataProvider.disconnected()
         } else {
           connectionStatusLiveDataProvider.connected()

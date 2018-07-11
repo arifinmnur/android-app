@@ -13,7 +13,7 @@ interface GenreDao {
   fun deleteAll()
 
   @Insert(onConflict = OnConflictStrategy.ABORT)
-  fun saveAll(list: List<GenreEntity>)
+  fun insertAll(list: List<GenreEntity>)
 
   @Query("select * from genre order by genre")
   fun getAll(): DataSource.Factory<Int, GenreEntity>

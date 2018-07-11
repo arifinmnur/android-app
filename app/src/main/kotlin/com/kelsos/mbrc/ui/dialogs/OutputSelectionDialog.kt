@@ -16,8 +16,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.features.output.OutputSelectionResult
 import com.kelsos.mbrc.features.output.OutputSelectionViewModel
+import org.koin.android.ext.android.inject
 
-class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
+class OutputSelectionDialog : DialogFragment(),
+  View.OnTouchListener,
+  AdapterView.OnItemSelectedListener {
 
   private var touchInitiated: Boolean = false
   private lateinit var fm: FragmentManager
@@ -27,22 +30,7 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
   private lateinit var loadingProgress: ProgressBar
   private lateinit var errorMessage: TextView
 
-  private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      if (!touchInitiated) {
-        return
-      }
-
-      val selectedOutput = availableOutputs.adapter.getItem(position) as String
-      viewModel.setOutput(selectedOutput)
-      touchInitiated = false
-    }
-  }
-
-  private lateinit var viewModel: OutputSelectionViewModel
+  private val viewModel: OutputSelectionViewModel by inject()
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
@@ -97,6 +85,19 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
     return dialog
   }
 
+  override fun onNothingSelected(parent: AdapterView<*>?) {
+  }
+
+  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+    if (!touchInitiated) {
+      return
+    }
+
+    val selectedOutput = availableOutputs.adapter.getItem(position) as String
+    viewModel.setOutput(selectedOutput)
+    touchInitiated = false
+  }
+
   override fun onTouch(view: View?, event: MotionEvent?): Boolean {
     touchInitiated = true
     return view?.performClick() == true
@@ -112,7 +113,8 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
       data
     )
     availableOutputs.adapter = outputAdapter
-    availableOutputs.onItemSelectedListener = onItemSelectedListener
+
+    availableOutputs.onItemSelectedListener = this
     availableOutputs.setOnTouchListener(this)
     loadingProgress.isVisible = false
     availableOutputs.isVisible = true

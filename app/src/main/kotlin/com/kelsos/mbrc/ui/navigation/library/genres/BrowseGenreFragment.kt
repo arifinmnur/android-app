@@ -12,7 +12,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -22,11 +21,11 @@ import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class BrowseGenreFragment : Fragment(),
-  BrowseGenreView,
   MenuItemSelectedListener<GenreEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
@@ -37,7 +36,7 @@ class BrowseGenreFragment : Fragment(),
 
   private val adapter: GenreEntryAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseGenrePresenter by inject()
+  private val viewModel: BrowseGenreViewModel by inject()
 
   private lateinit var syncButton: Button
 
@@ -49,11 +48,11 @@ class BrowseGenreFragment : Fragment(),
     return inflater.inflate(R.layout.fragment_browse, container, false)
   }
 
-  override fun search(term: String) {
+  fun search(term: String) {
     syncButton.isGone = term.isNotEmpty()
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -64,38 +63,30 @@ class BrowseGenreFragment : Fragment(),
       .show()
   }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-    presenter.detach()
-  }
-
-  override fun update(pagedList: PagedList<GenreEntity>) {
-    emptyView.isVisible = pagedList.isEmpty()
-    adapter.submitList(pagedList)
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     emptyViewTitle.setText(R.string.genres_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
-      presenter.sync()
     }
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
-    presenter.attach(this)
-    presenter.load()
+
+    viewModel.genres.nonNullObserver(this) {
+      emptyViewProgress.isVisible = false
+
+      emptyView.isVisible = it.isEmpty()
+      adapter.submitList(it)
+    }
   }
 
   override fun onMenuItemSelected(itemId: Int, item: GenreEntity) {
     val action = actionHandler.genreSelected(itemId)
     if (action === LibraryPopup.PROFILE) {
       onItemClicked(item)
-    } else {
-      presenter.queue(action, item)
     }
   }
 
@@ -104,9 +95,5 @@ class BrowseGenreFragment : Fragment(),
       item.genre
     )
     findNavController(this).navigate(directions)
-  }
-
-  override fun hideLoading() {
-    emptyViewProgress.isVisible = false
   }
 }

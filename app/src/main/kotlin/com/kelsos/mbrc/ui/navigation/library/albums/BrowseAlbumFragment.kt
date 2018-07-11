@@ -31,7 +31,6 @@ import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class BrowseAlbumFragment : Fragment(),
-  BrowseAlbumView,
   MenuItemSelectedListener<AlbumEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
@@ -43,11 +42,11 @@ class BrowseAlbumFragment : Fragment(),
   private val adapter: AlbumEntryAdapter by inject()
 
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseAlbumPresenter by inject()
+  private val presenter: BrowseAlbumViewModel by inject()
 
   private lateinit var syncButton: Button
 
-  override fun search(term: String) {
+  fun search(term: String) {
     syncButton.isGone = term.isNotEmpty()
   }
 
@@ -64,16 +63,6 @@ class BrowseAlbumFragment : Fragment(),
     setHasOptionsMenu(true)
   }
 
-  override fun onStart() {
-    super.onStart()
-    presenter.attach(this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    presenter.detach()
-  }
-
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.browse_album__menu, menu)
     super.onCreateOptionsMenu(menu, inflater)
@@ -87,7 +76,7 @@ class BrowseAlbumFragment : Fragment(),
     return super.onOptionsItemSelected(item)
   }
 
-  override fun showSorting(order: Int, selection: Int) {
+  fun showSorting(order: Int, selection: Int) {
     with(parentFragmentManager) {
       SortingDialog.create(this, selection, order, presenter::order, presenter::sortBy).show()
     }
@@ -98,22 +87,17 @@ class BrowseAlbumFragment : Fragment(),
     emptyViewTitle.setText(R.string.albums_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
-      presenter.sync()
     }
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
-    presenter.attach(this)
-    presenter.load()
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: AlbumEntity) {
     val action = actionHandler.albumSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
-    } else {
-      presenter.queue(action, item)
     }
   }
 
@@ -125,12 +109,12 @@ class BrowseAlbumFragment : Fragment(),
     findNavController(this).navigate(directions)
   }
 
-  override fun update(pagedList: PagedList<AlbumEntity>) {
+  fun update(pagedList: PagedList<AlbumEntity>) {
     emptyView.isVisible = pagedList.isEmpty()
     adapter.submitList(pagedList)
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -141,7 +125,7 @@ class BrowseAlbumFragment : Fragment(),
       .show()
   }
 
-  override fun hideLoading() {
+  fun hideLoading() {
     emptyViewProgress.isVisible = false
   }
 }

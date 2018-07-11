@@ -10,19 +10,15 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 
 class GenreRepositoryImpl(
-  private val dao: GenreDao,
   private val api: ApiBase,
+  private val dao: GenreDao,
   private val dispatchers: AppCoroutineDispatchers
 ) : GenreRepository {
 
   private val mapper = GenreDtoMapper()
 
-  override suspend fun getAll(): DataSource.Factory<Int, GenreEntity> = dao.getAll()
-
-  override suspend fun getAndSaveRemote(): DataSource.Factory<Int, GenreEntity> {
-    getRemote()
-    return dao.getAll()
-  }
+  override suspend fun getAll(): DataSource.Factory<Int, GenreEntity> =
+    withContext(dispatchers.database) { dao.getAll() }
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -32,14 +28,16 @@ class GenreRepositoryImpl(
           dao.removePreviousEntries(added)
         }
         .collect {
-          dao.saveAll(it.map { mapper.map(it).apply { dateAdded = added } })
+          dao.insertAll(it.map { mapper.map(it).apply { dateAdded = added } })
         }
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, GenreEntity> = dao.search(term)
+  override suspend fun search(term: String): DataSource.Factory<Int, GenreEntity> =
+    withContext(dispatchers.database) { dao.search(term) }
 
-  override suspend fun cacheIsEmpty(): Boolean = dao.count() == 0L
+  override suspend fun cacheIsEmpty(): Boolean =
+    withContext(dispatchers.database) { dao.count() == 0L }
 
-  override suspend fun count(): Long = dao.count()
+  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 }

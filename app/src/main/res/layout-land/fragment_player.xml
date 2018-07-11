@@ -19,8 +19,12 @@
         type="com.kelsos.mbrc.content.activestatus.TrackRating" />
 
     <variable
-        name="presenter"
-        type="com.kelsos.mbrc.ui.navigation.player.PlayerPresenter" />
+        name="viewModel"
+        type="com.kelsos.mbrc.ui.navigation.player.PlayerViewModel" />
+
+    <variable
+        name="volumeProvider"
+        type="com.kelsos.mbrc.ui.navigation.player.VolumeDialogProvider"/>
 
   </data>
 

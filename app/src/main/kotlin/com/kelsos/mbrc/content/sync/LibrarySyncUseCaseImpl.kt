@@ -19,8 +19,8 @@ class LibrarySyncUseCaseImpl(
   private val albumRepository: AlbumRepository,
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
+  private val metrics: SyncMetrics,
   dispatchers: AppCoroutineDispatchers,
-  private val metrics: SyncMetrics
 ) : LibrarySyncUseCase {
 
   private var running: Boolean = false
@@ -30,7 +30,7 @@ class LibrarySyncUseCaseImpl(
   private val job = SupervisorJob()
   private val scope = CoroutineScope(job + dispatchers.network)
 
-  override fun sync(auto: Boolean) {
+  override suspend fun sync(auto: Boolean) {
     if (isRunning()) {
       Timber.v("Sync is already running")
       return
@@ -68,6 +68,7 @@ class LibrarySyncUseCaseImpl(
         running = false
       } catch (e: Exception) {
         Timber.e(e, "Refresh couldn't complete")
+        metrics.librarySyncFailed()
         onCompleteListener?.onFailure(e)
       } finally {
         onCompleteListener?.onTermination()

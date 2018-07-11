@@ -23,9 +23,7 @@ import com.kelsos.mbrc.metrics.SyncedData
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class LibraryFragment : Fragment(),
-  LibraryView,
-  OnQueryTextListener {
+class LibraryFragment : Fragment(), OnQueryTextListener {
 
   private val pager: ViewPager2 by bindView(R.id.search_pager)
   private val tabs: TabLayout by bindView(R.id.pager_tab_strip)
@@ -36,7 +34,7 @@ class LibraryFragment : Fragment(),
   private var searchClear: MenuItem? = null
   private var pagerAdapter: LibraryPagerAdapter? = null
 
-  private val presenter: LibraryPresenter by inject()
+  private val presenter: LibraryViewModel by inject()
 
   override fun onQueryTextSubmit(query: String): Boolean {
     val search = query.trim()
@@ -91,7 +89,6 @@ class LibraryFragment : Fragment(),
         else -> throw IllegalArgumentException("invalid position")
       }
     }.attach()
-    presenter.attach(this)
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -108,8 +105,6 @@ class LibraryFragment : Fragment(),
       setIconifiedByDefault(true)
       setOnQueryTextListener(this@LibraryFragment)
     }
-
-    presenter.loadArtistPreference()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -127,20 +122,18 @@ class LibraryFragment : Fragment(),
         return true
       }
       R.id.library_search_clear -> {
-        presenter.search("")
         searchMenuItem?.isVisible = true
         searchClear?.isVisible = false
         return true
       }
       R.id.library_sync_state -> {
-        presenter.showStats()
         return true
       }
     }
     return super.onOptionsItemSelected(item)
   }
 
-  override fun showStats(stats: SyncedData) {
+  fun showStats(stats: SyncedData) {
     val dialog = MaterialAlertDialogBuilder(requireContext())
       .setTitle(R.string.library_stats__title)
       .setView(R.layout.library_stats__layout)
@@ -154,7 +147,7 @@ class LibraryFragment : Fragment(),
     dialog.findViewById<TextView>(R.id.library_stats__playlist_value)?.text = "${stats.playlists}"
   }
 
-  override fun syncComplete(stats: SyncedData) {
+  fun syncComplete(stats: SyncedData) {
     val message = getString(
       R.string.library__sync_complete,
       stats.genres,
@@ -169,12 +162,11 @@ class LibraryFragment : Fragment(),
   }
 
   override fun onDestroy() {
-    presenter.detach()
     pagerAdapter = null
     super.onDestroy()
   }
 
-  override fun updateArtistOnlyPreference(albumArtistOnly: Boolean?) {
+  fun updateArtistOnlyPreference(albumArtistOnly: Boolean?) {
     this.albumArtistOnly?.isChecked = albumArtistOnly ?: false
   }
 
@@ -188,18 +180,18 @@ class LibraryFragment : Fragment(),
     pager.currentItem = savedInstanceState?.getInt(PAGER_POSITION, 0) ?: 0
   }
 
-  override fun syncFailure() {
+  fun syncFailure() {
     Snackbar.make(pager, R.string.library__sync_failed, Snackbar.LENGTH_LONG).show()
   }
 
-  override fun showSyncProgress() {
+  fun showSyncProgress() {
     view?.apply {
       findViewById<ProgressIndicator>(R.id.sync_progress).isGone = false
       findViewById<TextView>(R.id.sync_progress_text).isGone = false
     }
   }
 
-  override fun hideSyncProgress() {
+  fun hideSyncProgress() {
     view?.apply {
       findViewById<ProgressIndicator>(R.id.sync_progress).isGone = true
       findViewById<TextView>(R.id.sync_progress_text).isGone = true

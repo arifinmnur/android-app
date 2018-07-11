@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -24,7 +23,6 @@ import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class BrowseTrackFragment : Fragment(),
-  BrowseTrackView,
   MenuItemSelectedListener<TrackEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
@@ -34,9 +32,8 @@ class BrowseTrackFragment : Fragment(),
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   private val adapter: TrackEntryAdapter by inject()
-
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseTrackPresenter by inject()
+  private val presenter: BrowseTrackViewModel by inject()
 
   private lateinit var syncButton: Button
 
@@ -48,11 +45,11 @@ class BrowseTrackFragment : Fragment(),
     return inflater.inflate(R.layout.fragment_browse, container, false)
   }
 
-  override fun search(term: String) {
+  fun search(term: String) {
     syncButton.isGone = term.isNotEmpty()
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -63,41 +60,26 @@ class BrowseTrackFragment : Fragment(),
       .show()
   }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-    presenter.detach()
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     emptyViewTitle.setText(R.string.tracks_list_empty)
     syncButton = view.findViewById(R.id.list_empty_sync)
     syncButton.setOnClickListener {
-      presenter.sync()
     }
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
-    presenter.attach(this)
-    presenter.load()
-  }
-
-  override fun update(pagedList: PagedList<TrackEntity>) {
-    emptyView.isVisible = pagedList.isEmpty()
-    adapter.submitList(pagedList)
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: TrackEntity) {
-    presenter.queue(item, actionHandler.trackSelected(itemId))
   }
 
   override fun onItemClicked(item: TrackEntity) {
-    presenter.queue(item)
   }
 
-  override fun hideLoading() {
+  fun hideLoading() {
     emptyViewProgress.isVisible
   }
 }

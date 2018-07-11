@@ -21,16 +21,14 @@ import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class GenreArtistsFragment : Fragment(),
-  GenreArtistsView,
-  MenuItemSelectedListener<ArtistEntity> {
+class GenreArtistsFragment : Fragment(), MenuItemSelectedListener<ArtistEntity> {
 
   private val recyclerView: RecyclerView by bindView(R.id.genre_artists__artist_list)
   private val emptyView: Group by bindView(R.id.genre_artists__empty_view)
 
   private val adapter: ArtistEntryAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: GenreArtistsPresenter by inject()
+  private val presenter: GenreArtistsViewModel by inject()
 
   private lateinit var genre: String
 
@@ -47,8 +45,6 @@ class GenreArtistsFragment : Fragment(),
     adapter.setMenuItemSelectedListener(this)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(recyclerView.context)
-    presenter.attach(this)
-    presenter.load(genre)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,8 +63,6 @@ class GenreArtistsFragment : Fragment(),
     val action = actionHandler.artistSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
-    } else {
-      presenter.queue(action, item)
     }
   }
 
@@ -79,11 +73,11 @@ class GenreArtistsFragment : Fragment(),
     findNavController(this).navigate(directions)
   }
 
-  override fun update(pagedList: PagedList<ArtistEntity>) {
+  fun update(pagedList: PagedList<ArtistEntity>) {
     adapter.submitList(pagedList)
   }
 
-  override fun queue(success: Boolean, tracks: Int) {
+  fun queue(success: Boolean, tracks: Int) {
     val message = if (success) {
       getString(R.string.queue_result__success, tracks)
     } else {
@@ -92,10 +86,5 @@ class GenreArtistsFragment : Fragment(),
     Snackbar.make(recyclerView, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  override fun onDestroy() {
-    presenter.detach()
-    super.onDestroy()
   }
 }
