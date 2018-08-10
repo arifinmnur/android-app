@@ -2,8 +2,7 @@ package com.kelsos.mbrc.ui.navigation.radio
 
 import android.app.Application
 import android.content.Intent
-import android.support.test.runner.AndroidJUnit4
-import android.view.View.VISIBLE
+import androidx.test.InstrumentationRegistry
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
@@ -11,11 +10,13 @@ import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.Visibility.VISIBLE
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.filters.LargeTest
+import androidx.test.runner.AndroidJUnit4
 import com.kelsos.mbrc.DbTest
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.radios.RadioStation
@@ -37,7 +38,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
-
 import java.net.SocketTimeoutException
 
 @RunWith(AndroidJUnit4::class)
@@ -84,6 +84,7 @@ class RadioFragmentTest : DbTest() {
     MockitoAnnotations.initMocks(this)
     val application = InstrumentationRegistry.getTargetContext().applicationContext as Application
 
+
     resource = CountingIdlingResource("idling resource")
     IdlingRegistry.getInstance().register(resource)
   }
@@ -127,12 +128,10 @@ class RadioFragmentTest : DbTest() {
         fail()
       })
 
-    onView(
-      allOf(
-        withId(android.support.design.R.id.snackbar_text),
-        withText(R.string.radio__play_successful)
-      )
-    ).check(matches(withEffectiveVisibility(VISIBLE)))
+    onView(allOf(
+      withId(com.google.android.material.R.id.snackbar_text),
+      withText(R.string.radio__play_successful)
+    )).check(matches(withEffectiveVisibility(VISIBLE)))
   }
 
   @Test
@@ -152,12 +151,10 @@ class RadioFragmentTest : DbTest() {
         fail()
       })
 
-    onView(
-      allOf(
-        withId(android.support.design.R.id.snackbar_text),
-        withText(R.string.radio__play_failed)
-      )
-    )
+    onView(allOf(
+      withId(com.google.android.material.R.id.snackbar_text),
+      withText(R.string.radio__play_failed)
+    ))
       .check(matches(withEffectiveVisibility(VISIBLE)))
 
     verify(presenter, times(1)).play(station3.url)
@@ -219,12 +216,10 @@ class RadioFragmentTest : DbTest() {
     given(presenter.refresh()).will { mockLoadingError(view, resource) }
 
     onView(withId(R.id.radio_stations__refresh_layout)).perform(swipeDown())
-    onView(
-      allOf(
-        withId(android.support.design.R.id.snackbar_text),
-        withText(R.string.radio__loading_failed)
-      )
-    ).check(matches(withEffectiveVisibility(VISIBLE)))
+    onView(allOf(
+      withId(com.google.android.material.R.id.snackbar_text),
+      withText(R.string.radio__loading_failed)
+    )).check(matches(withEffectiveVisibility(VISIBLE)))
 
     verify(presenter, times(1)).refresh()
     verify(presenter, times(1)).load()
