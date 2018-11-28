@@ -5,14 +5,29 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.artists.ArtistEntity
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.preferences.SettingsManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class BrowseArtistViewModel(
-  private val repository: ArtistRepository
+  private val repository: ArtistRepository,
+  private val settingsManager: SettingsManager,
+  private val dispatchers: AppCoroutineDispatchers
 ) : ViewModel() {
+
+  private val viewModelJob: Job = Job()
+  private val networkScope = CoroutineScope(dispatchers.network + viewModelJob)
 
   private lateinit var artists: LiveData<PagedList<ArtistEntity>>
 
   fun reload() {
-    launch { repository.getRemote() }
+    networkScope.launch { repository.getRemote() }
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    viewModelJob.cancel()
   }
 }

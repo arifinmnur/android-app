@@ -6,12 +6,18 @@ import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.albums.Sorting
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.preferences.AlbumSortingStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 
 class BrowseAlbumViewModel(
   private val repository: AlbumRepository,
-  private val albumSortingStore: AlbumSortingStore
+  private val albumSortingStore: AlbumSortingStore,
+  private val dispatchers: AppCoroutineDispatchers
 ) : ViewModel() {
+  private val viewModelJob: Job = Job()
+  private val networkScope = CoroutineScope(dispatchers.network + viewModelJob)
 
   val albums: MediatorLiveData<PagedList<AlbumEntity>> = MediatorLiveData()
 

@@ -26,10 +26,7 @@ class ArtistRepositoryImpl(
       dao.getArtistByGenre(genre)
     }
 
-  override suspend fun getAll(): DataSource.Factory<Int, ArtistEntity> =
-    withContext(dispatchers.database) {
-      dao.getAll()
-    }
+  override fun getAll(): DataSource.Factory<Int, ArtistEntity> = dao.getAll()
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -44,10 +41,7 @@ class ArtistRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, ArtistEntity> =
-    withContext(dispatchers.database) {
-      dao.search(term)
-    }
+  override fun search(term: String): DataSource.Factory<Int, ArtistEntity> = dao.search(term)
 
   override suspend fun getAlbumArtistsOnly(): DataSource.Factory<Int, ArtistEntity> =
     dao.getAlbumArtists()

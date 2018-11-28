@@ -1,15 +1,12 @@
 package com.kelsos.mbrc.ui.navigation.nowplaying
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 
 class MoveManagerImpl : MoveManager {
-  private val job = SupervisorJob()
-  private val scope = CoroutineScope(Dispatchers.Default + job)
+
   private var originalPosition: Int = -1
   private var finalPosition: Int = -1
 
@@ -20,7 +17,7 @@ class MoveManagerImpl : MoveManager {
     this.onMoveSubmit = onMoveSubmit
   }
 
-  override fun move(from: Int, to: Int) {
+  override suspend fun move(from: Int, to: Int) {
     notify?.cancel()
     if (originalPosition < 0) {
       originalPosition = from
@@ -30,7 +27,8 @@ class MoveManagerImpl : MoveManager {
       finalPosition = to
     }
 
-    notify = scope.async {
+    // TODO: maybe global scope is not the greatest idea ever
+    notify = GlobalScope.async {
       delay(400)
       onMoveSubmit(originalPosition, finalPosition)
       originalPosition = -1
@@ -38,3 +36,4 @@ class MoveManagerImpl : MoveManager {
     }
   }
 }
+

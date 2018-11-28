@@ -2,7 +2,12 @@ package com.kelsos.mbrc.ui.navigation.player
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
@@ -18,9 +23,6 @@ import org.koin.android.ext.android.inject
 class PlayerFragment : Fragment(), VolumeDialogProvider {
 
   private val viewModel: PlayerViewModel by inject()
-
-  private lateinit var dataBinding: FragmentPlayerBinding
-
   private var menu: Menu? = null
   private var shareActionProvider: ShareActionProvider? = null
 
@@ -34,7 +36,7 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    dataBinding = DataBindingUtil.inflate(
+    val dataBinding: FragmentPlayerBinding = DataBindingUtil.inflate<FragmentPlayerBinding>(
       inflater,
       R.layout.fragment_player,
       container,
@@ -42,26 +44,25 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
     ).apply {
       volumeProvider = this@PlayerFragment
       track = PlayingTrack()
+      this.viewModel = viewModel
     }
     return dataBinding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    dataBinding.viewModel = viewModel
-
     viewModel.playerStatus.observe(this) {
-      dataBinding.status = it
+      //dataBinding.status = it
       menu?.findItem(R.id.player_screen__action_scrobbling)?.isChecked = it.scrobbling
     }
 
     viewModel.playingTrack.observe(this) {
-      dataBinding.track = it
+      //dataBinding.track = it
       shareActionProvider?.setShareIntent(getShareIntent())
     }
 
     viewModel.trackPosition.observe(this) {
-      dataBinding.position = it
+      //dataBinding.position = it
     }
 
     viewModel.trackRating.observe(this) {
@@ -110,7 +111,7 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
 
   private fun getShareIntent(): Intent {
     return Intent(Intent.ACTION_SEND).apply {
-      val track = dataBinding.track
+      val track = viewModel.playingTrack.getValue()
       val payload = "Now Playing: ${track?.artist} - ${track?.title}"
       type = "text/plain"
       putExtra(Intent.EXTRA_TEXT, payload)

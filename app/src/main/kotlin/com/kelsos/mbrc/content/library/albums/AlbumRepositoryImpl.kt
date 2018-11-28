@@ -21,10 +21,7 @@ class AlbumRepositoryImpl(
   override suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity> =
     withContext(dispatchers.database) { dao.getAlbumsByArtist(artist) }
 
-  override suspend fun getAll(): DataSource.Factory<Int, AlbumEntity> =
-    withContext(dispatchers.database) {
-      dao.getAll()
-    }
+  override fun getAll(): DataSource.Factory<Int, AlbumEntity> = dao.getAll()
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -39,8 +36,7 @@ class AlbumRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, AlbumEntity> =
-    withContext(dispatchers.database) { dao.search(term) }
+  override fun search(term: String): DataSource.Factory<Int, AlbumEntity> = dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }

@@ -19,7 +19,7 @@ class TrackRepositoryImpl(
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override suspend fun getAll(): DataSource.Factory<Int, TrackEntity> = dao.getAll()
+  override fun getAll(): DataSource.Factory<Int, TrackEntity> = dao.getAll()
 
   override suspend fun getAlbumTracks(
     album: String,
@@ -59,13 +59,10 @@ class TrackRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, TrackEntity> =
-    withContext(dispatchers.database) {
-      return@withContext dao.search(term)
-    }
+  override fun search(term: String): DataSource.Factory<Int, TrackEntity> = dao.search(term)
 
   override suspend fun getGenreTrackPaths(genre: String): List<String> =
-    withContext(dispatchers.database) { dao.getGenreTrackPaths(genre) }
+    dao.getGenreTrackPaths(genre)
 
   override suspend fun getArtistTrackPaths(artist: String): List<String> =
     withContext(dispatchers.database) { dao.getArtistTrackPaths(artist) }

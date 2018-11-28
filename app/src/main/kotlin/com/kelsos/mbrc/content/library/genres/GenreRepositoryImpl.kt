@@ -17,8 +17,9 @@ class GenreRepositoryImpl(
 
   private val mapper = GenreDtoMapper()
 
-  override suspend fun getAll(): DataSource.Factory<Int, GenreEntity> =
-    withContext(dispatchers.database) { dao.getAll() }
+  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
+
+  override fun getAll(): DataSource.Factory<Int, GenreEntity> = dao.getAll()
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -33,11 +34,8 @@ class GenreRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, GenreEntity> =
-    withContext(dispatchers.database) { dao.search(term) }
+  override fun search(term: String): DataSource.Factory<Int, GenreEntity> = dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }
-
-  override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 }

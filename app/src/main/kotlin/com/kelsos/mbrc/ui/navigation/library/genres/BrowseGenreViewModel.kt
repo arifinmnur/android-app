@@ -5,18 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.library.genres.GenreRepository
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.utilities.paged
 
 class BrowseGenreViewModel(
-  private val repository: GenreRepository,
-  private val dispatchers: AppCoroutineDispatchers
+  repository: GenreRepository,
 ) : ViewModel() {
-
-  val genres: LiveData<PagedList<GenreEntity>>
-
-  fun reload() {
-    launch(dispatchers.network) {
-      repository.getRemote()
-    }
-  }
+  val genres: LiveData<PagedList<GenreEntity>> = repository.getAll().paged()
 }

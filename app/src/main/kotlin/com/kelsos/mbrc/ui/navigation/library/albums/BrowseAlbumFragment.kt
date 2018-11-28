@@ -15,7 +15,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -106,7 +106,7 @@ class BrowseAlbumFragment : Fragment(),
       artist = item.artist,
       album = item.album
     )
-    findNavController(this).navigate(directions)
+    findNavController().navigate(directions)
   }
 
   fun update(pagedList: PagedList<AlbumEntity>) {

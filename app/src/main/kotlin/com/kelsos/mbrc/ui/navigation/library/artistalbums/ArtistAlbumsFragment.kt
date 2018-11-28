@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.Group
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -71,7 +71,7 @@ class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
         album = item.album,
         artist = item.artist
       )
-    findNavController(this).navigate(directions)
+    findNavController().navigate(directions)
   }
 
   fun update(albums: PagedList<AlbumEntity>) {

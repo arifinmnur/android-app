@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Action
+import arrow.core.Option
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.library.tracks.PlayingTrack
@@ -20,8 +21,9 @@ import com.kelsos.mbrc.platform.mediasession.RemoteViewIntentBuilder.PREVIOUS
 import com.kelsos.mbrc.platform.mediasession.RemoteViewIntentBuilder.getPendingIntent
 import com.kelsos.mbrc.preferences.SettingsManager
 import com.kelsos.mbrc.utilities.RemoteUtils
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SessionNotificationManager(
@@ -31,6 +33,10 @@ class SessionNotificationManager(
   private val dispatchers: AppCoroutineDispatchers,
   private val notificationManager: NotificationManager
 ) : INotificationManager {
+
+  private val sessionJob: Job = Job()
+  private val uiScope: CoroutineScope = CoroutineScope(dispatchers.main + sessionJob)
+  private val diskScope: CoroutineScope = CoroutineScope(dispatchers.disk + sessionJob)
 
   private val previous: String by lazy { context.getString(R.string.notification_action_previous) }
   private val play: String by lazy { context.getString(R.string.notification_action_play) }
@@ -129,14 +135,15 @@ class SessionNotificationManager(
   }
 
   override fun trackChanged(playingTrack: PlayingTrack) {
-    GlobalScope.async {
+    diskScope.launch {
       notificationData = with(playingTrack.coverUrl) {
         val cover = if (isNotEmpty()) {
-          RemoteUtils.loadBitmap(this).await()
+          RemoteUtils.loadBitmap(this)
         } else {
-          null
+          Option.empty()
         }
-        notificationData.copy(track = playingTrack, cover = cover)
+
+        notificationData.copy(track = playingTrack, cover = cover.orNull())
       }
 
       update(notificationData)
@@ -156,8 +163,10 @@ class SessionNotificationManager(
       return
     }
 
-    notificationData = notificationData.copy(playerState = state)
-    update(notificationData)
+    uiScope.launch {
+      notificationData = notificationData.copy(playerState = state)
+      update(notificationData)
+    }
   }
 
   companion object {

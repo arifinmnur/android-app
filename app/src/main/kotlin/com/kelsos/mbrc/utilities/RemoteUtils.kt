@@ -2,12 +2,10 @@ package com.kelsos.mbrc.utilities
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import arrow.core.Option
+import arrow.core.Try
 import com.kelsos.mbrc.BuildConfig
 import io.reactivex.Observable
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import timber.log.Timber
 import java.io.File
 
 object RemoteUtils {
@@ -38,17 +36,12 @@ object RemoteUtils {
     }
   }
 
-  fun loadBitmap(path: String): Deferred<Bitmap?> {
-    return GlobalScope.async {
-      try {
-        BitmapFactory.decodeFile(path, BitmapFactory.Options().apply {
-          inPreferredConfig = Bitmap.Config.RGB_565
-        })
-      } catch (ex: Exception) {
-        Timber.e(ex, "Failed to decode path")
-        null
-      }
-    }
+  fun loadBitmap(path: String): Option<Bitmap> {
+    return Try {
+      BitmapFactory.decodeFile(path, BitmapFactory.Options().apply {
+        inPreferredConfig = Bitmap.Config.RGB_565
+      })
+    }.toOption()
   }
 
   private fun coverBitmap(coverPath: String): Observable<Bitmap> {

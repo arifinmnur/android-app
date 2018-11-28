@@ -18,8 +18,7 @@ class NowPlayingRepositoryImpl(
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override suspend fun getAll(): DataSource.Factory<Int, NowPlayingEntity> =
-    withContext(dispatchers.database) { dao.getAll() }
+  override fun getAll(): DataSource.Factory<Int, NowPlayingEntity> = dao.getAll()
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -35,8 +34,7 @@ class NowPlayingRepositoryImpl(
     }
   }
 
-  override suspend fun search(term: String): DataSource.Factory<Int, NowPlayingEntity> =
-    withContext(dispatchers.database) { dao.search(term) }
+  override fun search(term: String): DataSource.Factory<Int, NowPlayingEntity> = dao.search(term)
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }

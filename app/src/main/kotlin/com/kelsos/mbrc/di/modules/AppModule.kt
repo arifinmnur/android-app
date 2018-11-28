@@ -218,8 +218,8 @@ val appModule = module {
     AppRxSchedulers(
       AndroidSchedulers.mainThread(),
       Schedulers.io(),
-      Schedulers.from(Executors.newSingleThreadExecutor {
-        Thread(it, "database")
+      Schedulers.from(Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "database")
       }),
       Schedulers.io()
     )
@@ -279,16 +279,16 @@ val appModule = module {
 }
 
 val uiModule = module {
-  viewModel { AlbumTracksViewModel(get()) }
+  viewModel { AlbumTracksViewModel(get(), get()) }
   viewModel { ConnectionManagerViewModel(get(), get(), get()) }
   viewModel { PlayerViewModel(get(), get(), get(), get(), get(), get(), get()) }
-  viewModel { BrowseAlbumViewModel(get(), get()) }
-  viewModel { BrowseGenreViewModel(get(), get()) }
-  viewModel { BrowseArtistViewModel(get()) }
+  viewModel { BrowseAlbumViewModel(get(), get(), get()) }
+  viewModel { BrowseGenreViewModel(get()) }
+  viewModel { BrowseArtistViewModel(get(), get(), get()) }
   viewModel { BrowseTrackViewModel(get(), get()) }
   viewModel { MiniControlViewModel(get(), get(), get(), get()) }
   viewModel { LyricsViewModel(get()) }
-  viewModel { RadioViewModel(get(), get()) }
+  viewModel { RadioViewModel(get(), get(), get()) }
   viewModel { NowPlayingViewModel(get(), get(), get(), get(), get()) }
   viewModel { LibraryViewModel(get(), get(), get()) }
 

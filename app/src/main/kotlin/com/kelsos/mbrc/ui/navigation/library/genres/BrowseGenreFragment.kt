@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -25,8 +25,7 @@ import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseGenreFragment : Fragment(),
-  MenuItemSelectedListener<GenreEntity> {
+class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<GenreEntity> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -94,6 +93,6 @@ class BrowseGenreFragment : Fragment(),
     val directions = LibraryFragmentDirections.actionLibraryFragmentToGenreArtistsActivity(
       item.genre
     )
-    findNavController(this).navigate(directions)
+    findNavController().navigate(directions)
   }
 }

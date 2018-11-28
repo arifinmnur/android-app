@@ -3,7 +3,8 @@ package com.kelsos.mbrc.networking.connections
 import androidx.lifecycle.LiveData
 import com.kelsos.mbrc.content.activestatus.livedata.DefaultSettingsLiveDataProvider
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ConnectionRepositoryImpl(
@@ -14,7 +15,7 @@ class ConnectionRepositoryImpl(
 ) : ConnectionRepository {
 
   init {
-    runBlocking {
+    GlobalScope.launch(dispatchers.disk) {
       getDefault()?.let {
         defaultSettingsLiveDataProvider.update(it)
       }
@@ -76,6 +77,7 @@ class ConnectionRepositoryImpl(
 
   override suspend fun setDefault(settings: ConnectionSettingsEntity) {
     defaultId = settings.id
+    defaultSettingsLiveDataProvider.update(settings)
   }
 
   override suspend fun getDefault(): ConnectionSettingsEntity? = withContext(dispatchers.database) {
