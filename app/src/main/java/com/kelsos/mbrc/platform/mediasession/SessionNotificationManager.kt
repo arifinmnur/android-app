@@ -57,14 +57,6 @@ class SessionNotificationManager(
     }
   }
 
-  private suspend fun connectionChanged(connected: Boolean) {
-    if (!connected) {
-      cancel(NOW_PLAYING_PLACEHOLDER)
-    } else {
-      update(this.notificationData)
-    }
-  }
-
   private fun createNotificationChannels() {
     val channel = channel(context)
     if (channel === null) {

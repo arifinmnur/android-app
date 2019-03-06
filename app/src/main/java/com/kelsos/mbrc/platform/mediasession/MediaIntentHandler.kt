@@ -17,6 +17,7 @@ class MediaIntentHandler(
 
   fun handleMediaIntent(mediaIntent: Intent?): Boolean {
     var result = false
+
     val intent = mediaIntent ?: return false
     val action = intent.action
 
@@ -38,9 +39,7 @@ class MediaIntentHandler(
           previousClick = currentClick
           postAction(UserAction(Protocol.PlayerPlayPause, true))
         }
-        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ->
-
-          postAction(UserAction(Protocol.PlayerPlayPause, true))
+        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> postAction(UserAction(Protocol.PlayerPlayPause, true))
         KeyEvent.KEYCODE_MEDIA_PLAY -> postAction(UserAction(Protocol.PlayerPlay, true))
         KeyEvent.KEYCODE_MEDIA_PAUSE -> postAction(UserAction(Protocol.PlayerPause, true))
         KeyEvent.KEYCODE_MEDIA_STOP -> postAction(UserAction(Protocol.PlayerStop, true))

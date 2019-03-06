@@ -15,10 +15,13 @@ class RadioRepositoryImpl(
   private val dispatchers: AppCoroutineDispatchers
 ) : RadioRepository {
   private val mapper = RadioDtoMapper()
+  private val dao2Model = RadioDaoMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override fun getAll(): DataSource.Factory<Int, RadioStationEntity> = dao.getAll()
+  override fun getAll(): DataSource.Factory<Int, RadioStation> {
+    return dao.getAll().map { dao2Model.map(it) }
+  }
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -27,12 +30,17 @@ class RadioRepositoryImpl(
         .onCompletion {
           dao.removePreviousEntries(added)
         }.collect {
-          dao.insertAll(it.map { mapper.map(it).apply { dateAdded = added } })
+          val items = it.map { mapper.map(it).apply { dateAdded = added } }
+          withContext(dispatchers.database) {
+            dao.insertAll(items)
+          }
         }
     }
   }
 
-  override fun search(term: String): DataSource.Factory<Int, RadioStationEntity> = dao.search(term)
+  override fun search(term: String): DataSource.Factory<Int, RadioStation> {
+    return dao.search(term).map { dao2Model.map(it) }
+  }
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }

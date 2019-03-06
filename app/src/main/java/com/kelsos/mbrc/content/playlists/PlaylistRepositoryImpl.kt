@@ -15,10 +15,12 @@ class PlaylistRepositoryImpl(
   private val dispatchers: AppCoroutineDispatchers
 ) : PlaylistRepository {
   private val mapper = PlaylistDtoMapper()
+  private val entity2model = PlaylistEntityMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override fun getAll(): DataSource.Factory<Int, PlaylistEntity> = dao.getAll()
+  override fun getAll(): DataSource.Factory<Int, Playlist> =
+    dao.getAll().map { entity2model.map(it) }
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -32,12 +34,15 @@ class PlaylistRepositoryImpl(
               this.dateAdded = added
             }
           }
-          dao.insertAll(playlists)
+          withContext(dispatchers.database) {
+            dao.insertAll(playlists)
+          }
         }
     }
   }
 
-  override fun search(term: String): DataSource.Factory<Int, PlaylistEntity> = dao.search(term)
+  override fun search(term: String): DataSource.Factory<Int, Playlist> =
+    dao.search(term).map { entity2model.map(it) }
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }

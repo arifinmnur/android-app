@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
+import com.kelsos.mbrc.content.library.genres.Genre
 import com.kelsos.mbrc.content.library.genres.GenreEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
@@ -25,7 +26,7 @@ import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<GenreEntity> {
+class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -82,14 +83,14 @@ class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<GenreEntity> {
     }
   }
 
-  override fun onMenuItemSelected(itemId: Int, item: GenreEntity) {
+  override fun onMenuItemSelected(itemId: Int, item: Genre) {
     val action = actionHandler.genreSelected(itemId)
     if (action === LibraryPopup.PROFILE) {
       onItemClicked(item)
     }
   }
 
-  override fun onItemClicked(item: GenreEntity) {
+  override fun onItemClicked(item: Genre) {
     val directions = LibraryFragmentDirections.actionLibraryFragmentToGenreArtistsActivity(
       item.genre
     )

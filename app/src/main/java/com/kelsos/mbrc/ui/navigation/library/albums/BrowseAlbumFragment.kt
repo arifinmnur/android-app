@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -23,7 +22,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumEntity
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
-import com.kelsos.mbrc.ui.dialogs.SortingDialog
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
@@ -66,20 +64,6 @@ class BrowseAlbumFragment : Fragment(),
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.browse_album__menu, menu)
     super.onCreateOptionsMenu(menu, inflater)
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.browse_album__sort_albums) {
-      presenter.showSorting()
-      return true
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
-  fun showSorting(order: Int, selection: Int) {
-    with(parentFragmentManager) {
-      SortingDialog.create(this, selection, order, presenter::order, presenter::sortBy).show()
-    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

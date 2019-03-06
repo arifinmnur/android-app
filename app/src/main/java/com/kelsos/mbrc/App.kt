@@ -32,7 +32,6 @@ open class App : MultiDexApplication() {
     val androidModule = module {
       val app = this@App as Application
 
-      single { app }
       single { app.resources }
       single { checkNotNull(app.getSystemService<ActivityManager>()) }
       single { checkNotNull(app.getSystemService<AudioManager>()) }

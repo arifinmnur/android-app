@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
-import com.kelsos.mbrc.content.library.tracks.TrackEntity
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.utilities.paged
@@ -19,7 +19,7 @@ class AlbumTracksViewModel(
   private val job: Job = Job()
   private val scope = CoroutineScope(dispatchers.database + job)
 
-  private lateinit var tracks: LiveData<PagedList<TrackEntity>>
+  private lateinit var tracks: LiveData<PagedList<Track>>
 
   fun load(album: AlbumInfo) {
     scope.launch {

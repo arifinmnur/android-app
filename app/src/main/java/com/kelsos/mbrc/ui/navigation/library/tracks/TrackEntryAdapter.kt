@@ -10,7 +10,9 @@ import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
 
 class TrackEntryAdapter : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CALLBACK) {
+
   private var listener: MenuItemSelectedListener<TrackEntity>? = null
+
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {
       val listener = checkNotNull(listener)

@@ -4,7 +4,7 @@ import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncMetricsImpl
 import org.koin.dsl.module.Module
 
-class FlavorApp : App() {
+open class FlavorApp : App() {
   override fun onCreate() {
     super.onCreate()
   }

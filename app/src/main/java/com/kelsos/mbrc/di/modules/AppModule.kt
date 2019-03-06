@@ -107,8 +107,6 @@ import com.kelsos.mbrc.platform.mediasession.INotificationManager
 import com.kelsos.mbrc.platform.mediasession.RemoteSessionManager
 import com.kelsos.mbrc.platform.mediasession.RemoteVolumeProvider
 import com.kelsos.mbrc.platform.mediasession.SessionNotificationManager
-import com.kelsos.mbrc.preferences.AlbumSortingStore
-import com.kelsos.mbrc.preferences.AlbumSortingStoreImpl
 import com.kelsos.mbrc.preferences.ClientInformationStore
 import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.kelsos.mbrc.preferences.SettingsManager
@@ -141,6 +139,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.koin.androidx.viewmodel.ext.koin.viewModel
 import org.koin.dsl.module.module
+import org.koin.experimental.builder.create
 import java.util.concurrent.Executors
 
 val appModule = module {
@@ -155,8 +154,6 @@ val appModule = module {
 
   single<NowPlayingRepository> { NowPlayingRepositoryImpl(get(), get(), get()) }
   single<PlaylistRepository> { PlaylistRepositoryImpl(get(), get(), get()) }
-
-  single<AlbumSortingStore> { AlbumSortingStoreImpl(get()) }
 
   single<MessageSerializer> { MessageSerializerImpl(get()) }
 
@@ -174,7 +171,7 @@ val appModule = module {
   single<ServiceChecker> { ServiceCheckerImpl(get()) }
 
   single<LibrarySyncUseCase> {
-    LibrarySyncUseCaseImpl(get(), get(), get(), get(), get(), get(), get())
+    create<LibrarySyncUseCaseImpl>()
   }
 
   single<RadioRepository> { RadioRepositoryImpl(get(), get(), get()) }
@@ -282,17 +279,17 @@ val uiModule = module {
   viewModel { AlbumTracksViewModel(get(), get()) }
   viewModel { ConnectionManagerViewModel(get(), get(), get()) }
   viewModel { PlayerViewModel(get(), get(), get(), get(), get(), get(), get()) }
-  viewModel { BrowseAlbumViewModel(get(), get(), get()) }
-  viewModel { BrowseGenreViewModel(get()) }
+  viewModel { BrowseAlbumViewModel(get(), get()) }
+  viewModel { BrowseGenreViewModel(get(), get()) }
   viewModel { BrowseArtistViewModel(get(), get(), get()) }
   viewModel { BrowseTrackViewModel(get(), get()) }
   viewModel { MiniControlViewModel(get(), get(), get(), get()) }
   viewModel { LyricsViewModel(get()) }
   viewModel { RadioViewModel(get(), get(), get()) }
   viewModel { NowPlayingViewModel(get(), get(), get(), get(), get()) }
-  viewModel { LibraryViewModel(get(), get(), get()) }
+  viewModel { create<LibraryViewModel>() }
 
-  viewModel { VolumeDialogViewModel(get(), get(), get()) }
+  viewModel { create<VolumeDialogViewModel>() }
 
   factory { RadioAdapter() }
   factory { GenreEntryAdapter() }

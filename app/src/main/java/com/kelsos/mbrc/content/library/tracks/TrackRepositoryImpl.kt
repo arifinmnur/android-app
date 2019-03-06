@@ -16,22 +16,23 @@ class TrackRepositoryImpl(
 ) : TrackRepository {
 
   private val mapper = TrackDtoMapper()
+  private val entity2model = TrackEntityMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override fun getAll(): DataSource.Factory<Int, TrackEntity> = dao.getAll()
-
-  override suspend fun getAlbumTracks(
-    album: String,
-    artist: String
-  ): DataSource.Factory<Int, TrackEntity> = withContext(dispatchers.database) {
-    dao.getAlbumTracks(album, artist)
+  override fun getAll(): DataSource.Factory<Int, Track> {
+    return dao.getAll().map { entity2model.map(it) }
   }
 
-  override suspend fun getNonAlbumTracks(artist: String): DataSource.Factory<Int, TrackEntity> =
-    withContext(dispatchers.database) {
-      dao.getNonAlbumTracks(artist)
-    }
+  override fun getAlbumTracks(
+    album: String,
+    artist: String
+  ): DataSource.Factory<Int, Track>{
+    return dao.getAlbumTracks(album, artist).map { entity2model.map(it) }
+  }
+
+  override fun getNonAlbumTracks(artist: String): DataSource.Factory<Int, Track> =
+    dao.getNonAlbumTracks(artist).map { entity2model.map(it) }
 
   override suspend fun getRemote() {
     withContext(dispatchers.network) {
@@ -59,19 +60,20 @@ class TrackRepositoryImpl(
     }
   }
 
-  override fun search(term: String): DataSource.Factory<Int, TrackEntity> = dao.search(term)
+  override fun search(term: String): DataSource.Factory<Int, Track> {
+    return dao.search(term).map { entity2model.map(it) }
+  }
 
-  override suspend fun getGenreTrackPaths(genre: String): List<String> =
+  override fun getGenreTrackPaths(genre: String): List<String> =
     dao.getGenreTrackPaths(genre)
 
-  override suspend fun getArtistTrackPaths(artist: String): List<String> =
-    withContext(dispatchers.database) { dao.getArtistTrackPaths(artist) }
+  override fun getArtistTrackPaths(artist: String): List<String> =
+    dao.getArtistTrackPaths(artist)
 
-  override suspend fun getAlbumTrackPaths(album: String, artist: String): List<String> =
-    withContext(dispatchers.database) { dao.getAlbumTrackPaths(album, artist) }
+  override fun getAlbumTrackPaths(album: String, artist: String): List<String> =
+    dao.getAlbumTrackPaths(album, artist)
 
-  override suspend fun getAllTrackPaths(): List<String> =
-    withContext(dispatchers.database) { dao.getAllTrackPaths() }
+  override fun getAllTrackPaths(): List<String> = dao.getAllTrackPaths()
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }

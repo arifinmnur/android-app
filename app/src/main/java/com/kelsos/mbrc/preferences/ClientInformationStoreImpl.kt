@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import java.util.UUID
 
 class ClientInformationStoreImpl(
-  private val preferences: SharedPreferences
+private val preferences: SharedPreferences
 ) : ClientInformationStore {
 
   override fun getClientId(): String {

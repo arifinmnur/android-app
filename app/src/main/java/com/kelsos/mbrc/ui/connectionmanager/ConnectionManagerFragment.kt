@@ -33,7 +33,7 @@ class ConnectionManagerFragment : Fragment(),
   private val scanButton: Button by bindView(R.id.connection_manager__scan)
 
   private fun onAddButtonClick() {
-    SettingsDialogFragment.create(parentFragmentManager).show()
+    SettingsDialogFragment.create(parentFragmentManager).show(this)
   }
 
   private fun onScanButtonClick() {
@@ -89,7 +89,7 @@ class ConnectionManagerFragment : Fragment(),
 
   override fun onEdit(settings: ConnectionSettingsEntity) {
     val settingsDialog = SettingsDialogFragment.newInstance(settings, parentFragmentManager)
-    settingsDialog.show()
+    settingsDialog.show(this)
   }
 
   override fun onDefault(settings: ConnectionSettingsEntity) {

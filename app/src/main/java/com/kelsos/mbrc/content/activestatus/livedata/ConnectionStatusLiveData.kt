@@ -12,7 +12,8 @@ interface ConnectionStatusLiveDataProvider : LiveDataProvider<ConnectionStatus> 
   fun disconnected()
 }
 
-class ConnectionStatusLiveDataProviderImpl : ConnectionStatusLiveDataProvider, BaseLiveDataProvider<ConnectionStatus>() {
+class ConnectionStatusLiveDataProviderImpl : ConnectionStatusLiveDataProvider,
+  BaseLiveDataProvider<ConnectionStatus>() {
   init {
     update(ConnectionStatus())
   }

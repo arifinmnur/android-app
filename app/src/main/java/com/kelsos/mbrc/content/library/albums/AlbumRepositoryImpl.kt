@@ -15,13 +15,15 @@ class AlbumRepositoryImpl(
   private val dispatchers: AppCoroutineDispatchers
 ) : AlbumRepository {
   private val mapper = AlbumDtoMapper()
+  private val view2model = AlbumViewMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
-  override suspend fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity> =
-    withContext(dispatchers.database) { dao.getAlbumsByArtist(artist) }
+  override fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, Album> =
+    dao.getAlbumsByArtist(artist).map { view2model.map(it) }
 
-  override fun getAll(): DataSource.Factory<Int, AlbumEntity> = dao.getAll()
+  override fun getAll(): DataSource.Factory<Int, Album> =
+    dao.getAll().map { view2model.map(it) }
 
   override suspend fun getRemote() {
     val added = epoch()
@@ -36,66 +38,9 @@ class AlbumRepositoryImpl(
     }
   }
 
-  override fun search(term: String): DataSource.Factory<Int, AlbumEntity> = dao.search(term)
+  override fun search(term: String): DataSource.Factory<Int, Album> =
+    dao.search(term).map { view2model.map(it) }
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }
-
-  override suspend fun getAlbumsSorted(
-    @Sorting.Fields order: Int,
-    ascending: Boolean
-  ): DataSource.Factory<Int, AlbumEntity> = withContext(dispatchers.database) {
-    return@withContext when (order) {
-      Sorting.ALBUM -> {
-        if (ascending) {
-          dao.getSortedByAlbumAsc()
-        } else {
-          dao.getSortedByAlbumDesc()
-        }
-      }
-      Sorting.ALBUM_ARTIST__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByAlbumArtistAndAlbumAsc()
-        } else {
-          dao.getSortedByAlbumArtistAndAlbumDesc()
-        }
-      }
-      Sorting.ALBUM_ARTIST__YEAR__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByAlbumArtistAndYearAndAlbumAsc()
-        } else {
-          dao.getSortedByAlbumArtistAndYearAndAlbumDesc()
-        }
-      }
-      Sorting.ARTIST__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByArtistAndAlbumAsc()
-        } else {
-          dao.getSortedByArtistAndAlbumDesc()
-        }
-      }
-      Sorting.GENRE__ALBUM_ARTIST__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByGenreAndAlbumArtistAndAlbumAsc()
-        } else {
-          dao.getSortedByGenreAndAlbumArtistAndAlbumDesc()
-        }
-      }
-      Sorting.YEAR__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByYearAndAlbumAsc()
-        } else {
-          dao.getSortedByYearAndAlbumDesc()
-        }
-      }
-      Sorting.YEAR__ALBUM_ARTIST__ALBUM -> {
-        if (ascending) {
-          dao.getSortedByYearAndAlbumArtistAndAlbumAsc()
-        } else {
-          dao.getSortedByYearAndAlbumArtistAndAlbumDesc()
-        }
-      }
-      else -> throw IllegalArgumentException("Invalid option")
-    }
-  }
 }

@@ -1,286 +1,317 @@
 package com.kelsos.mbrc.repository
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
-import android.os.Build
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.kelsos.mbrc.BuildConfig
 import com.kelsos.mbrc.TestApplication
+import com.kelsos.mbrc.content.activestatus.livedata.DefaultSettingsLiveDataProvider
+import com.kelsos.mbrc.content.activestatus.livedata.DefaultSettingsLiveDataProviderImpl
+import com.kelsos.mbrc.data.Database
+import com.kelsos.mbrc.networking.connections.ConnectionDao
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionRepositoryImpl
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
+import com.kelsos.mbrc.networking.connections.DefaultSettingsModel
+import com.kelsos.mbrc.networking.connections.DefaultSettingsModelImpl
+import com.kelsos.mbrc.utils.observeOnce
+import com.kelsos.mbrc.utils.testDispatcherModule
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.BDDMockito.given
-import org.mockito.Mockito
-import org.mockito.Mockito.anyInt
-import org.mockito.Mockito.anyLong
-import org.mockito.Mockito.anyString
-import org.robolectric.RobolectricTestRunner
+import org.koin.dsl.module.module
+import org.koin.experimental.builder.create
+import org.koin.standalone.StandAloneContext.startKoin
+import org.koin.standalone.StandAloneContext.stopKoin
+import org.koin.standalone.inject
+import org.koin.test.KoinTest
 import org.robolectric.annotation.Config
-
 import java.util.ArrayList
 
-@RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class,
-    application = TestApplication::class,
-    sdk = [(Build.VERSION_CODES.N_MR1)])
-class ConnectionRepositoryTest {
-  private val toothPickRule = ToothPickRule(this, "test")
-  @Rule
-  @JvmField
-  val ruleChain: TestRule = RuleChain.outerRule(toothPickRule)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
+class ConnectionRepositoryTest : KoinTest {
 
-  private lateinit var repository: ConnectionRepository
+  private val repository: ConnectionRepository by inject()
+
+  private lateinit var db: Database
+  private lateinit var connectionDao: ConnectionDao
+
+  @get:Rule
+  val rule = InstantTaskExecutorRule()
 
   @Before
-  @Throws(Exception::class)
   fun setUp() {
-    toothPickRule.scope.installModules(TestModule())
-    repository = toothPickRule.getInstance(ConnectionRepository::class.java)
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    db = Room.inMemoryDatabaseBuilder(context, Database::class.java)
+      .allowMainThreadQueries()
+      .build()
+    connectionDao = db.connectionDao()
+
+    startKoin(listOf(getTestModule(), testDispatcherModule))
+  }
+
+  @After
+  fun tearDown() {
+    stopKoin()
+    db.close()
   }
 
   @Test
   fun addNewSettings() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
 
-    val settings = createSettings("192.167.90.10")
-    repository.save(settings)
+      repository.save(settings)
 
-    assertThat(repository.default).isEqualTo(settings)
-    assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
+      assertThat(settings.id).isEqualTo(1)
+    }
   }
 
   @Test
   fun addMultipleNewSettings() {
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.12")
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.12")
 
-    assertThat(repository.default).isEqualTo(settings)
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.count()).isEqualTo(3)
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
+
+      assertThat(repository.getDefault()).isEqualTo(settings)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.count()).isEqualTo(3)
+    }
   }
 
   @Test
   fun addMultipleNewSettingsRemoveOne() {
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.13")
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.13")
 
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
 
-    assertThat(repository.default).isEqualTo(settings)
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.count()).isEqualTo(4)
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
 
-    repository.delete(settings2)
 
-    val settingsList = ArrayList<ConnectionSettingsEntity>()
-    settingsList.add(settings)
-    settingsList.add(settings1)
-    settingsList.add(settings3)
+      assertThat(repository.getDefault()).isEqualTo(settings)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.count()).isEqualTo(4)
 
-    assertThat(repository.count()).isEqualTo(3)
-    assertThat(repository.getAll().value).containsAllIn(settingsList)
+      repository.delete(settings2)
+
+      val settingsList = ArrayList<ConnectionSettingsEntity>()
+      settingsList.add(settings)
+      settingsList.add(settings1)
+      settingsList.add(settings3)
+
+      assertThat(repository.count()).isEqualTo(3)
+
+      repository.getAll().observeOnce {
+        assertThat(it).containsAllIn(settingsList)
+      }
+    }
   }
 
   @Test
   fun changeDefault() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
 
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
+      repository.save(settings)
+      repository.save(settings1)
 
-    repository.save(settings)
-    repository.save(settings1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    assertThat(repository.default).isEqualTo(settings)
+      repository.default = settings1
 
-    repository.default = settings1
+      assertThat(repository.getDefault()).isEqualTo(settings1)
+    }
 
-    assertThat(repository.default).isEqualTo(settings1)
   }
 
   @Test
   fun deleteSingleDefault() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
 
-    val settings = createSettings("192.167.90.10")
-    repository.save(settings)
+      repository.save(settings)
 
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    repository.delete(settings)
+      repository.delete(settings)
 
-    assertThat(repository.count()).isEqualTo(0)
-    assertThat(repository.default).isNull()
-    assertThat(repository.defaultId).isEqualTo(-1)
+      assertThat(repository.count()).isEqualTo(0)
+      assertThat(repository.getDefault()).isNull()
+      assertThat(repository.defaultId).isEqualTo(-1)
+    }
   }
 
   @Test
   fun deleteFromMultipleDefaultFirst() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.14")
 
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.14")
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
 
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
+      assertThat(repository.count()).isEqualTo(4)
 
-    assertThat(repository.count()).isEqualTo(4)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
+      repository.delete(settings)
 
-    repository.delete(settings)
-
-    assertThat(repository.count()).isEqualTo(3)
-    assertThat(repository.default).isEqualTo(settings1)
-    assertThat(repository.defaultId).isEqualTo(2)
+      assertThat(repository.count()).isEqualTo(3)
+      assertThat(repository.getDefault()).isEqualTo(settings1)
+      assertThat(repository.defaultId).isEqualTo(2)
+    }
   }
 
   @Test
   fun deleteFromMultipleDefaultSecond() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.14")
 
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.14")
 
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
 
-    assertThat(repository.count()).isEqualTo(4)
+      assertThat(repository.count()).isEqualTo(4)
 
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    repository.default = settings1
-    assertThat(repository.default).isEqualTo(settings1)
+      repository.setDefault(settings1)
+      assertThat(repository.getDefault()).isEqualTo(settings1)
 
-    repository.delete(settings1)
+      repository.delete(settings1)
 
-    assertThat(repository.count()).isEqualTo(3)
-    assertThat(repository.default).isEqualTo(settings)
-    assertThat(repository.defaultId).isEqualTo(1)
+      assertThat(repository.count()).isEqualTo(3)
+      assertThat(repository.getDefault()).isEqualTo(settings)
+      assertThat(repository.defaultId).isEqualTo(1)
+    }
   }
 
   @Test
   fun deleteFromMultipleDefaultLast() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.14")
 
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.14")
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
 
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
+      assertThat(repository.count()).isEqualTo(4)
 
-    assertThat(repository.count()).isEqualTo(4)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
+      repository.setDefault(settings3)
+      assertThat(repository.getDefault()).isEqualTo(settings3)
 
-    repository.default = settings3
-    assertThat(repository.default).isEqualTo(settings3)
+      repository.delete(settings3)
 
-    repository.delete(settings3)
-
-    assertThat(repository.count()).isEqualTo(3)
-    assertThat(repository.default).isEqualTo(settings2)
-    assertThat(repository.defaultId).isEqualTo(3)
+      assertThat(repository.count()).isEqualTo(3)
+      assertThat(repository.getDefault()).isEqualTo(settings2)
+      assertThat(repository.defaultId).isEqualTo(3)
+    }
   }
 
   @Test
   fun deleteFromMultipleNonDefault() {
+    runBlocking {
+      val settings = createSettings("192.167.90.10")
+      val settings1 = createSettings("192.167.90.11")
+      val settings2 = createSettings("192.167.90.12")
+      val settings3 = createSettings("192.167.90.14")
 
-    val settings = createSettings("192.167.90.10")
-    val settings1 = createSettings("192.167.90.11")
-    val settings2 = createSettings("192.167.90.12")
-    val settings3 = createSettings("192.167.90.14")
+      repository.save(settings)
+      repository.save(settings1)
+      repository.save(settings2)
+      repository.save(settings3)
 
-    repository.save(settings)
-    repository.save(settings1)
-    repository.save(settings2)
-    repository.save(settings3)
+      assertThat(repository.count()).isEqualTo(4)
 
-    assertThat(repository.count()).isEqualTo(4)
+      assertThat(settings.id).isEqualTo(1)
+      assertThat(repository.getDefault()).isEqualTo(settings)
 
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
+      repository.setDefault(settings3)
+      assertThat(repository.getDefault()).isEqualTo(settings3)
 
-    repository.default = settings3
-    assertThat(repository.default).isEqualTo(settings3)
+      repository.delete(settings1)
 
-    repository.delete(settings1)
-
-    assertThat(repository.count()).isEqualTo(3)
-    assertThat(repository.default).isEqualTo(settings3)
-    assertThat(repository.defaultId).isEqualTo(4)
+      assertThat(repository.count()).isEqualTo(3)
+      assertThat(repository.getDefault()).isEqualTo(settings3)
+      assertThat(repository.defaultId).isEqualTo(4)
+    }
   }
 
   @Test
   fun updateSettings() {
-    val newPort = 6060
-    val address = "192.167.90.10"
-    val newAddress = "192.167.90.11"
+    runBlocking {
+      val newPort = 6060
+      val address = "192.167.90.10"
+      val newAddress = "192.167.90.11"
 
-    val settings = createSettings(address)
-    repository.save(settings)
+      val settings = createSettings(address)
 
-    assertThat(settings.id).isEqualTo(1)
-    val defaultSettings = repository.default
+      repository.save(settings)
 
-    assertThat(defaultSettings).isEqualTo(settings)
-    assertThat(defaultSettings!!.port).isEqualTo(3000)
-    assertThat(defaultSettings.address).isEqualTo(address)
+      assertThat(settings.id).isEqualTo(1)
+      val defaultSettings = repository.getDefault()
 
-    settings.port = newPort
+      assertThat(defaultSettings).isEqualTo(settings)
+      assertThat(defaultSettings!!.port).isEqualTo(3000)
+      assertThat(defaultSettings.address).isEqualTo(address)
 
-    repository.save(settings)
+      settings.port = newPort
 
-    assertThat(repository.default!!.port).isEqualTo(newPort)
+      repository.save(settings)
 
-    settings.address = newAddress
-    repository.save(settings)
+      assertThat(repository.getDefault()!!.port).isEqualTo(newPort)
 
-    assertThat(repository.default!!.address).isEqualTo(newAddress)
-  }
+      settings.address = newAddress
 
-  @Test
-  fun setDefaultNull() {
+      repository.save(settings)
 
-    val settings = createSettings("192.167.90.10")
-    repository.save(settings)
-
-    assertThat(settings.id).isEqualTo(1)
-    assertThat(repository.default).isEqualTo(settings)
-
-    repository.default = null
-
-    assertThat(repository.count()).isEqualTo(1)
-    assertThat(repository.default!!).isEqualTo(settings)
-    assertThat(repository.defaultId).isEqualTo(1)
+      assertThat(repository.getDefault()!!.address).isEqualTo(newAddress)
+    }
   }
 
   private fun createSettings(address: String): ConnectionSettingsEntity {
@@ -291,28 +322,26 @@ class ConnectionRepositoryTest {
     return settings
   }
 
-  private inner class TestModule @SuppressLint("CommitPrefEdits")
-  internal constructor() : Module() {
-    init {
-      bind(SharedPreferences::class.java).toProviderInstance {
-        val defaultId = longArrayOf(-1)
-        val preferences = Mockito.mock(SharedPreferences::class.java)
-        val editor = Mockito.mock(SharedPreferences.Editor::class.java)
-        given(preferences.edit()).willReturn(editor)
-        given(preferences.getLong(anyString(), anyLong())).willAnswer { defaultId[0] }
-        given(editor.putLong(anyString(), anyLong())).will {
-          val o = it.arguments[1]
-          defaultId[0] = java.lang.Long.parseLong(o.toString())
-          editor
-        }
-        preferences
-      }
-      bind(ConnectionRepository::class.java).to(ConnectionRepositoryImpl::class.java)
-      bind(Resources::class.java).toProviderInstance {
-        val resources = Mockito.mock(Resources::class.java)
-        given(resources.getString(anyInt())).willReturn("preferences_key")
-        resources
-      }
+  private fun getTestModule() = module {
+
+    single {
+      val slot = slot<Long>()
+      val preferences = mockk<SharedPreferences>()
+      val editor = mockk<SharedPreferences.Editor>()
+      every { preferences.edit() } returns editor
+      every { preferences.getLong(any(), any()) } answers { slot.captured }
+      every { editor.putLong(any(), capture(slot)) } returns editor
+      preferences
     }
+
+    single<ConnectionRepository> { create<ConnectionRepositoryImpl>() }
+    single {
+      val resources = mockk<Resources>()
+      every { resources.getString(any()) } returns "preferences_key"
+      resources
+    }
+    single { connectionDao }
+    single<DefaultSettingsLiveDataProvider> { create<DefaultSettingsLiveDataProviderImpl>() }
+    factory { DefaultSettingsModelImpl as DefaultSettingsModel }
   }
 }

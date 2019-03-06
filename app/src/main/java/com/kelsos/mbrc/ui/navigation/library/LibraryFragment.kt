@@ -88,9 +88,8 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
         Category.SECTION_TRACK -> getString(R.string.label_tracks)
         else -> throw IllegalArgumentException("invalid position")
       }
-    }.attach()
+}.attach()
   }
-
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.library_search, menu)

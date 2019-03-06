@@ -16,7 +16,6 @@ import com.kelsos.mbrc.preferences.SettingsManager
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
-
 class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
 
   private val settingsManager: SettingsManager by inject()

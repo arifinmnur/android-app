@@ -13,7 +13,7 @@ class ServiceDiscoveryUseCaseImpl(
     serviceDiscovery.discover { status, setting ->
       if (status == COMPLETE) {
         GlobalScope.launch {
-          connectionRepository.save(checkNotNull(setting){" settings should be not null"})
+          connectionRepository.save(checkNotNull(setting) { " settings should be not null" })
         }
       }
       onDiscoveryTerminated(status)

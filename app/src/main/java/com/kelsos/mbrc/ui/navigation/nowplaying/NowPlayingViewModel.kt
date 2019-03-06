@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.kelsos.mbrc.content.activestatus.livedata.PlayingTrackLiveDataProvider
-import com.kelsos.mbrc.content.nowplaying.NowPlayingEntity
+import com.kelsos.mbrc.content.nowplaying.NowPlaying
 import com.kelsos.mbrc.content.nowplaying.NowPlayingRepository
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.events.Event
@@ -17,7 +17,6 @@ import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class NowPlayingViewModel(
@@ -28,13 +27,11 @@ class NowPlayingViewModel(
   private val userActionUseCase: UserActionUseCase
 ) : ViewModel() {
 
-
   private val viewModelJob: Job = Job()
   private val networkScope: CoroutineScope = CoroutineScope(dispatchers.network + viewModelJob)
   private val eventStream: MutableLiveData<Event<Int>> = MutableLiveData()
 
-  val nowPlayingTracks: LiveData<PagedList<NowPlayingEntity>> =
-    runBlocking { repository.getAll() }.paged()
+  val nowPlayingTracks: LiveData<PagedList<NowPlaying>> = repository.getAll().paged()
   val events: LiveData<Event<Int>>
     get() = eventStream
 

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.genres.GenreEntity
+import com.kelsos.mbrc.content.library.genres.Genre
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.ui.BindableViewHolder
 import kotterknife.bindView
@@ -15,7 +15,7 @@ class GenreViewHolder(
   itemView: View,
   indicatorPressed: (view: View, position: Int) -> Unit,
   pressed: (view: View, position: Int) -> Unit
-) : BindableViewHolder<GenreEntity>(itemView) {
+) : BindableViewHolder<Genre>(itemView) {
   private val title: TextView by bindView(R.id.line_one)
   private val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
   private val empty: String by lazy { string(R.string.empty) }
@@ -25,7 +25,7 @@ class GenreViewHolder(
     itemView.setOnClickListener { pressed(it, adapterPosition) }
   }
 
-  override fun bindTo(item: GenreEntity) {
+  override fun bindTo(item: Genre) {
     title.text = if (item.genre.isBlank()) empty else item.genre
   }
 

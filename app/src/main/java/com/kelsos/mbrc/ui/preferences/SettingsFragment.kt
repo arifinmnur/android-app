@@ -8,9 +8,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
+import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.core.os.HandlerCompat
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -25,24 +26,22 @@ import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
+  private fun <T : Preference> preference(@StringRes resId: Int): T {
+    return checkNotNull(findPreference(getString(resId)))
+  }
+
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     addPreferencesFromResource(R.xml.application_settings)
 
-    val reduceOnIncoming = findPreference<ListPreference>(
-      getString(R.string.settings_key_incoming_call_action)
-    )
-    val mOpenSource = findPreference<Preference>(getString(R.string.preferences_open_source))
-    val mManager = findPreference<Preference>(
-      resources.getString(R.string.preferences_key_connection_manager)
-    )
-    val mVersion = findPreference<Preference>(resources.getString(R.string.settings_version))
-    val mBuild = findPreference<Preference>(resources.getString(R.string.pref_key_build_time))
-    val mRevision = findPreference<Preference>(resources.getString(R.string.pref_key_revision))
-    val debugLogging = findPreference<CheckBoxPreference>(
-      resources.getString(R.string.settings_key_debug_logging)
-    )
+    val reduceOnIncoming: ListPreference = preference(R.string.settings_key_incoming_call_action)
+    val openSource: Preference = preference(R.string.preferences_open_source)
+    val manager: Preference = preference(R.string.preferences_key_connection_manager)
+    val version: Preference = preference(R.string.settings_version)
+    val mBuild: Preference = preference(R.string.pref_key_build_time)
+    val mRevision: Preference = preference(R.string.pref_key_revision)
+    val debugLogging: CheckBoxPreference = preference(R.string.settings_key_debug_logging)
 
-    debugLogging?.setOnPreferenceChangeListener { _, newValue ->
+    debugLogging.setOnPreferenceChangeListener { _, newValue ->
       if (newValue as Boolean) {
         Timber.plant(FileLoggingTree(requireContext().applicationContext))
       } else {
@@ -53,38 +52,39 @@ class SettingsFragment : PreferenceFragmentCompat() {
       true
     }
 
-    mOpenSource?.setOnPreferenceClickListener {
+    openSource.setOnPreferenceClickListener {
       showOpenSourceLicenseDialog()
       false
     }
 
-    reduceOnIncoming?.setOnPreferenceChangeListener { _, _ ->
+    reduceOnIncoming.setOnPreferenceChangeListener { _, _ ->
       if (!hasPhonePermission()) {
         requestPhoneStatePermission()
       }
       true
     }
 
-    mManager?.setOnPreferenceClickListener {
-      requireView().findNavController().navigate(R.id.action_settingsFragment_to_connectionManagerFragment)
+    manager.setOnPreferenceClickListener {
+      val navController = findNavController()
+      navController.navigate(R.id.action_settingsFragment_to_connectionManagerFragment)
       false
     }
 
     try {
-      val version = getVersion()
-      mVersion?.summary = resources.getString(R.string.settings_version_number, version)
+      val appVersion = getVersion()
+      version.summary = resources.getString(R.string.settings_version_number, appVersion)
     } catch (e: PackageManager.NameNotFoundException) {
       Timber.d(e, "failed")
     }
 
-    val mLicense = findPreference<Preference>(resources.getString(R.string.settings_key_license))
-    mLicense?.setOnPreferenceClickListener {
+    val license: Preference = preference(R.string.settings_key_license)
+    license.setOnPreferenceClickListener {
       showLicenseDialog()
       false
     }
 
-    mBuild?.summary = BuildConfig.BUILD_TIME
-    mRevision?.summary = BuildConfig.GIT_SHA
+    mBuild.summary = BuildConfig.BUILD_TIME
+    mRevision.summary = BuildConfig.GIT_SHA
   }
 
   private fun requestPhoneStatePermission() {

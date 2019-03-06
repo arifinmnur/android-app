@@ -1,16 +1,17 @@
 package com.kelsos.mbrc.content.sync
 
+import arrow.core.Either
+import arrow.core.Try
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
+import com.kelsos.mbrc.content.sync.LibrarySyncUseCase.*
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncedData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class LibrarySyncUseCaseImpl(
@@ -20,61 +21,56 @@ class LibrarySyncUseCaseImpl(
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
   private val metrics: SyncMetrics,
-  dispatchers: AppCoroutineDispatchers,
+  private val dispatchers: AppCoroutineDispatchers,
 ) : LibrarySyncUseCase {
 
   private var running: Boolean = false
-  private var onCompleteListener: LibrarySyncUseCase.OnCompleteListener? = null
-  private var onStartListener: LibrarySyncUseCase.OnStartListener? = null
+  private var onCompleteListener: OnCompleteListener? = null
+  private var onStartListener: OnStartListener? = null
 
-  private val job = SupervisorJob()
-  private val scope = CoroutineScope(job + dispatchers.network)
+  override suspend fun sync(auto: Boolean): Either<Throwable, Boolean> {
 
-  override suspend fun sync(auto: Boolean) {
     if (isRunning()) {
       Timber.v("Sync is already running")
-      return
+      return Either.right(false)
     }
 
     running = true
-    scope.launch {
-      Timber.v("Starting library metadata sync")
-      metrics.librarySyncStarted()
-      onStartListener?.onStart()
+    Timber.v("Starting library metadata sync")
+    metrics.librarySyncStarted()
+    onStartListener?.onStart()
 
-      val shouldSync = checkIfShouldSync(auto)
-      if (!shouldSync) {
-        onCompleteListener?.onTermination()
-        running = false
-        return@launch
-      }
-
-      try {
+    val result: Either<Throwable, Boolean> = if (checkIfShouldSync(auto)) {
+      Try {
         genreRepository.getRemote()
         artistRepository.getRemote()
         albumRepository.getRemote()
         trackRepository.getRemote()
         playlistRepository.getRemote()
 
-        val stats = SyncedData(
-          genres = genreRepository.count(),
-          artists = artistRepository.count(),
-          albums = albumRepository.count(),
-          tracks = trackRepository.count(),
-          playlists = playlistRepository.count()
-        )
-        onCompleteListener?.onSuccess(stats)
-        metrics.librarySyncComplete(stats)
-        running = false
-      } catch (e: Exception) {
-        Timber.e(e, "Refresh couldn't complete")
-        metrics.librarySyncFailed()
-        onCompleteListener?.onFailure(e)
-      } finally {
-        onCompleteListener?.onTermination()
+        onCompleteListener?.onSuccess(syncStats())
+        metrics.librarySyncComplete(syncStats())
+
+        return@Try true
+      }.toEither()
+    } else {
+      Either.right(false)
+    }
+
+    if (result.isLeft()) {
+      metrics.librarySyncFailed()
+    } else {
+      withContext(dispatchers.disk) {
+        metrics.librarySyncComplete(syncStats())
+        onCompleteListener?.onSuccess(syncStats())
       }
     }
+
+    onCompleteListener?.onTermination()
+    running = false
+    return result
   }
+
 
   override suspend fun syncStats(): SyncedData {
     return SyncedData(
@@ -86,9 +82,11 @@ class LibrarySyncUseCaseImpl(
     )
   }
 
-  private suspend fun checkIfShouldSync(auto: Boolean): Boolean {
-    return if (auto) isEmpty() else true
-  }
+  private suspend fun checkIfShouldSync(auto: Boolean): Boolean = if (auto)
+    isEmpty()
+  else
+    true
+
 
   private suspend fun isEmpty(): Boolean {
     return genreRepository.cacheIsEmpty() &&
@@ -97,13 +95,11 @@ class LibrarySyncUseCaseImpl(
       trackRepository.cacheIsEmpty()
   }
 
-  override fun setOnCompleteListener(
-    onCompleteListener: LibrarySyncUseCase.OnCompleteListener?
-  ) {
+  override fun setOnCompleteListener(onCompleteListener: OnCompleteListener?) {
     this.onCompleteListener = onCompleteListener
   }
 
-  override fun setOnStartListener(onStartListener: LibrarySyncUseCase.OnStartListener?) {
+  override fun setOnStartListener(onStartListener: OnStartListener?) {
     this.onStartListener = onStartListener
   }
 

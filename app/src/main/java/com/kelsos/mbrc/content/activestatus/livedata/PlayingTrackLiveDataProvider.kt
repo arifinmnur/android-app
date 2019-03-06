@@ -4,7 +4,6 @@ import com.kelsos.mbrc.content.activestatus.PlayingTrackCache
 import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import kotlinx.coroutines.launch
-
 interface PlayingTrackLiveDataProvider : LiveDataProvider<PlayingTrack>
 
 class PlayingTrackLiveDataProviderImpl(
