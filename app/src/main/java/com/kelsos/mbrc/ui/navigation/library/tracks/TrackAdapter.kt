@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.TrackEntity
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
 
-class TrackEntryAdapter : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CALLBACK) {
+class TrackAdapter : PagedListAdapter<Track, TrackViewHolder>(DIFF_CALLBACK) {
 
-  private var listener: MenuItemSelectedListener<TrackEntity>? = null
+  private var listener: MenuItemSelectedListener<Track>? = null
 
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_track) {
@@ -41,17 +41,17 @@ class TrackEntryAdapter : PagedListAdapter<TrackEntity, TrackViewHolder>(DIFF_CA
     }
   }
 
-  fun setMenuItemSelectedListener(listener: MenuItemSelectedListener<TrackEntity>) {
+  fun setMenuItemSelectedListener(listener: MenuItemSelectedListener<Track>) {
     this.listener = listener
   }
 
   companion object {
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<TrackEntity>() {
-      override fun areItemsTheSame(oldItem: TrackEntity, newItem: TrackEntity): Boolean {
+    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Track>() {
+      override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
         return oldItem.id == newItem.id
       }
 
-      override fun areContentsTheSame(oldItem: TrackEntity, newItem: TrackEntity): Boolean {
+      override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
         return oldItem == newItem
       }
     }

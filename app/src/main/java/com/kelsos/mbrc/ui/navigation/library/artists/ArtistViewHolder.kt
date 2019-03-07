@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.artists.ArtistEntity
+import com.kelsos.mbrc.content.library.artists.Artist
 import com.kelsos.mbrc.ui.BindableViewHolder
 import kotterknife.bindView
 
@@ -14,7 +14,7 @@ class ArtistViewHolder(
   itemView: View,
   indicatorPressed: (View, Int) -> Unit,
   pressed: (View, Int) -> Unit
-) : BindableViewHolder<ArtistEntity>(itemView) {
+) : BindableViewHolder<Artist>(itemView) {
   private val title: TextView by bindView(R.id.line_one)
   private val indicator: ImageView by bindView(R.id.ui_item_context_indicator)
   private val empty: String = itemView.context.getString(R.string.empty)
@@ -36,7 +36,7 @@ class ArtistViewHolder(
     }
   }
 
-  override fun bindTo(item: ArtistEntity) {
+  override fun bindTo(item: Artist) {
     title.text = if (item.artist.isBlank()) {
       empty
     } else {

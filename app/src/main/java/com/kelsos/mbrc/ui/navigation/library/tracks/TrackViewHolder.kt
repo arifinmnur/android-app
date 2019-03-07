@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.TrackEntity
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.ui.BindableViewHolder
 import kotterknife.bindView
@@ -15,7 +15,7 @@ class TrackViewHolder(
   itemView: View,
   indicatorPressed: (view: View, position: Int) -> Unit,
   pressed: (view: View, position: Int) -> Unit
-) : BindableViewHolder<TrackEntity>(itemView) {
+) : BindableViewHolder<Track>(itemView) {
   private val artist: TextView by bindView(R.id.line_two)
   private val title: TextView by bindView(R.id.line_one)
   private val indicator: ImageView by bindView(R.id.overflow_menu)
@@ -31,7 +31,7 @@ class TrackViewHolder(
     title.text = ""
   }
 
-  override fun bindTo(item: TrackEntity) {
+  override fun bindTo(item: Track) {
     title.text = item.title
     artist.text = if (item.artist.isBlank()) unknownArtist else item.artist
   }

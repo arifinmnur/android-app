@@ -13,20 +13,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.artists.ArtistEntity
+import com.kelsos.mbrc.content.library.artists.Artist
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
-import com.kelsos.mbrc.ui.navigation.library.artists.ArtistEntryAdapter
+import com.kelsos.mbrc.ui.navigation.library.artists.ArtistAdapter
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class GenreArtistsFragment : Fragment(), MenuItemSelectedListener<ArtistEntity> {
+class GenreArtistsFragment : Fragment(), MenuItemSelectedListener<Artist> {
 
   private val recyclerView: RecyclerView by bindView(R.id.genre_artists__artist_list)
   private val emptyView: Group by bindView(R.id.genre_artists__empty_view)
 
-  private val adapter: ArtistEntryAdapter by inject()
+  private val adapter: ArtistAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
   private val presenter: GenreArtistsViewModel by inject()
 
@@ -59,21 +59,21 @@ class GenreArtistsFragment : Fragment(), MenuItemSelectedListener<ArtistEntity> 
     }
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: ArtistEntity) {
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: Artist) {
     val action = actionHandler.artistSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
     }
   }
 
-  override fun onItemClicked(item: ArtistEntity) {
+  override fun onItemClicked(item: Artist) {
     val directions = GenreArtistsFragmentDirections.actionGenreArtistsFragmentToArtistAlbumsFragment(
       artist = item.artist
     )
     findNavController(this).navigate(directions)
   }
 
-  fun update(pagedList: PagedList<ArtistEntity>) {
+  fun update(pagedList: PagedList<Artist>) {
     adapter.submitList(pagedList)
   }
 

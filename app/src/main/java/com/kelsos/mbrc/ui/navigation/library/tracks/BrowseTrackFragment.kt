@@ -16,14 +16,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.tracks.TrackEntity
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class BrowseTrackFragment : Fragment(),
-  MenuItemSelectedListener<TrackEntity> {
+  MenuItemSelectedListener<Track> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -31,7 +31,7 @@ class BrowseTrackFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  private val adapter: TrackEntryAdapter by inject()
+  private val adapter: TrackAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
   private val presenter: BrowseTrackViewModel by inject()
 
@@ -73,10 +73,10 @@ class BrowseTrackFragment : Fragment(),
     adapter.setMenuItemSelectedListener(this)
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: TrackEntity) {
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: Track) {
   }
 
-  override fun onItemClicked(item: TrackEntity) {
+  override fun onItemClicked(item: Track) {
   }
 
   fun hideLoading() {

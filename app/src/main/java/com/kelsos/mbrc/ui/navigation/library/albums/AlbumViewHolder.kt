@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.AlbumEntity
+import com.kelsos.mbrc.content.library.albums.Album
 import com.kelsos.mbrc.extensions.string
 import com.kelsos.mbrc.ui.BindableViewHolder
 import kotterknife.bindView
@@ -15,7 +15,7 @@ class AlbumViewHolder(
   itemView: View,
   indicatorPressed: (View, Int) -> Unit,
   pressed: (View, Int) -> Unit
-) : BindableViewHolder<AlbumEntity>(itemView) {
+) : BindableViewHolder<Album>(itemView) {
   private val artist: TextView by bindView(R.id.line_two)
   private val album: TextView by bindView(R.id.line_one)
   private val indicator: ImageView by bindView(R.id.overflow_menu)
@@ -27,7 +27,7 @@ class AlbumViewHolder(
     itemView.setOnClickListener { pressed(it, adapterPosition) }
   }
 
-  override fun bindTo(item: AlbumEntity) {
+  override fun bindTo(item: Album) {
     val title = item.album
     val artist = item.artist
     this.album.text = if (title.isBlank()) emptyAlbum else title

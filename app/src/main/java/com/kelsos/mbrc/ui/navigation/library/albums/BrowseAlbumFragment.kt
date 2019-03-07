@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.AlbumEntity
+import com.kelsos.mbrc.content.library.albums.Album
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
@@ -29,7 +29,7 @@ import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class BrowseAlbumFragment : Fragment(),
-  MenuItemSelectedListener<AlbumEntity> {
+  MenuItemSelectedListener<Album> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -37,8 +37,7 @@ class BrowseAlbumFragment : Fragment(),
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
   private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
-  private val adapter: AlbumEntryAdapter by inject()
-
+  private val adapter: AlbumAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
   private val presenter: BrowseAlbumViewModel by inject()
 
@@ -78,14 +77,14 @@ class BrowseAlbumFragment : Fragment(),
     adapter.setMenuItemSelectedListener(this)
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: AlbumEntity) {
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: Album) {
     val action = actionHandler.albumSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
     }
   }
 
-  override fun onItemClicked(item: AlbumEntity) {
+  override fun onItemClicked(item: Album) {
     val directions = LibraryFragmentDirections.actionLibraryFragmentToAlbumTracksFragment(
       artist = item.artist,
       album = item.album
@@ -93,7 +92,7 @@ class BrowseAlbumFragment : Fragment(),
     findNavController().navigate(directions)
   }
 
-  fun update(pagedList: PagedList<AlbumEntity>) {
+  fun update(pagedList: PagedList<Album>) {
     emptyView.isVisible = pagedList.isEmpty()
     adapter.submitList(pagedList)
   }

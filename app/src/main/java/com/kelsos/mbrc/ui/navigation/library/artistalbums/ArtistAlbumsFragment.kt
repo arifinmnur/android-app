@@ -12,21 +12,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.library.albums.AlbumEntity
+import com.kelsos.mbrc.content.library.albums.Album
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
-import com.kelsos.mbrc.ui.navigation.library.albums.AlbumEntryAdapter
+import com.kelsos.mbrc.ui.navigation.library.albums.AlbumAdapter
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
+class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<Album> {
 
   private val recyclerView: RecyclerView by bindView(R.id.artist_albums__album_list)
   private val emptyView: Group by bindView(R.id.artist_albums__empty_view)
 
   private val actionHandler: PopupActionHandler by inject()
-  private val adapter: AlbumEntryAdapter by inject()
+  private val adapter: AlbumAdapter by inject()
   private val viewModel: ArtistAlbumsViewModel by inject()
 
   private lateinit var artist: String
@@ -58,7 +58,7 @@ class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
     }
   }
 
-  override fun onMenuItemSelected(itemId: Int, item: AlbumEntity) {
+  override fun onMenuItemSelected(itemId: Int, item: Album) {
     val action = actionHandler.albumSelected(itemId)
     if (action == LibraryPopup.PROFILE) {
       onItemClicked(item)
@@ -66,7 +66,7 @@ class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
     }
   }
 
-  override fun onItemClicked(item: AlbumEntity) {
+  override fun onItemClicked(item: Album) {
     val directions = ArtistAlbumsFragmentDirections.actionArtistAlbumsFragmentToAlbumTracksFragment(
         album = item.album,
         artist = item.artist
@@ -74,7 +74,7 @@ class ArtistAlbumsFragment : Fragment(), MenuItemSelectedListener<AlbumEntity> {
     findNavController().navigate(directions)
   }
 
-  fun update(albums: PagedList<AlbumEntity>) {
+  fun update(albums: PagedList<Album>) {
     adapter.submitList(albums)
   }
 

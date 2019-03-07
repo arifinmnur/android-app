@@ -14,20 +14,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.AlbumInfo
-import com.kelsos.mbrc.content.library.tracks.TrackEntity
+import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
-import com.kelsos.mbrc.ui.navigation.library.tracks.TrackEntryAdapter
+import com.kelsos.mbrc.ui.navigation.library.tracks.TrackAdapter
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class AlbumTracksFragment : Fragment(), MenuItemSelectedListener<TrackEntity> {
+class AlbumTracksFragment : Fragment(), MenuItemSelectedListener<Track> {
 
   private val listTracks: RecyclerView by bindView(R.id.album_tracks__track_list)
   private val emptyView: Group by bindView(R.id.album_tracks__empty_view)
   private val playAlbum: FloatingActionButton by bindView(R.id.play_album)
 
-  private val adapter: TrackEntryAdapter by inject()
+  private val adapter: TrackAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
   private val presenter: AlbumTracksViewModel by inject()
 
@@ -65,13 +65,13 @@ class AlbumTracksFragment : Fragment(), MenuItemSelectedListener<TrackEntity> {
     }
   }
 
-  override fun onMenuItemSelected(@IdRes itemId: Int, item: TrackEntity) {
+  override fun onMenuItemSelected(@IdRes itemId: Int, item: Track) {
   }
 
-  override fun onItemClicked(item: TrackEntity) {
+  override fun onItemClicked(item: Track) {
   }
 
-  fun update(pagedList: PagedList<TrackEntity>) {
+  fun update(pagedList: PagedList<Track>) {
     adapter.submitList(pagedList)
   }
 
