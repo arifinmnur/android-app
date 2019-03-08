@@ -1,13 +1,30 @@
 package com.kelsos.mbrc.services
 
+import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
+import com.kelsos.mbrc.TestApplication
+import com.kelsos.mbrc.data.DeserializationAdapter
+import com.kelsos.mbrc.data.DeserializationAdapterImpl
+import com.kelsos.mbrc.data.SerializationAdapter
+import com.kelsos.mbrc.data.SerializationAdapterImpl
+import com.kelsos.mbrc.networking.RequestManager
+import com.kelsos.mbrc.networking.RequestManagerImpl
 import com.kelsos.mbrc.networking.client.ConnectivityVerifier
 import com.kelsos.mbrc.networking.client.ConnectivityVerifierImpl
 import com.kelsos.mbrc.networking.client.SocketMessage
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.protocol.Protocol
+import com.kelsos.mbrc.preferences.ClientInformationModel
+import com.kelsos.mbrc.preferences.ClientInformationModelImpl
+import com.kelsos.mbrc.preferences.ClientInformationStore
+import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.squareup.moshi.Moshi
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -18,8 +35,8 @@ import org.koin.standalone.StandAloneContext.startKoin
 import org.koin.standalone.StandAloneContext.stopKoin
 import org.koin.standalone.inject
 import org.koin.test.KoinTest
-import org.koin.test.declareMock
-import org.mockito.BDDMockito.given
+import org.robolectric.annotation.Config
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -29,9 +46,9 @@ import java.net.ServerSocket
 import java.util.Random
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class ConnectivityVerifierImplTest : KoinTest {
 
   private val port: Int = 46000
@@ -43,7 +60,6 @@ class ConnectivityVerifierImplTest : KoinTest {
   @Before
   fun setUp() {
     startKoin(listOf(testModule))
-    declareMock<ConnectionRepository>()
   }
 
   @After
@@ -61,13 +77,15 @@ class ConnectivityVerifierImplTest : KoinTest {
     val server = ServerSocket(port + random.nextInt(1000))
     val mockSocket = Runnable {
       server.soTimeout = 3000
-      val messageAdapter = moshi.adapter<SocketMessage>(SocketMessage::class.java)
+      val messageAdapter = moshi.adapter(SocketMessage::class.java)
 
       while (true) {
+        Timber.v("Listening on ${server.inetAddress.hostAddress}:${server.localPort}")
         val connection = server.accept()
         val input = InputStreamReader(connection!!.inputStream)
         val inputReader = BufferedReader(input)
         val line = inputReader.readLine()
+        Timber.v("Received a message $line")
 
         val value = messageAdapter.fromJson(line)
 
@@ -109,81 +127,110 @@ class ConnectivityVerifierImplTest : KoinTest {
 
   @Test
   fun testSuccessfulVerification() {
+    val verifier = this.verifier
     val server = startMockServer()
 
-    given(connectionRepository.getDefault()).willAnswer {
+    coEvery { connectionRepository.getDefault() } answers {
       val settings = ConnectionSettingsEntity()
       settings.address = server.inetAddress.hostAddress
       settings.port = server.localPort
-      return@willAnswer settings
+      return@answers settings
     }
 
-    val subscriber = verifier.verify().test()
-    subscriber.awaitTerminalEvent(1, TimeUnit.SECONDS)
-    subscriber.assertComplete()
-    subscriber.assertNoErrors()
-    subscriber.assertValueCount(1)
-    subscriber.assertValue(true)
+    runBlocking { assertThat(verifier.verify()).isTrue() }
   }
 
   @Test
   fun testPrematureDisconnectDuringVerification() {
+    val verifier = this.verifier
     val server = startMockServer(true)
-    given(connectionRepository.getDefault()).willAnswer {
+    coEvery { connectionRepository.getDefault() } answers {
       val settings = ConnectionSettingsEntity()
       settings.address = server.inetAddress.hostAddress
       settings.port = server.localPort
-      return@willAnswer settings
+      return@answers settings
     }
 
-    val subscriber = verifier.verify().test()
-    subscriber.awaitTerminalEvent(1, TimeUnit.SECONDS)
-    subscriber.assertError(RuntimeException::class.java)
+    runBlocking {
+      try {
+        verifier.verify()
+      } catch (e: Exception) {
+        assertThat(e).isInstanceOf(RuntimeException::class.java)
+      }
+    }
   }
 
   @Test
   fun testInvalidPluginResponseVerification() {
+    val verifier = this.verifier
     val server = startMockServer(false, Protocol.ClientNotAllowed)
-    given(connectionRepository.getDefault()).willAnswer {
+    coEvery { connectionRepository.getDefault() } answers {
       val settings = ConnectionSettingsEntity()
       settings.address = server.inetAddress.hostAddress
       settings.port = server.localPort
-      return@willAnswer settings
+      return@answers settings
     }
 
-    val subscriber = verifier.verify().test()
-    subscriber.awaitTerminalEvent(1, TimeUnit.SECONDS)
-    subscriber.assertError(ConnectivityVerifierImpl.NoValidPluginConnection::class.java)
+    runBlocking {
+      try {
+        verifier.verify()
+      } catch (e: Exception) {
+        assertThat(e).isInstanceOf(ConnectivityVerifierImpl.NoValidPluginConnection::class.java)
+      }
+    }
   }
 
   @Test
   fun testVerificationNoConnection() {
+    val verifier = this.verifier
     startMockServer(true)
 
-    given(connectionRepository.getDefault()).willAnswer {
-      return@willAnswer null
+    coEvery { connectionRepository.getDefault() } answers {
+      return@answers null
     }
 
-    val subscriber = verifier.verify().test()
-    subscriber.awaitTerminalEvent(1, TimeUnit.SECONDS)
-    subscriber.assertError(RuntimeException::class.java)
+    runBlocking {
+      try {
+        verifier.verify()
+      } catch (e: Exception) {
+        assertThat(e).isInstanceOf(RuntimeException::class.java)
+      }
+    }
   }
 
   @Test
   fun testVerificationNoJsonPayload() {
+    val verifier = this.verifier
     startMockServer(false, "payload", false)
 
-    given(connectionRepository.getDefault()).willAnswer {
-      return@willAnswer null
+    coEvery { connectionRepository.getDefault() } answers {
+      return@answers null
     }
 
-    val subscriber = verifier.verify().test()
-    subscriber.awaitTerminalEvent(1, TimeUnit.SECONDS)
-    subscriber.assertError(RuntimeException::class.java)
+    runBlocking {
+      try {
+        verifier.verify()
+      } catch (e: Exception) {
+        assertThat(e).isInstanceOf(RuntimeException::class.java)
+      }
+    }
   }
 
   private val testModule = module {
+    val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     single { Moshi.Builder().build() }
+    single { mockk<ConnectionRepository>() }
+    single<ClientInformationStore> { create<ClientInformationStoreImpl>() }
+    single<ClientInformationModel> {
+      ClientInformationModelImpl(
+        PreferenceManager.getDefaultSharedPreferences(
+          appContext
+        )
+      )
+    }
     single<ConnectivityVerifier> { create<ConnectivityVerifierImpl>() }
+    single<SerializationAdapter> { create<SerializationAdapterImpl>() }
+    single<DeserializationAdapter> { create<DeserializationAdapterImpl>() }
+    single<RequestManager> { create<RequestManagerImpl>() }
   }
 }

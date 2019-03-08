@@ -143,7 +143,7 @@ class ConnectionRepositoryTest : KoinTest {
 
       assertThat(repository.getDefault()).isEqualTo(settings)
 
-      repository.default = settings1
+      repository.setDefault(settings1)
 
       assertThat(repository.getDefault()).isEqualTo(settings1)
     }

@@ -32,7 +32,9 @@ class ArtistRepositoryImpl(
       val added = epoch()
       api.getAllPages(Protocol.LibraryBrowseArtists, ArtistDto::class)
         .onCompletion {
-          dao.removePreviousEntries(added)
+          withContext(dispatchers.database) {
+            dao.removePreviousEntries(added)
+          }
         }
         .collect {
           val items = it.map { mapper.map(it).apply { dateAdded = added } }
@@ -43,7 +45,8 @@ class ArtistRepositoryImpl(
     }
   }
 
-  override fun search(term: String): DataSource.Factory<Int, Artist> = dao.search(term).map { entity2model.map(it) }
+  override fun search(term: String): DataSource.Factory<Int, Artist> =
+    dao.search(term).map { entity2model.map(it) }
 
   override fun getAlbumArtistsOnly(): DataSource.Factory<Int, Artist> =
     dao.getAlbumArtists().map { entity2model.map(it) }

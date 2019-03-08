@@ -51,12 +51,13 @@ android {
   }
 
   testOptions {
+    execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    animationsDisabled true
+
     unitTests {
       includeAndroidResources = true
       returnDefaultValues = true
     }
-
-    execution 'ANDROIDX_TEST_ORCHESTRATOR'
   }
 
   compileOptions {
