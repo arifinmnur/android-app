@@ -269,7 +269,7 @@ val appModule = module {
 
   factory { DefaultSettingsModelImpl as DefaultSettingsModel }
   factory { ClientInformationModelImpl as ClientInformationModel }
-  factory { MoveManagerImpl() as MoveManager }
+  factory { create<MoveManagerImpl>() as MoveManager }
 
   factory { SocketActivityChecker() }
   factory { RemoteBroadcastReceiver() }
