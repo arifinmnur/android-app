@@ -3,7 +3,7 @@ package com.kelsos.mbrc.preferences
 import java.util.UUID
 
 class ClientInformationStoreImpl(
-private val model: ClientInformationModel
+  private val model: ClientInformationModel
 ) : ClientInformationStore {
 
   override fun getClientId(): String {
