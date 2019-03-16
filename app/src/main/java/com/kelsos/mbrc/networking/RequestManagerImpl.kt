@@ -72,9 +72,9 @@ class RequestManagerImpl(
       }
     }
 
-  private suspend fun connect(firstMessage: SocketMessage?): Socket {
+  private fun connect(firstMessage: SocketMessage?): Socket {
     val mapper = InetAddressMapper()
-    val connectionSettings = checkNotNull(repository.getDefault())
+    val connectionSettings = checkNotNull(repository.getDefault().orNull())
 
     try {
       val socketAddress = mapper.map(connectionSettings)

@@ -13,7 +13,6 @@ buildscript {
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.36.0'
     classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.3.3'
 
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
     classpath "org.jacoco:org.jacoco.core:0.8.6"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
