@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.ProgressIndicator
@@ -61,6 +62,14 @@ class ConnectionManagerFragment : Fragment(),
     recyclerView.adapter = adapter
     connectionManagerViewModel.settings.nonNullObserver(this) {
       adapter.submitList(it)
+    }
+    connectionManagerViewModel.default.observe(this, Observer {
+      adapter.setDefault(it)
+    })
+    connectionManagerViewModel.discoveryStatus.nonNullObserver(this) {
+      it.getContentIfNotHandled()?.let { status ->
+        onDiscoveryStopped(status)
+      }
     }
   }
 

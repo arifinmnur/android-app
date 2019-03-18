@@ -2,7 +2,7 @@ package com.kelsos.mbrc.ui.navigation.nowplaying
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kelsos.mbrc.TestApplication
-import com.kelsos.mbrc.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers

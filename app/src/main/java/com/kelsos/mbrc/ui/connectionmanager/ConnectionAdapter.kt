@@ -15,7 +15,8 @@ import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.ui.connectionmanager.ConnectionAdapter.ConnectionViewHolder
 import kotterknife.bindView
 
-class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity, ConnectionViewHolder>(
+class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity,
+  ConnectionViewHolder>(
   DIFF_CALLBACK
 ) {
 
@@ -49,7 +50,8 @@ class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity, ConnectionViewHo
   }
 
   override fun onBindViewHolder(holder: ConnectionViewHolder, position: Int) {
-    holder.bind(getItem(holder.adapterPosition), selectionId)
+    val entity = getItem(holder.adapterPosition)
+    holder.bind(entity, default?.id ?: -1)
   }
 
   private fun showPopup(settings: ConnectionSettingsEntity, v: View) {
@@ -70,6 +72,12 @@ class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity, ConnectionViewHo
       true
     }
     popupMenu.show()
+  }
+
+  private var default: ConnectionSettingsEntity? = null
+
+  fun setDefault(default: ConnectionSettingsEntity?) {
+    this.default = default
   }
 
   class ConnectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

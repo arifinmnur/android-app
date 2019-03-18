@@ -1,3 +1,4 @@
+//noinspection GradleDependency
 import java.text.SimpleDateFormat
 
 plugins {
@@ -218,8 +219,8 @@ dependencies {
   implementation 'androidx.preference:preference-ktx:1.1.1'
   implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
-  implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0-rc02'
-  implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-rc02'
+  implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0'
+  implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0'
 
   implementation "androidx.paging:paging-runtime-ktx:2.1.2";
 
@@ -256,14 +257,14 @@ dependencies {
   implementation "androidx.datastore:datastore-core:1.0.0-alpha02"
   implementation "com.google.protobuf:protobuf-javalite:3.14.0"
 
-  def arrow_version = "0.8.2"
-  implementation "io.arrow-kt:arrow-core:$arrow_version"
+  def arrow_version = "0.9.0"
+  implementation "io.arrow-kt:arrow-core-data:$arrow_version"
+  implementation "io.arrow-kt:arrow-core-extensions:$arrow_version"
   implementation "io.arrow-kt:arrow-syntax:$arrow_version"
   implementation "io.arrow-kt:arrow-typeclasses:$arrow_version"
-  implementation "io.arrow-kt:arrow-data:$arrow_version"
-  implementation "io.arrow-kt:arrow-instances-core:$arrow_version"
-  implementation "io.arrow-kt:arrow-instances-data:$arrow_version"
-  kapt "io.arrow-kt:arrow-annotations-processor:$arrow_version"
+  implementation "io.arrow-kt:arrow-extras-data:$arrow_version"
+  implementation "io.arrow-kt:arrow-extras-extensions:$arrow_version"
+  kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 
   debugImplementation "com.squareup.leakcanary:leakcanary-android:2.5"
 

@@ -7,8 +7,6 @@ import com.kelsos.mbrc.content.activestatus.PlayingTrackCache
 import com.kelsos.mbrc.content.activestatus.PlayingTrackCacheImpl
 import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProvider
 import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusLiveDataProviderImpl
-import com.kelsos.mbrc.content.activestatus.livedata.DefaultSettingsLiveDataProvider
-import com.kelsos.mbrc.content.activestatus.livedata.DefaultSettingsLiveDataProviderImpl
 import com.kelsos.mbrc.content.activestatus.livedata.LyricsLiveDataProvider
 import com.kelsos.mbrc.content.activestatus.livedata.LyricsLiveDataProviderImpl
 import com.kelsos.mbrc.content.activestatus.livedata.PlayerStatusLiveDataProvider
@@ -56,14 +54,10 @@ import com.kelsos.mbrc.networking.RequestManagerImpl
 import com.kelsos.mbrc.networking.SocketActivityChecker
 import com.kelsos.mbrc.networking.client.ClientConnectionManager
 import com.kelsos.mbrc.networking.client.IClientConnectionManager
-import com.kelsos.mbrc.networking.client.MessageDeserializer
-import com.kelsos.mbrc.networking.client.MessageDeserializerImpl
 import com.kelsos.mbrc.networking.client.MessageHandler
 import com.kelsos.mbrc.networking.client.MessageHandlerImpl
 import com.kelsos.mbrc.networking.client.MessageQueue
 import com.kelsos.mbrc.networking.client.MessageQueueImpl
-import com.kelsos.mbrc.networking.client.MessageSerializer
-import com.kelsos.mbrc.networking.client.MessageSerializerImpl
 import com.kelsos.mbrc.networking.client.UiMessageQueue
 import com.kelsos.mbrc.networking.client.UiMessageQueueImpl
 import com.kelsos.mbrc.networking.client.UserActionUseCase
@@ -154,8 +148,6 @@ val appModule = module {
   single<NowPlayingRepository> { create<NowPlayingRepositoryImpl>() }
   single<PlaylistRepository> { create<PlaylistRepositoryImpl>() }
 
-  single<MessageSerializer> { create<MessageSerializerImpl>() }
-
   single<SerializationAdapter> { create<SerializationAdapterImpl>() }
   single<DeserializationAdapter> { create<DeserializationAdapterImpl>() }
   single<DatabaseTransactionRunner> { create<DatabaseTransactionRunnerImpl>() }
@@ -185,10 +177,6 @@ val appModule = module {
     create<ConnectionStatusLiveDataProviderImpl>()
   }
 
-  single<DefaultSettingsLiveDataProvider> {
-    create<DefaultSettingsLiveDataProviderImpl>()
-  }
-
   single<LyricsLiveDataProvider> { create<LyricsLiveDataProviderImpl>() }
 
   single<MessageQueue> { create<MessageQueueImpl>() }
@@ -197,7 +185,6 @@ val appModule = module {
 
   single<IClientConnectionManager> { create<ClientConnectionManager>() }
   single<CommandFactory> { create<CommandFactoryImpl>() }
-  single<MessageDeserializer> { create<MessageDeserializerImpl>() }
   single<UiMessageQueue> { create<UiMessageQueueImpl>() }
   single<RemoteServiceDiscovery> { create<RemoteServiceDiscoveryImpl>() }
   single<TrackPositionLiveDataProvider> { create<TrackPositionLiveDataProviderImpl>() }
