@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
@@ -32,7 +31,6 @@ class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
 
   private val emptyView: Group by bindView(R.id.library_browser__empty_group)
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   private val adapter: ArtistAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
@@ -92,9 +90,5 @@ class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
   fun update(pagedList: PagedList<Artist>) {
     emptyView.isVisible = pagedList.isEmpty()
     adapter.submitList(pagedList)
-  }
-
-  fun hideLoading() {
-    emptyViewProgress.isVisible = false
   }
 }

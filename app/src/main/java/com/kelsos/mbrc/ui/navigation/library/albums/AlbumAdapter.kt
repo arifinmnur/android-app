@@ -31,10 +31,10 @@ class AlbumAdapter : PagedListAdapter<Album, AlbumViewHolder>(DIFF_CALLBACK) {
   }
 
   override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
-    val albumEntity = getItem(position)
+    val album = getItem(position)
 
-    if (albumEntity != null) {
-      holder.bindTo(albumEntity)
+    if (album != null) {
+      holder.bindTo(album)
     } else {
       holder.clear()
     }

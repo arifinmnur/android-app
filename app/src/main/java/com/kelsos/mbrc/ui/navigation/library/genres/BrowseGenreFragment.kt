@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
@@ -31,7 +30,6 @@ class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
 
   private val emptyView: Group by bindView(R.id.library_browser__empty_group)
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   private val adapter: GenreEntryAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
@@ -75,8 +73,6 @@ class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
     adapter.setMenuItemSelectedListener(this)
 
     viewModel.genres.nonNullObserver(this) {
-      emptyViewProgress.isVisible = false
-
       emptyView.isVisible = it.isEmpty()
       adapter.submitList(it)
     }

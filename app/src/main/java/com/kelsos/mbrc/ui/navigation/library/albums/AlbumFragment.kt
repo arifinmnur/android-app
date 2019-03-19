@@ -7,7 +7,6 @@ import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
@@ -25,21 +24,20 @@ import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseAlbumFragment : Fragment(),
-  MenuItemSelectedListener<Album> {
+class AlbumFragment : Fragment(), MenuItemSelectedListener<Album> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
   private val emptyView: Group by bindView(R.id.library_browser__empty_group)
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   private val adapter: AlbumAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseAlbumViewModel by inject()
+  private val viewModel: AlbumViewModel by inject()
 
   private lateinit var syncButton: Button
 
@@ -75,6 +73,10 @@ class BrowseAlbumFragment : Fragment(),
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
+    viewModel.albums.nonNullObserver(this) {
+      adapter.submitList(it)
+      emptyView.isVisible = it.isEmpty()
+    }
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: Album) {
@@ -106,9 +108,5 @@ class BrowseAlbumFragment : Fragment(),
     Snackbar.make(recycler, R.string.queue_result__success, Snackbar.LENGTH_SHORT)
       .setText(message)
       .show()
-  }
-
-  fun hideLoading() {
-    emptyViewProgress.isVisible = false
   }
 }

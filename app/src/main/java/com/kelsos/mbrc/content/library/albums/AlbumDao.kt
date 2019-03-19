@@ -14,7 +14,7 @@ interface AlbumDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insert(list: List<AlbumEntity>)
 
-  @Query("select * from album")
+  @Query("select * from album order by album collate nocase asc")
   fun getAll(): DataSource.Factory<Int, AlbumEntity>
 
   @Query("select * from album where album like '%' || :term || '%'")

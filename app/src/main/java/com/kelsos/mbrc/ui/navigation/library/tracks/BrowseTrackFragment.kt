@@ -5,18 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.Track
+import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
 import kotterknife.bindView
@@ -29,7 +28,6 @@ class BrowseTrackFragment : Fragment(),
 
   private val emptyView: Group by bindView(R.id.library_browser__empty_group)
   private val emptyViewTitle: TextView by bindView(R.id.library_browser__text_title)
-  private val emptyViewProgress: ProgressBar by bindView(R.id.library_browser__loading_bar)
 
   private val adapter: TrackAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
@@ -74,12 +72,12 @@ class BrowseTrackFragment : Fragment(),
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: Track) {
+    val action = actionHandler.trackSelected(itemId)
+    if (action == LibraryPopup.PROFILE) {
+      onItemClicked(item)
+    }
   }
 
   override fun onItemClicked(item: Track) {
-  }
-
-  fun hideLoading() {
-    emptyViewProgress.isVisible
   }
 }
