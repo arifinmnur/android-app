@@ -12,7 +12,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -22,10 +21,11 @@ import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryFragmentDirections
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
+class ArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -34,7 +34,7 @@ class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
 
   private val adapter: ArtistAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseArtistViewModel by inject()
+  private val viewModel: ArtistViewModel by inject()
 
   private lateinit var syncButton: Button
 
@@ -71,6 +71,10 @@ class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     adapter.setMenuItemSelectedListener(this)
+    viewModel.artists.nonNullObserver(this) { list ->
+      emptyView.isVisible = list.isEmpty()
+      adapter.submitList(list)
+    }
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: Artist) {
@@ -85,10 +89,5 @@ class BrowseArtistFragment : Fragment(), MenuItemSelectedListener<Artist> {
       item.artist
     )
     findNavController().navigate(directions)
-  }
-
-  fun update(pagedList: PagedList<Artist>) {
-    emptyView.isVisible = pagedList.isEmpty()
-    adapter.submitList(pagedList)
   }
 }
