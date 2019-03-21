@@ -24,7 +24,7 @@ import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
+class GenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -33,7 +33,7 @@ class BrowseGenreFragment : Fragment(), MenuItemSelectedListener<Genre> {
 
   private val adapter: GenreEntryAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val viewModel: BrowseGenreViewModel by inject()
+  private val viewModel: GenreViewModel by inject()
 
   private lateinit var syncButton: Button
 
