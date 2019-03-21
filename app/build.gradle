@@ -58,6 +58,10 @@ android {
     unitTests {
       includeAndroidResources = true
       returnDefaultValues = true
+
+      all {
+        maxHeapSize = "1024m"
+      }
     }
   }
 
@@ -415,4 +419,8 @@ android.applicationVariants.all { variant ->
   if (variant.name != 'play') {
     project.tasks.getByName('process' + variant.name.capitalize() + 'GoogleServices').enabled = false
   }
+}
+
+configurations.all {
+  resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
 }
