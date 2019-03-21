@@ -19,7 +19,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
+import com.kelsos.mbrc.content.sync.SyncResult
 import com.kelsos.mbrc.metrics.SyncedData
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
@@ -34,8 +36,7 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   private var searchClear: MenuItem? = null
   private var pagerAdapter: LibraryPagerAdapter? = null
 
-  private val presenter: LibraryViewModel by inject()
-
+  private val viewModel: LibraryViewModel by inject()
   override fun onQueryTextSubmit(query: String): Boolean {
     val search = query.trim()
     if (search.isNotEmpty()) {
@@ -45,6 +46,14 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
     }
 
     return true
+  }
+
+  private fun onSyncResult(result: Int) {
+    when (result) {
+      SyncResult.NO_OP -> Unit
+      SyncResult.FAILED -> Unit
+      SyncResult.SUCCESS -> Unit
+    }
   }
 
   private fun closeSearch(): Boolean {
@@ -88,8 +97,13 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
         Category.SECTION_TRACK -> getString(R.string.label_tracks)
         else -> throw IllegalArgumentException("invalid position")
       }
-}.attach()
+    }.attach()
+
+    viewModel.events.nonNullObserver(this) { event ->
+      event.getContentIfNotHandled()?.let { onSyncResult(it) }
+    }
   }
+
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.library_search, menu)
@@ -109,13 +123,12 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.library_screen__action_refresh -> {
-        presenter.refresh()
+        viewModel.refresh()
         return true
       }
       R.id.library_album_artist -> {
         albumArtistOnly?.let {
           it.isChecked = !it.isChecked
-          presenter.setArtistPreference(it.isChecked)
         }
 
         return true

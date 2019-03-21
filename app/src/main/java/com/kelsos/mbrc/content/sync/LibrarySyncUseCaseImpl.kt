@@ -1,6 +1,5 @@
 package com.kelsos.mbrc.content.sync
 
-import arrow.core.Either
 import arrow.core.Try
 import com.kelsos.mbrc.content.library.albums.AlbumRepository
 import com.kelsos.mbrc.content.library.artists.ArtistRepository
@@ -25,22 +24,20 @@ class LibrarySyncUseCaseImpl(
 ) : LibrarySyncUseCase {
 
   private var running: Boolean = false
-  private var onCompleteListener: OnCompleteListener? = null
-  private var onStartListener: OnStartListener? = null
 
-  override suspend fun sync(auto: Boolean): Either<Throwable, Boolean> {
+  override suspend fun sync(auto: Boolean): Int {
 
     if (isRunning()) {
       Timber.v("Sync is already running")
-      return Either.right(false)
+      return SyncResult.NO_OP
     }
 
     running = true
     Timber.v("Starting library metadata sync")
-    metrics.librarySyncStarted()
-    onStartListener?.onStart()
 
-    val result: Either<Throwable, Boolean> = if (checkIfShouldSync(auto)) {
+    metrics.librarySyncStarted()
+
+    val result: Int = if (checkIfShouldSync(auto)) {
       Try {
         genreRepository.getRemote()
         artistRepository.getRemote()
@@ -48,25 +45,23 @@ class LibrarySyncUseCaseImpl(
         trackRepository.getRemote()
         playlistRepository.getRemote()
 
-        onCompleteListener?.onSuccess(syncStats())
+
         metrics.librarySyncComplete(syncStats())
 
         return@Try true
-      }.toEither()
+      }.toEither().fold({ SyncResult.FAILED }, { SyncResult.SUCCESS })
     } else {
-      Either.right(false)
+      SyncResult.NO_OP
     }
 
-    if (result.isLeft()) {
+    if (result == SyncResult.FAILED) {
       metrics.librarySyncFailed()
     } else {
       withContext(dispatchers.disk) {
         metrics.librarySyncComplete(syncStats())
-        onCompleteListener?.onSuccess(syncStats())
       }
     }
 
-    onCompleteListener?.onTermination()
     running = false
     return result
   }
@@ -93,14 +88,6 @@ class LibrarySyncUseCaseImpl(
       artistRepository.cacheIsEmpty() &&
       albumRepository.cacheIsEmpty() &&
       trackRepository.cacheIsEmpty()
-  }
-
-  override fun setOnCompleteListener(onCompleteListener: OnCompleteListener?) {
-    this.onCompleteListener = onCompleteListener
-  }
-
-  override fun setOnStartListener(onStartListener: OnStartListener?) {
-    this.onStartListener = onStartListener
   }
 
   override fun isRunning(): Boolean = running

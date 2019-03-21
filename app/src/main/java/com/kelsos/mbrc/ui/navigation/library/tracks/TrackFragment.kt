@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Group
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,11 +19,11 @@ import com.kelsos.mbrc.content.library.tracks.Track
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.PopupActionHandler
+import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class BrowseTrackFragment : Fragment(),
-  MenuItemSelectedListener<Track> {
+class TrackFragment : Fragment(), MenuItemSelectedListener<Track> {
 
   private val recycler: RecyclerView by bindView(R.id.library_browser__content)
 
@@ -31,7 +32,7 @@ class BrowseTrackFragment : Fragment(),
 
   private val adapter: TrackAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
-  private val presenter: BrowseTrackViewModel by inject()
+  private val viewModel: TrackViewModel by inject()
 
   private lateinit var syncButton: Button
 
@@ -69,6 +70,10 @@ class BrowseTrackFragment : Fragment(),
     recycler.layoutManager = LinearLayoutManager(recycler.context)
     recycler.setHasFixedSize(true)
     adapter.setMenuItemSelectedListener(this)
+    viewModel.tracks.nonNullObserver(this) { list ->
+      emptyView.isVisible = list.isEmpty()
+      adapter.submitList(list)
+    }
   }
 
   override fun onMenuItemSelected(@IdRes itemId: Int, item: Track) {
