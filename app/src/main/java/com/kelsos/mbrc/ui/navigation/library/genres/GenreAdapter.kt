@@ -9,7 +9,7 @@ import com.kelsos.mbrc.content.library.genres.Genre
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
 import com.kelsos.mbrc.ui.navigation.library.popup
 
-class GenreEntryAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
+class GenreAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
 
   private var listener: MenuItemSelectedListener<Genre>? = null
 
