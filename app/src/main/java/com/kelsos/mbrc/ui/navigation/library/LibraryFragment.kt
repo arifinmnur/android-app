@@ -110,7 +110,11 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
         )
       )
     }
-    val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+    val layoutManager = LinearLayoutManager(
+      requireContext(),
+      RecyclerView.HORIZONTAL,
+      false
+    )
     pager.layoutManager = layoutManager
     val snapHelper = PagerSnapHelper()
     snapHelper.attachToRecyclerView(pager)
