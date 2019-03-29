@@ -25,11 +25,11 @@ class LibrarySyncUseCaseImpl(
 
   private var running: Boolean = false
 
-  override suspend fun sync(auto: Boolean): Int {
+  override suspend fun sync(auto: Boolean): SyncResult {
 
     if (isRunning()) {
       Timber.v("Sync is already running")
-      return SyncResult.NO_OP
+      return SyncResult.NOOP
     }
 
     running = true
@@ -37,21 +37,17 @@ class LibrarySyncUseCaseImpl(
 
     metrics.librarySyncStarted()
 
-    val result: Int = if (checkIfShouldSync(auto)) {
+    val result: SyncResult = if (checkIfShouldSync(auto)) {
       Try {
         genreRepository.getRemote()
         artistRepository.getRemote()
         albumRepository.getRemote()
         trackRepository.getRemote()
         playlistRepository.getRemote()
-
-
-        metrics.librarySyncComplete(syncStats())
-
         return@Try true
       }.toEither().fold({ SyncResult.FAILED }, { SyncResult.SUCCESS })
     } else {
-      SyncResult.NO_OP
+      SyncResult.NOOP
     }
 
     if (result == SyncResult.FAILED) {

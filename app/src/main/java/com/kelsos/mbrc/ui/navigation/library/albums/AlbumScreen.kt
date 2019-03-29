@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.Album
 import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
+import com.kelsos.mbrc.ui.navigation.library.LibraryResult
 import com.kelsos.mbrc.ui.navigation.library.LibraryScreen
 import com.kelsos.mbrc.ui.navigation.library.LibraryViewHolder
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener
@@ -26,6 +27,19 @@ class AlbumScreen : LibraryScreen,
     viewModel.albums.nonNullObserver(viewLifecycleOwner) {
       adapter.submitList(it)
       viewHolder.refreshingComplete(it.isEmpty())
+    }
+
+    viewModel.emitter.nonNullObserver(viewLifecycleOwner) {
+      it.contentIfNotHandled?.let { result ->
+        when (result) {
+          LibraryResult.RefreshSuccess -> {
+
+          }
+          LibraryResult.RefreshFailure -> {
+
+          }
+        }
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.content.playlists
 
 import androidx.paging.DataSource
+import arrow.core.Try
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
@@ -22,12 +23,14 @@ class PlaylistRepositoryImpl(
   override fun getAll(): DataSource.Factory<Int, Playlist> =
     dao.getAll().map { entity2model.map(it) }
 
-  override suspend fun getRemote() {
+  override suspend fun getRemote(): Try<Unit> = Try {
     withContext(dispatchers.network) {
       val added = epoch()
       api.getAllPages(Protocol.PlaylistList, PlaylistDto::class)
         .onCompletion {
-          dao.removePreviousEntries(added)
+          withContext(dispatchers.database) {
+            dao.removePreviousEntries(added)
+          }
         }.collect { items ->
           val playlists = items.map {
             mapper.map(it).apply {

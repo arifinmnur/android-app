@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.content.library.albums
 
 import androidx.paging.DataSource
+import arrow.core.Try
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
@@ -25,15 +26,19 @@ class AlbumRepositoryImpl(
   override fun getAll(): DataSource.Factory<Int, Album> =
     dao.getAll().map { view2model.map(it) }
 
-  override suspend fun getRemote() {
+  override suspend fun getRemote(): Try<Unit> = Try {
     val added = epoch()
     withContext(dispatchers.network) {
       api.getAllPages(Protocol.LibraryBrowseAlbums, AlbumDto::class)
         .onCompletion {
-          dao.removePreviousEntries(added)
+          withContext(dispatchers.database) {
+            dao.removePreviousEntries(added)
+          }
         }
         .collect {
-          dao.insert(it.map { mapper.map(it) })
+          withContext(dispatchers.database) {
+            dao.insert(it.map { mapper.map(it) })
+          }
         }
     }
   }

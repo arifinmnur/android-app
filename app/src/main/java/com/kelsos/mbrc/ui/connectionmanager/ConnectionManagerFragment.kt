@@ -67,7 +67,7 @@ class ConnectionManagerFragment : Fragment(),
       adapter.setDefault(it)
     })
     connectionManagerViewModel.discoveryStatus.nonNullObserver(this) {
-      it.getContentIfNotHandled()?.let { status ->
+      it.contentIfNotHandled?.let { status ->
         onDiscoveryStopped(status)
       }
     }

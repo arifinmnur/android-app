@@ -1,6 +1,7 @@
 package com.kelsos.mbrc.content.library.artists
 
 import androidx.paging.DataSource
+import arrow.core.Try
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
@@ -27,7 +28,7 @@ class ArtistRepositoryImpl(
 
   override fun getAll(): DataSource.Factory<Int, Artist> = dao.getAll().map { entity2model.map(it) }
 
-  override suspend fun getRemote() {
+  override suspend fun getRemote(): Try<Unit> = Try {
     withContext(dispatchers.network) {
       val added = epoch()
       api.getAllPages(Protocol.LibraryBrowseArtists, ArtistDto::class)
