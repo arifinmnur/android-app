@@ -10,16 +10,17 @@ import android.telephony.TelephonyManager
 import com.kelsos.mbrc.events.UserAction
 import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.protocol.Protocol
-import com.kelsos.mbrc.networking.protocol.VolumeInteractor
+import com.kelsos.mbrc.networking.protocol.VolumeModifyUseCase
 import com.kelsos.mbrc.platform.mediasession.RemoteViewIntentBuilder
 import com.kelsos.mbrc.preferences.SettingsManager
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
+
 class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
 
   private val settingsManager: SettingsManager by inject()
-  private val volumeInteractor: VolumeInteractor by inject()
+  private val volumeModifyUseCase: VolumeModifyUseCase by inject()
   private val userActionUseCase: UserActionUseCase by inject()
 
   /**
@@ -81,7 +82,7 @@ class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
     when (settingsManager.getCallAction()) {
       SettingsManager.PAUSE -> postAction(UserAction(Protocol.PlayerPause, true))
       SettingsManager.STOP -> postAction(UserAction(Protocol.PlayerStop, true))
-      SettingsManager.REDUCE -> volumeInteractor.reduceVolume()
+      SettingsManager.REDUCE -> volumeModifyUseCase.reduceVolume()
     }
   }
 
