@@ -18,13 +18,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.output.OutputSelectionResult
 import com.kelsos.mbrc.features.output.OutputSelectionViewModel
+import com.kelsos.mbrc.utilities.nonNullObserver
 import org.koin.android.ext.android.inject
 
-class OutputSelectionDialog : DialogFragment(),
-  View.OnTouchListener,
-  AdapterView.OnItemSelectedListener {
+class OutputSelectionDialog() : DialogFragment(), View.OnTouchListener {
 
   private var touchInitiated: Boolean = false
   private lateinit var fm: FragmentManager
@@ -34,36 +32,35 @@ class OutputSelectionDialog : DialogFragment(),
   private lateinit var loadingProgress: ProgressBar
   private lateinit var errorMessage: TextView
 
+  private val onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+      if (!touchInitiated) {
+        return
+      }
+
+      val selectedOutput = availableOutputs.adapter.getItem(position) as String
+      viewModel.setOutput(selectedOutput)
+      touchInitiated = false
+    }
+  }
+
   private val viewModel: OutputSelectionViewModel by inject()
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    viewModel.outputs.observe(this) {
+    viewModel.outputs.nonNullObserver(viewLifecycleOwner) {
       update(it)
     }
-    viewModel.selection.observe(this) {
-      val adapter = availableOutputs.adapter as ArrayAdapter<*>
-      for (position in 0 until adapter.count) {
-        if (it == adapter.getItem(position)) {
-          availableOutputs.setSelection(position, false)
-          break
-        }
+    viewModel.selection.nonNullObserver(viewLifecycleOwner) {
+    }
+    viewModel.emitter.nonNullObserver(viewLifecycleOwner) {
+      it.contentIfNotHandled?.let { result ->
+        error(result)
       }
     }
-    viewModel.events.observe(this) {
-      if (it.handled) {
-        return@observe
-      }
-      it.handled = true
-      when (it) {
-        OutputSelectionResult.Success -> {
-          availableOutputs.isVisible = true
-          errorMessage.isInvisible = true
-        }
-        else -> error(it)
-      }
-    }
-    viewModel.reload()
   }
 
   @SuppressLint("InflateParams")
@@ -89,19 +86,6 @@ class OutputSelectionDialog : DialogFragment(),
     return dialog
   }
 
-  override fun onNothingSelected(parent: AdapterView<*>?) {
-  }
-
-  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-    if (!touchInitiated) {
-      return
-    }
-
-    val selectedOutput = availableOutputs.adapter.getItem(position) as String
-    viewModel.setOutput(selectedOutput)
-    touchInitiated = false
-  }
-
   override fun onTouch(view: View?, event: MotionEvent?): Boolean {
     touchInitiated = true
     return view?.performClick() == true
@@ -117,8 +101,7 @@ class OutputSelectionDialog : DialogFragment(),
       data
     )
     availableOutputs.adapter = outputAdapter
-
-    availableOutputs.onItemSelectedListener = this
+    availableOutputs.onItemSelectedListener = onItemSelectedListener
     availableOutputs.setOnTouchListener(this)
     loadingProgress.isVisible = false
     availableOutputs.isVisible = true
@@ -146,7 +129,7 @@ class OutputSelectionDialog : DialogFragment(),
   companion object {
     private const val TAG = "output_selection_dialog"
 
-    fun create(fm: FragmentManager): OutputSelectionDialog {
+    fun instance(fm: FragmentManager): OutputSelectionDialog {
       val dialog = OutputSelectionDialog()
       dialog.fm = fm
       return dialog

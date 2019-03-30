@@ -1,7 +1,8 @@
-package com.kelsos.mbrc.features.output
+package com.kelsos.mbrc.ui.dialogs
 
-sealed class OutputSelectionResult {
-  var handled: Boolean = false
+import com.kelsos.mbrc.ui.UiMessageBase
+
+sealed class OutputSelectionResult : UiMessageBase {
   object Success : OutputSelectionResult()
   object ConnectionError : OutputSelectionResult()
   object UnknownError : OutputSelectionResult()

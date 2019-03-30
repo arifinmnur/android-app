@@ -2,32 +2,26 @@ package com.kelsos.mbrc.features.output
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import arrow.core.Try
 import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputResponse
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
+import com.kelsos.mbrc.ui.BaseViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.net.SocketException
 import java.net.SocketTimeoutException
 
 class OutputSelectionViewModel(
   private val outputApi: OutputApi,
   dispatchers: AppCoroutineDispatchers
-) : ViewModel() {
+) : BaseViewModel<OutputSelectionResult>(dispatchers) {
 
-  private val job = SupervisorJob()
-  private val context = job + dispatchers.main
-  private val scope = CoroutineScope(context)
   private val _outputs: MutableLiveData<List<String>> = MutableLiveData()
   private val _selection: MutableLiveData<String> = MutableLiveData()
-  private val _events: MutableLiveData<OutputSelectionResult> = MutableLiveData()
 
   init {
-    _outputs.postValue(emptyList())
-    _selection.postValue("")
+      _outputs.postValue(emptyList())
+      _selection.postValue("")
   }
 
   val outputs: LiveData<List<String>>
@@ -35,9 +29,6 @@ class OutputSelectionViewModel(
 
   val selection: LiveData<String>
     get() = _selection
-
-  val events: LiveData<OutputSelectionResult>
-    get() = _events
 
   private fun updateState(response: OutputResponse) {
     _outputs.postValue(response.devices)
@@ -52,33 +43,29 @@ class OutputSelectionViewModel(
     }
   }
 
+  private fun Try<OutputResponse>.toResult(): OutputSelectionResult {
+    return toEither().fold({ code(it) }, { OutputSelectionResult.Success })
+  }
+
   fun reload() {
     scope.launch {
-      try {
-        val response = outputApi.getOutputs()
-        updateState(response)
-        _events.postValue(OutputSelectionResult.Success)
-      } catch (e: Exception) {
-        Timber.e(e)
-        _events.postValue(code(e))
-      }
+      val result = Try {
+        outputApi.getOutputs().also {
+          updateState(it)
+        }
+      }.toResult()
+      emit(result)
     }
   }
 
   fun setOutput(output: String) {
     scope.launch {
-      try {
-        val response = outputApi.setOutput(output)
-        updateState(response)
-        _events.postValue(OutputSelectionResult.Success)
-      } catch (e: Exception) {
-        _events.postValue(code(e))
-      }
+      val result = Try {
+        outputApi.setOutput(output).also {
+          updateState(it)
+        }
+      }.toResult()
+      emit(result)
     }
-  }
-
-  override fun onCleared() {
-    job.cancel()
-    super.onCleared()
   }
 }
