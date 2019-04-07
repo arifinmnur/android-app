@@ -75,7 +75,6 @@ class VersionAdapter(private val changeLog: List<ChangeLogEntry>) :
     }
   }
 
-
   override fun getItemCount(): Int {
     return changeLog.size
   }

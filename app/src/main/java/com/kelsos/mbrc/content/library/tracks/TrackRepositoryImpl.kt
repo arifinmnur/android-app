@@ -28,7 +28,7 @@ class TrackRepositoryImpl(
   override fun getAlbumTracks(
     album: String,
     artist: String
-  ): DataSource.Factory<Int, Track>{
+  ): DataSource.Factory<Int, Track> {
     return dao.getAlbumTracks(album, artist).map { entity2model.map(it) }
   }
 

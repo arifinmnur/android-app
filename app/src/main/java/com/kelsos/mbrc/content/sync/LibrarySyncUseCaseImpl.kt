@@ -6,7 +6,6 @@ import com.kelsos.mbrc.content.library.artists.ArtistRepository
 import com.kelsos.mbrc.content.library.genres.GenreRepository
 import com.kelsos.mbrc.content.library.tracks.TrackRepository
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
-import com.kelsos.mbrc.content.sync.LibrarySyncUseCase.*
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncedData
@@ -20,7 +19,7 @@ class LibrarySyncUseCaseImpl(
   private val trackRepository: TrackRepository,
   private val playlistRepository: PlaylistRepository,
   private val metrics: SyncMetrics,
-  private val dispatchers: AppCoroutineDispatchers,
+  private val dispatchers: AppCoroutineDispatchers
 ) : LibrarySyncUseCase {
 
   private var running: Boolean = false
@@ -62,7 +61,6 @@ class LibrarySyncUseCaseImpl(
     return result
   }
 
-
   override suspend fun syncStats(): SyncedData {
     return SyncedData(
       genres = genreRepository.count(),
@@ -77,7 +75,6 @@ class LibrarySyncUseCaseImpl(
     isEmpty()
   else
     true
-
 
   private suspend fun isEmpty(): Boolean {
     return genreRepository.cacheIsEmpty() &&

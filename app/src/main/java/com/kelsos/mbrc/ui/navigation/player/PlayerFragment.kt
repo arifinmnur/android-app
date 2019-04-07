@@ -52,17 +52,17 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     viewModel.playerStatus.observe(this) {
-      //dataBinding.status = it
+      // dataBinding.status = it
       menu?.findItem(R.id.player_screen__action_scrobbling)?.isChecked = it.scrobbling
     }
 
     viewModel.playingTrack.observe(this) {
-      //dataBinding.track = it
+      // dataBinding.track = it
       shareActionProvider?.setShareIntent(getShareIntent())
     }
 
     viewModel.trackPosition.observe(this) {
-      //dataBinding.position = it
+      // dataBinding.position = it
     }
 
     viewModel.trackRating.observe(this) {

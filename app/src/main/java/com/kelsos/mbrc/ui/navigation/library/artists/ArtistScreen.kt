@@ -43,6 +43,5 @@ class ArtistScreen : LibraryScreen,
   }
 
   override fun onItemClicked(item: Artist) {
-
   }
 }

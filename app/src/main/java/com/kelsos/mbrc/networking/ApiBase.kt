@@ -43,7 +43,10 @@ class ApiBase(
         Timber.v("fetching $request offset $offset [$limit]")
         val message = SocketMessage.create(request, range ?: "")
         val response = apiRequestManager.request(connection, message)
-        val socketMessage = deserializationAdapter.objectify<GenericSocketMessage<Page<T>>>(response, type)
+        val socketMessage = deserializationAdapter.objectify<GenericSocketMessage<Page<T>>>(
+          response,
+          type
+        )
 
         Timber.v("duration ${now() - pageStart} ms")
         val page = socketMessage.data

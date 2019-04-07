@@ -43,6 +43,5 @@ class GenreScreen : LibraryScreen,
   }
 
   override fun onItemClicked(item: Genre) {
-
   }
 }

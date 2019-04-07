@@ -38,4 +38,3 @@ class MoveManagerImpl(dispatchers: AppCoroutineDispatchers) : MoveManager {
     }
   }
 }
-

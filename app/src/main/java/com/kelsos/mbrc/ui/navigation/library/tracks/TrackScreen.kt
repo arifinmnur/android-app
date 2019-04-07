@@ -43,6 +43,5 @@ class TrackScreen : LibraryScreen,
   }
 
   override fun onItemClicked(item: Track) {
-
   }
 }

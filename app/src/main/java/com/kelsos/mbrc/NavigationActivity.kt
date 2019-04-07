@@ -190,7 +190,8 @@ class NavigationActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     connectionStatusLiveDataProvider.removeObservers(this)
-    findNavController(R.id.main_navigation_fragment).removeOnDestinationChangedListener(onNavigatedListener)
+    val navController = findNavController(R.id.main_navigation_fragment)
+    navController.removeOnDestinationChangedListener(onNavigatedListener)
     super.onDestroy()
   }
 

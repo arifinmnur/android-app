@@ -15,7 +15,7 @@ import org.koin.standalone.inject
 
 class AlbumScreen : LibraryScreen,
   KoinComponent,
-  MenuItemSelectedListener<Album>{
+  MenuItemSelectedListener<Album> {
 
   private val adapter: AlbumAdapter by inject()
   private val actionHandler: PopupActionHandler by inject()
@@ -33,10 +33,8 @@ class AlbumScreen : LibraryScreen,
       it.contentIfNotHandled?.let { result ->
         when (result) {
           LibraryResult.RefreshSuccess -> {
-
           }
           LibraryResult.RefreshFailure -> {
-
           }
         }
       }
@@ -57,6 +55,5 @@ class AlbumScreen : LibraryScreen,
   }
 
   override fun onItemClicked(item: Album) {
-
   }
 }

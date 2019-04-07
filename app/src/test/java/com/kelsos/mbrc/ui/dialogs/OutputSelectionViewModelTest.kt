@@ -6,11 +6,11 @@ import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.TestApplication
 import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputResponse
+import com.kelsos.mbrc.features.output.OutputSelectionViewModel
 import com.kelsos.mbrc.utils.TestDispatchers
 import com.kelsos.mbrc.utils.observeOnce
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,12 +52,10 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `after reload it should return the output information`() {
-    every { outputApi.getOutputs() } answers {
-      Single.just(
-        OutputResponse(
-          devices = listOf("Output 1", "Output 2"),
-          active = "Output 2"
-        )
+    coEvery { outputApi.getOutputs() } answers {
+      OutputResponse(
+        devices = listOf("Output 1", "Output 2"),
+        active = "Output 2"
       )
     }
 
@@ -75,9 +73,7 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `if there is a socket timeout the emitter should have the proper result`() {
-    every { outputApi.getOutputs() } answers {
-      Single.error(SocketTimeoutException())
-    }
+    coEvery { outputApi.getOutputs() } throws SocketTimeoutException()
 
     viewmodel.reload()
 
@@ -88,9 +84,7 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `if there is a socket exception the emitter should have the proper result`() {
-    every { outputApi.getOutputs() } answers {
-      Single.error(SocketException())
-    }
+    coEvery { outputApi.getOutputs() } throws SocketException()
 
     viewmodel.reload()
 
@@ -101,9 +95,7 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `if there is an exception the emitter should have the proper result`() {
-    every { outputApi.getOutputs() } answers {
-      Single.error(IOException())
-    }
+    coEvery { outputApi.getOutputs() } throws IOException()
 
     viewmodel.reload()
 
@@ -114,12 +106,10 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `if the user changes the output the result should update the live data`() {
-    every { outputApi.setOutput(any()) } answers {
-      Single.just(
-        OutputResponse(
-          devices = listOf("Output 1", "Output 2"),
-          active = "Output 2"
-        )
+    coEvery { outputApi.setOutput(any()) } answers {
+      OutputResponse(
+        devices = listOf("Output 1", "Output 2"),
+        active = "Output 2"
       )
     }
 

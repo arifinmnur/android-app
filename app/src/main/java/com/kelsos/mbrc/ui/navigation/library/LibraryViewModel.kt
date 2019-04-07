@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 
 class LibraryViewModel(
   dispatchers: AppCoroutineDispatchers,
-  private val librarySyncUseCase: LibrarySyncUseCase,
+  private val librarySyncUseCase: LibrarySyncUseCase
 ) : BaseViewModel<SyncResult>(dispatchers) {
 
   fun refresh() {

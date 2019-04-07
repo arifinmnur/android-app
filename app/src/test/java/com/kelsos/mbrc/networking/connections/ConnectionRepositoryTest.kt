@@ -99,7 +99,6 @@ class ConnectionRepositoryTest : KoinTest {
       val settings2 = createSettings("192.167.90.12")
       val settings3 = createSettings("192.167.90.13")
 
-
       repository.save(settings)
       repository.save(settings1)
       repository.save(settings2)
@@ -188,7 +187,6 @@ class ConnectionRepositoryTest : KoinTest {
       val settings1 = createSettings("192.167.90.11")
       val settings2 = createSettings("192.167.90.12")
       val settings3 = createSettings("192.167.90.14")
-
 
       repository.save(settings)
       repository.save(settings1)
