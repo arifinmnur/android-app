@@ -1,4 +1,4 @@
-package com.kelsos.mbrc.ui.navigation.radio
+package com.kelsos.mbrc.features.radio.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.radios.RadioStation
 import com.kelsos.mbrc.extensions.snackbar
-import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter.OnRadioPressedListener
+import com.kelsos.mbrc.features.radio.domain.RadioStation
+import com.kelsos.mbrc.features.radio.presentation.RadioAdapter.OnRadioPressedListener
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
@@ -78,7 +78,7 @@ class RadioFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener, OnRadioP
   }
 
   override fun onRefresh() {
-    presenter.refresh()
+    presenter.reload()
   }
 
   fun radioPlayFailed(error: Throwable?) {

@@ -33,8 +33,6 @@ import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputApiImpl
 import com.kelsos.mbrc.content.playlists.PlaylistRepository
 import com.kelsos.mbrc.content.playlists.PlaylistRepositoryImpl
-import com.kelsos.mbrc.content.radios.RadioRepository
-import com.kelsos.mbrc.content.radios.RadioRepositoryImpl
 import com.kelsos.mbrc.content.sync.LibrarySyncUseCase
 import com.kelsos.mbrc.content.sync.LibrarySyncUseCaseImpl
 import com.kelsos.mbrc.core.IRemoteServiceCore
@@ -46,6 +44,10 @@ import com.kelsos.mbrc.data.DeserializationAdapter
 import com.kelsos.mbrc.data.DeserializationAdapterImpl
 import com.kelsos.mbrc.data.SerializationAdapter
 import com.kelsos.mbrc.data.SerializationAdapterImpl
+import com.kelsos.mbrc.features.radio.presentation.RadioAdapter
+import com.kelsos.mbrc.features.radio.presentation.RadioViewModel
+import com.kelsos.mbrc.features.radio.repository.RadioRepository
+import com.kelsos.mbrc.features.radio.repository.RadioRepositoryImpl
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.ClientConnectionUseCase
 import com.kelsos.mbrc.networking.ClientConnectionUseCaseImpl
@@ -124,8 +126,6 @@ import com.kelsos.mbrc.ui.navigation.nowplaying.MoveManagerImpl
 import com.kelsos.mbrc.ui.navigation.nowplaying.NowPlayingViewModel
 import com.kelsos.mbrc.ui.navigation.player.PlayerViewModel
 import com.kelsos.mbrc.ui.navigation.player.VolumeDialogViewModel
-import com.kelsos.mbrc.ui.navigation.radio.RadioAdapter
-import com.kelsos.mbrc.ui.navigation.radio.RadioViewModel
 import com.kelsos.mbrc.utilities.AppRxSchedulers
 import com.squareup.moshi.Moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
