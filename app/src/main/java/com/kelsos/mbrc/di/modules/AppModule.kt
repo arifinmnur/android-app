@@ -44,6 +44,8 @@ import com.kelsos.mbrc.data.DeserializationAdapter
 import com.kelsos.mbrc.data.DeserializationAdapterImpl
 import com.kelsos.mbrc.data.SerializationAdapter
 import com.kelsos.mbrc.data.SerializationAdapterImpl
+import com.kelsos.mbrc.features.minicontrol.MiniControlFactory
+import com.kelsos.mbrc.features.minicontrol.MiniControlFactoryImpl
 import com.kelsos.mbrc.features.radio.presentation.RadioAdapter
 import com.kelsos.mbrc.features.radio.presentation.RadioViewModel
 import com.kelsos.mbrc.features.radio.repository.RadioRepository
@@ -197,6 +199,7 @@ val appModule = module {
   single<CoverModel> { StoredCoverModel }
 
   single<WidgetUpdater> { create<WidgetUpdaterImpl>() }
+  single<MiniControlFactory> { MiniControlFactoryImpl }
 
   single {
     AppRxSchedulers(
