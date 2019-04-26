@@ -31,8 +31,6 @@ import com.kelsos.mbrc.content.nowplaying.cover.CoverModel
 import com.kelsos.mbrc.content.nowplaying.cover.StoredCoverModel
 import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputApiImpl
-import com.kelsos.mbrc.features.playlists.repository.PlaylistRepository
-import com.kelsos.mbrc.features.playlists.repository.PlaylistRepositoryImpl
 import com.kelsos.mbrc.content.sync.LibrarySyncUseCase
 import com.kelsos.mbrc.content.sync.LibrarySyncUseCaseImpl
 import com.kelsos.mbrc.core.IRemoteServiceCore
@@ -46,6 +44,9 @@ import com.kelsos.mbrc.data.SerializationAdapter
 import com.kelsos.mbrc.data.SerializationAdapterImpl
 import com.kelsos.mbrc.features.minicontrol.MiniControlFactory
 import com.kelsos.mbrc.features.minicontrol.MiniControlFactoryImpl
+import com.kelsos.mbrc.features.playlists.presentation.PlaylistViewModel
+import com.kelsos.mbrc.features.playlists.repository.PlaylistRepository
+import com.kelsos.mbrc.features.playlists.repository.PlaylistRepositoryImpl
 import com.kelsos.mbrc.features.radio.presentation.RadioAdapter
 import com.kelsos.mbrc.features.radio.presentation.RadioViewModel
 import com.kelsos.mbrc.features.radio.repository.RadioRepository
@@ -278,6 +279,7 @@ val uiModule = module {
   viewModel { create<RadioViewModel>() }
   viewModel { create<NowPlayingViewModel>() }
   viewModel { create<LibraryViewModel>() }
+  viewModel { create<PlaylistViewModel>() }
 
   viewModel { create<VolumeDialogViewModel>() }
 
