@@ -1,7 +1,12 @@
-package com.kelsos.mbrc.content.playlists
+package com.kelsos.mbrc.features.playlists.repository
 
 import androidx.paging.DataSource
 import arrow.core.Try
+import com.kelsos.mbrc.features.playlists.domain.Playlist
+import com.kelsos.mbrc.features.playlists.data.PlaylistDao
+import com.kelsos.mbrc.features.playlists.PlaylistDto
+import com.kelsos.mbrc.features.playlists.PlaylistDtoMapper
+import com.kelsos.mbrc.features.playlists.PlaylistEntityMapper
 import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
