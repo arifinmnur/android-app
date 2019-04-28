@@ -1,4 +1,4 @@
-package com.kelsos.mbrc.ui.navigation.nowplaying
+package com.kelsos.mbrc.features.nowplaying.presentation
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.nowplaying.NowPlaying
+import com.kelsos.mbrc.features.nowplaying.domain.NowPlaying
 import com.kelsos.mbrc.ui.BindableViewHolder
 import com.kelsos.mbrc.ui.OnViewItemPressed
 import com.kelsos.mbrc.ui.drag.ItemTouchHelperAdapter
@@ -36,11 +36,13 @@ class NowPlayingAdapter(
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NowPlayingTrackViewHolder {
-    return NowPlayingTrackViewHolder.create(parent, { position ->
-      listener?.onPress(position)
-      playingTrackIndex = position
-      currentTrack = getItem(position)?.path ?: ""
-    }) { holder -> dragStartListener.onStartDrag(holder) }
+    return NowPlayingTrackViewHolder.create(
+      parent,
+      { position ->
+        listener?.onPress(position)
+        playingTrackIndex = position
+        currentTrack = getItem(position)?.path ?: ""
+      }) { holder -> dragStartListener.onStartDrag(holder) }
   }
 
   override fun onBindViewHolder(holder: NowPlayingTrackViewHolder, position: Int) {
@@ -149,7 +151,11 @@ class NowPlayingAdapter(
       ): NowPlayingTrackViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.ui_list_track_item, parent, false)
-        return NowPlayingTrackViewHolder(view, onHolderItemPressed, onDragStart)
+        return NowPlayingTrackViewHolder(
+          view,
+          onHolderItemPressed,
+          onDragStart
+        )
       }
     }
   }

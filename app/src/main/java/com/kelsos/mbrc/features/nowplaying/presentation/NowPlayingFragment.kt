@@ -1,4 +1,4 @@
-package com.kelsos.mbrc.ui.navigation.nowplaying
+package com.kelsos.mbrc.features.nowplaying.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,7 +22,7 @@ import com.kelsos.mbrc.content.library.tracks.PlayingTrack
 import com.kelsos.mbrc.extensions.snackbar
 import com.kelsos.mbrc.ui.drag.OnStartDragListener
 import com.kelsos.mbrc.ui.drag.SimpleItemTouchHelper
-import com.kelsos.mbrc.ui.navigation.nowplaying.NowPlayingAdapter.NowPlayingListener
+import com.kelsos.mbrc.features.nowplaying.presentation.NowPlayingAdapter.NowPlayingListener
 import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
@@ -37,7 +37,11 @@ class NowPlayingFragment : Fragment(),
   private val emptyGroup: Group by bindView(R.id.now_playing__empty_group)
   private val emptyViewProgress: ProgressBar by bindView(R.id.now_playing__loading_bar)
 
-  private val adapter: NowPlayingAdapter by lazy { NowPlayingAdapter(this@NowPlayingFragment) }
+  private val adapter: NowPlayingAdapter by lazy {
+    NowPlayingAdapter(
+      this@NowPlayingFragment
+    )
+  }
 
   private val viewModel: NowPlayingViewModel by inject()
 

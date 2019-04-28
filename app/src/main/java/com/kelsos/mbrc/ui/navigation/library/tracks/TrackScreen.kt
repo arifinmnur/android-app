@@ -3,7 +3,7 @@ package com.kelsos.mbrc.ui.navigation.library.tracks
 import androidx.lifecycle.LifecycleOwner
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.tracks.Track
-import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
+import com.kelsos.mbrc.features.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryScreen
 import com.kelsos.mbrc.ui.navigation.library.LibraryViewHolder
 import com.kelsos.mbrc.ui.navigation.library.MenuItemSelectedListener

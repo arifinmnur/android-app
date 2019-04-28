@@ -1,4 +1,4 @@
-package com.kelsos.mbrc.ui.navigation.nowplaying
+package com.kelsos.mbrc.features.nowplaying.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kelsos.mbrc.TestApplication
@@ -27,7 +27,8 @@ class MoveManagerImplTest {
     database = dispatcher,
     network = dispatcher
   )
-  private val moveManager: MoveManager = MoveManagerImpl(dispatchers)
+  private val moveManager: MoveManager =
+    MoveManagerImpl(dispatchers)
 
   @Before
   fun setUp() {

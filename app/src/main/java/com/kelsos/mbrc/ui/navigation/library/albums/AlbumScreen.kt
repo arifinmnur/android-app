@@ -3,7 +3,7 @@ package com.kelsos.mbrc.ui.navigation.library.albums
 import androidx.lifecycle.LifecycleOwner
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.content.library.albums.Album
-import com.kelsos.mbrc.content.nowplaying.queue.LibraryPopup
+import com.kelsos.mbrc.features.queue.LibraryPopup
 import com.kelsos.mbrc.ui.navigation.library.LibraryResult
 import com.kelsos.mbrc.ui.navigation.library.LibraryScreen
 import com.kelsos.mbrc.ui.navigation.library.LibraryViewHolder
