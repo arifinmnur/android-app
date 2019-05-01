@@ -18,7 +18,9 @@ import kotlinx.coroutines.withContext
 
 interface NowPlayingRepository : Repository<NowPlaying> {
 
-  fun move(from: Int, to: Int)
+  suspend fun move(from: Int, to: Int)
+  suspend fun remove(position: Int)
+  suspend fun findPosition(query: String): Int
 }
 
 class NowPlayingRepositoryImpl(
@@ -37,9 +39,9 @@ class NowPlayingRepositoryImpl(
     val added = epoch()
     withContext(dispatchers.network) {
       api.getAllPages(
-      Protocol.NowPlayingList,
-      NowPlayingDto::class
-    )
+        Protocol.NowPlayingList,
+        NowPlayingDto::class
+      )
         .onCompletion {
           withContext(dispatchers.database) {
             dao.removePreviousEntries(added)
@@ -59,10 +61,18 @@ class NowPlayingRepositoryImpl(
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) {
-    dao.count() == 0L
+      dao.count() == 0L
+    }
+
+  override suspend fun move(from: Int, to: Int) = withContext(dispatchers.database) {
+    dao.move(from, to)
   }
 
-  override fun move(from: Int, to: Int) {
-    TODO("implement move")
+  override suspend fun remove(position: Int) = withContext(dispatchers.database) {
+    dao.remove(position)
+  }
+
+  override suspend fun findPosition(query: String): Int = withContext(dispatchers.database) {
+    return@withContext dao.findPositionByQuery(query) ?: -1
   }
 }
