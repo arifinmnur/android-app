@@ -194,7 +194,7 @@ dependencies {
   androidTestUtil 'com.linkedin.testbutler:test-butler-app:2.0.0@apk'
 
   // Test dependencies
-  testImplementation 'org.koin:koin-test:1.0.2'
+  testImplementation 'org.koin:koin-test:2.0.1'
 
   testImplementation "androidx.test:runner:1.1.1"
   testImplementation "androidx.test.ext:junit:1.1.0"
@@ -244,9 +244,11 @@ dependencies {
   implementation 'com.squareup.moshi:moshi:1.11.0'
   kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
 
-  implementation 'org.koin:koin-android:1.0.2'
-  implementation 'org.koin:koin-androidx-scope:1.0.2'
-  implementation 'org.koin:koin-androidx-viewmodel:1.0.2'
+  implementation "org.koin:koin-core-ext:2.0.1"
+  implementation 'org.koin:koin-android:2.0.1'
+  implementation 'org.koin:koin-androidx-ext:2.0.1'
+  implementation 'org.koin:koin-androidx-scope:2.0.1'
+  implementation 'org.koin:koin-androidx-viewmodel:2.0.1'
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
