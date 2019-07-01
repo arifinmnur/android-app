@@ -264,7 +264,7 @@ val appModule = module {
 
   single<SharedPreferences> { PreferenceManager.getDefaultSharedPreferences(get()) }
 
-  factoryBy<DefaultSettingsModel, DefaultSettingsModelImpl>()
+  factory<DefaultSettingsModel> { DefaultSettingsModelImpl }
   factoryBy<ClientInformationModel, ClientInformationModelImpl>()
   factoryBy<MoveManager, MoveManagerImpl>()
 

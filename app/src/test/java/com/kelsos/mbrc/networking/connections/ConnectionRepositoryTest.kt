@@ -25,7 +25,6 @@ import org.junit.runner.RunWith
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import org.koin.experimental.builder.factoryBy
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
@@ -328,6 +327,6 @@ class ConnectionRepositoryTest : KoinTest {
       resources
     }
     single { connectionDao }
-    factoryBy<DefaultSettingsModel, DefaultSettingsModelImpl>()
+    factory<DefaultSettingsModel> { DefaultSettingsModelImpl }
   }
 }
