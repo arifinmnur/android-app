@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import arrow.core.Option
-import com.kelsos.mbrc.TestApplication
 import com.kelsos.mbrc.data.DeserializationAdapter
 import com.kelsos.mbrc.data.DeserializationAdapterImpl
 import com.kelsos.mbrc.data.SerializationAdapter
@@ -33,7 +32,6 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import org.robolectric.annotation.Config
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -46,7 +44,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
 class ConnectivityVerifierImplTest : KoinTest {
 
   private val port: Int = 46000

@@ -8,7 +8,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.kelsos.mbrc.TestApplication
 import com.kelsos.mbrc.data.Database
 import com.kelsos.mbrc.networking.discovery.RemoteServiceDiscovery
 import com.kelsos.mbrc.utils.observeOnce
@@ -28,11 +27,9 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import org.robolectric.annotation.Config
 import java.util.ArrayList
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
 class ConnectionRepositoryTest : KoinTest {
 
   private val repository: ConnectionRepository by inject()

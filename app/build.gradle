@@ -286,9 +286,9 @@ dependencies {
   implementation "io.arrow-kt:arrow-effects-rx2-data:$arrow_version" //optional
   implementation "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
 
-  kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+  kapt "io.arrow-kt:arrow-meta:$arrow_version"
 
-  debugImplementation("androidx.fragment:fragment-testing:1.1.0-beta01") {
+  debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc04") {
     exclude group: 'androidx.test', module: 'core'
   }
   debugImplementation "com.squareup.leakcanary:leakcanary-android:2.5"
