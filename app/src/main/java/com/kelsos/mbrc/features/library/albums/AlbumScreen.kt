@@ -2,12 +2,11 @@ package com.kelsos.mbrc.features.library.albums
 
 import androidx.lifecycle.LifecycleOwner
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.queue.LibraryPopup
-import com.kelsos.mbrc.features.library.LibraryResult
 import com.kelsos.mbrc.features.library.LibraryScreen
 import com.kelsos.mbrc.features.library.LibraryViewHolder
 import com.kelsos.mbrc.features.library.MenuItemSelectedListener
 import com.kelsos.mbrc.features.library.PopupActionHandler
+import com.kelsos.mbrc.features.queue.LibraryPopup
 import com.kelsos.mbrc.utilities.nonNullObserver
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -26,17 +25,6 @@ class AlbumScreen : LibraryScreen,
     viewModel.albums.nonNullObserver(viewLifecycleOwner) {
       adapter.submitList(it)
       viewHolder.refreshingComplete(it.isEmpty())
-    }
-
-    viewModel.emitter.nonNullObserver(viewLifecycleOwner) {
-      it.contentIfNotHandled?.let { result ->
-        when (result) {
-          LibraryResult.RefreshSuccess -> {
-          }
-          LibraryResult.RefreshFailure -> {
-          }
-        }
-      }
     }
   }
 

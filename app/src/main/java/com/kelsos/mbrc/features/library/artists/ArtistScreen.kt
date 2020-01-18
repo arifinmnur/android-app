@@ -2,11 +2,11 @@ package com.kelsos.mbrc.features.library.artists
 
 import androidx.lifecycle.LifecycleOwner
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.queue.LibraryPopup
 import com.kelsos.mbrc.features.library.LibraryScreen
 import com.kelsos.mbrc.features.library.LibraryViewHolder
 import com.kelsos.mbrc.features.library.MenuItemSelectedListener
 import com.kelsos.mbrc.features.library.PopupActionHandler
+import com.kelsos.mbrc.features.queue.LibraryPopup
 import com.kelsos.mbrc.utilities.nonNullObserver
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -23,7 +23,7 @@ class ArtistScreen : LibraryScreen,
 
   override fun bind(viewHolder: LibraryViewHolder) {
     this.viewHolder = viewHolder
-    viewHolder.setup(R.string.albums_list_empty, adapter)
+    viewHolder.setup(R.string.artists_list_empty, adapter)
     adapter.setMenuItemSelectedListener(this)
   }
 

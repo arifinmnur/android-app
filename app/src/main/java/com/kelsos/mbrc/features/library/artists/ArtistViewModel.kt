@@ -8,7 +8,7 @@ import com.kelsos.mbrc.ui.BaseViewModel
 import com.kelsos.mbrc.utilities.paged
 
 class ArtistViewModel(
-  private val repository: ArtistRepository,
+  repository: ArtistRepository,
   dispatchers: AppCoroutineDispatchers
 ) : BaseViewModel<LibraryResult>(dispatchers) {
   val artists: LiveData<PagedList<Artist>> = repository.getAll().paged()
