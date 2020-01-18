@@ -3,7 +3,7 @@ package com.kelsos.mbrc.networking.connections
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import arrow.core.Option
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.discovery.DiscoveryStop
 import com.kelsos.mbrc.networking.discovery.RemoteServiceDiscovery
 import kotlinx.coroutines.withContext

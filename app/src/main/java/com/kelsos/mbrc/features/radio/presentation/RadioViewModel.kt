@@ -3,12 +3,12 @@ package com.kelsos.mbrc.features.radio.presentation
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import arrow.core.Try
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.paged
 import com.kelsos.mbrc.features.radio.domain.RadioStation
 import com.kelsos.mbrc.features.radio.repository.RadioRepository
 import com.kelsos.mbrc.helper.QueueHandler
 import com.kelsos.mbrc.ui.BaseViewModel
-import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.launch
 
 class RadioViewModel(

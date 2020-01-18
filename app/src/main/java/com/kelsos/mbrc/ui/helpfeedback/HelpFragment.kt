@@ -9,7 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.utilities.RemoteUtils.getVersion
+import com.kelsos.mbrc.common.utilities.RemoteUtils.getVersion
 import timber.log.Timber
 
 class HelpFragment : Fragment() {

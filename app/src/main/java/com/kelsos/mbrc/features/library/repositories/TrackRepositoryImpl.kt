@@ -2,7 +2,8 @@ package com.kelsos.mbrc.features.library.repositories
 
 import androidx.paging.DataSource
 import arrow.core.Try
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.epoch
 import com.kelsos.mbrc.features.library.data.Track
 import com.kelsos.mbrc.features.library.data.TrackDao
 import com.kelsos.mbrc.features.library.data.TrackEntityMapper
@@ -10,7 +11,6 @@ import com.kelsos.mbrc.features.library.dto.TrackDto
 import com.kelsos.mbrc.features.library.dto.TrackDtoMapper
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
-import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext

@@ -3,7 +3,7 @@ package com.kelsos.mbrc.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.events.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

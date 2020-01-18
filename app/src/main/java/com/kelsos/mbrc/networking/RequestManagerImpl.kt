@@ -1,8 +1,8 @@
 package com.kelsos.mbrc.networking
 
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.data.DeserializationAdapter
 import com.kelsos.mbrc.data.SerializationAdapter
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.client.SocketMessage
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.InetAddressMapper

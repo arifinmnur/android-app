@@ -1,4 +1,4 @@
-package com.kelsos.mbrc.di.modules
+package com.kelsos.mbrc.common.utilities
 
 import kotlinx.coroutines.CoroutineDispatcher
 

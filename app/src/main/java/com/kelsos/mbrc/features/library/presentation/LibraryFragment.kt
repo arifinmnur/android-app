@@ -19,13 +19,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.content.sync.SyncResult
+import com.kelsos.mbrc.common.utilities.nonNullObserver
 import com.kelsos.mbrc.features.library.presentation.screens.AlbumScreen
 import com.kelsos.mbrc.features.library.presentation.screens.ArtistScreen
 import com.kelsos.mbrc.features.library.presentation.screens.GenreScreen
 import com.kelsos.mbrc.features.library.presentation.screens.TrackScreen
+import com.kelsos.mbrc.features.library.sync.SyncResult
 import com.kelsos.mbrc.metrics.SyncedData
-import com.kelsos.mbrc.utilities.nonNullObserver
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 

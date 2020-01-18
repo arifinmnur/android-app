@@ -2,8 +2,9 @@ package com.kelsos.mbrc.features.nowplaying.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.paged
 import com.kelsos.mbrc.content.activestatus.livedata.PlayingTrackState
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.features.nowplaying.domain.MoveManager
 import com.kelsos.mbrc.features.nowplaying.domain.NowPlaying
 import com.kelsos.mbrc.features.nowplaying.repository.NowPlayingRepository
@@ -13,7 +14,6 @@ import com.kelsos.mbrc.networking.client.playTrack
 import com.kelsos.mbrc.networking.client.removeTrack
 import com.kelsos.mbrc.networking.protocol.NowPlayingMoveRequest
 import com.kelsos.mbrc.ui.BaseViewModel
-import com.kelsos.mbrc.utilities.paged
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

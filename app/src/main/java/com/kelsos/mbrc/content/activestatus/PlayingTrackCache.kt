@@ -3,8 +3,8 @@ package com.kelsos.mbrc.content.activestatus
 import android.app.Application
 import androidx.datastore.DataStore
 import androidx.datastore.createDataStore
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.features.library.PlayingTrack
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.store.Store
 import com.kelsos.mbrc.store.StoreSerializer
 import com.kelsos.mbrc.store.Track

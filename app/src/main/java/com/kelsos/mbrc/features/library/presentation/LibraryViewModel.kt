@@ -1,8 +1,8 @@
 package com.kelsos.mbrc.features.library.presentation
 
-import com.kelsos.mbrc.content.sync.LibrarySyncUseCase
-import com.kelsos.mbrc.content.sync.SyncResult
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.features.library.sync.LibrarySyncUseCase
+import com.kelsos.mbrc.features.library.sync.SyncResult
 import com.kelsos.mbrc.ui.BaseViewModel
 import kotlinx.coroutines.launch
 

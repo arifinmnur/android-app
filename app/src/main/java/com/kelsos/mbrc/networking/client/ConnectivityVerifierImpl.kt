@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.networking.client
 
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.data.DeserializationAdapter
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.networking.RequestManager
 import com.kelsos.mbrc.networking.protocol.Protocol
 import kotlinx.coroutines.withContext

@@ -2,7 +2,8 @@ package com.kelsos.mbrc.features.library.repositories
 
 import androidx.paging.DataSource
 import arrow.core.Try
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
+import com.kelsos.mbrc.common.utilities.epoch
 import com.kelsos.mbrc.features.library.data.Artist
 import com.kelsos.mbrc.features.library.data.ArtistDao
 import com.kelsos.mbrc.features.library.data.ArtistEntityMapper
@@ -10,7 +11,6 @@ import com.kelsos.mbrc.features.library.dto.ArtistDto
 import com.kelsos.mbrc.features.library.dto.ArtistDtoMapper
 import com.kelsos.mbrc.networking.ApiBase
 import com.kelsos.mbrc.networking.protocol.Protocol
-import com.kelsos.mbrc.utilities.epoch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
@@ -22,8 +22,7 @@ class ArtistRepositoryImpl(
 ) : ArtistRepository {
 
   private val mapper = ArtistDtoMapper()
-  private val entity2model =
-    ArtistEntityMapper()
+  private val entity2model = ArtistEntityMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) {
     dao.count()

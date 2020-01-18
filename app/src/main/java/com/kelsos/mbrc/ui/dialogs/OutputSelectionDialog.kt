@@ -18,11 +18,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kelsos.mbrc.R
+import com.kelsos.mbrc.common.utilities.nonNullObserver
 import com.kelsos.mbrc.features.output.OutputSelectionViewModel
-import com.kelsos.mbrc.utilities.nonNullObserver
 import org.koin.android.ext.android.inject
 
-class OutputSelectionDialog() : DialogFragment(), View.OnTouchListener {
+class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
 
   private var touchInitiated: Boolean = false
   private lateinit var fm: FragmentManager

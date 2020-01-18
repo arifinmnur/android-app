@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.core.net.toUri
 import com.kelsos.mbrc.common.ui.extensions.md5
+import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.activestatus.PlayerStatus
 import com.kelsos.mbrc.content.activestatus.PlayingPosition
@@ -14,7 +15,6 @@ import com.kelsos.mbrc.content.activestatus.livedata.PlayerStatusState
 import com.kelsos.mbrc.content.activestatus.livedata.PlayingTrackState
 import com.kelsos.mbrc.content.activestatus.livedata.TrackPositionState
 import com.kelsos.mbrc.content.activestatus.livedata.TrackRatingState
-import com.kelsos.mbrc.di.modules.AppCoroutineDispatchers
 import com.kelsos.mbrc.events.ShuffleMode
 import com.kelsos.mbrc.features.lyrics.LyricsPayload
 import com.kelsos.mbrc.features.lyrics.LyricsState
