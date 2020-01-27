@@ -53,4 +53,8 @@ class AlbumRepositoryImpl(
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }
+
+  override suspend fun getById(id: Int): Album? {
+    TODO("Not yet implemented")
+  }
 }

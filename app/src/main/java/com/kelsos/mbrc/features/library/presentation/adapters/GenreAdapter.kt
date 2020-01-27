@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.library.data.Genre
-import com.kelsos.mbrc.features.library.presentation.viewholders.GenreViewHolder
 import com.kelsos.mbrc.features.library.MenuItemSelectedListener
+import com.kelsos.mbrc.features.library.data.Genre
 import com.kelsos.mbrc.features.library.popup
+import com.kelsos.mbrc.features.library.presentation.viewholders.GenreViewHolder
 
 class GenreAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
 

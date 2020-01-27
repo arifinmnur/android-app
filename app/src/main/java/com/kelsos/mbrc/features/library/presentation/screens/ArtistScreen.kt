@@ -9,7 +9,7 @@ import com.kelsos.mbrc.features.library.data.Artist
 import com.kelsos.mbrc.features.library.presentation.LibraryViewHolder
 import com.kelsos.mbrc.features.library.presentation.adapters.ArtistAdapter
 import com.kelsos.mbrc.features.library.presentation.viewmodels.ArtistViewModel
-import com.kelsos.mbrc.features.queue.LibraryPopup
+import com.kelsos.mbrc.features.queue.Queue
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -38,7 +38,7 @@ class ArtistScreen : LibraryScreen,
 
   override fun onMenuItemSelected(itemId: Int, item: Artist) {
     val action = actionHandler.genreSelected(itemId)
-    if (action === LibraryPopup.PROFILE) {
+    if (action === Queue.DEFAULT) {
       onItemClicked(item)
     }
   }

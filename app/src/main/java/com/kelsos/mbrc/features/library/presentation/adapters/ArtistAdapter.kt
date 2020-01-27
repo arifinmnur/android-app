@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.library.data.Artist
-import com.kelsos.mbrc.features.library.presentation.viewholders.ArtistViewHolder
 import com.kelsos.mbrc.features.library.MenuItemSelectedListener
+import com.kelsos.mbrc.features.library.data.Artist
 import com.kelsos.mbrc.features.library.popup
+import com.kelsos.mbrc.features.library.presentation.viewholders.ArtistViewHolder
 
 class ArtistAdapter : PagedListAdapter<Artist, ArtistViewHolder>(DIFF_CALLBACK) {
 

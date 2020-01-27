@@ -241,6 +241,11 @@ dependencies {
   implementation "androidx.room:room-ktx:2.2.6"
   kapt 'androidx.room:room-compiler:2.2.6'
 
+  def work_version = "2.3.0"
+
+  implementation "androidx.work:work-runtime:$work_version"
+  implementation "androidx.work:work-runtime-ktx:$work_version"
+
   implementation 'com.squareup.moshi:moshi:1.11.0'
   kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
 
@@ -288,7 +293,7 @@ dependencies {
 
   kapt "io.arrow-kt:arrow-meta:$arrow_version"
 
-  debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc04") {
+  debugImplementation("androidx.fragment:fragment-testing:1.2.0") {
     exclude group: 'androidx.test', module: 'core'
   }
   debugImplementation "com.squareup.leakcanary:leakcanary-android:2.5"

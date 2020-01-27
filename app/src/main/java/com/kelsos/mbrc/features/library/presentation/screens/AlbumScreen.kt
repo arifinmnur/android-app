@@ -9,7 +9,7 @@ import com.kelsos.mbrc.features.library.data.Album
 import com.kelsos.mbrc.features.library.presentation.LibraryViewHolder
 import com.kelsos.mbrc.features.library.presentation.adapters.AlbumAdapter
 import com.kelsos.mbrc.features.library.presentation.viewmodels.AlbumViewModel
-import com.kelsos.mbrc.features.queue.LibraryPopup
+import com.kelsos.mbrc.features.queue.Queue
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -38,7 +38,7 @@ class AlbumScreen : LibraryScreen,
 
   override fun onMenuItemSelected(itemId: Int, item: Album) {
     val action = actionHandler.genreSelected(itemId)
-    if (action === LibraryPopup.PROFILE) {
+    if (action === Queue.DEFAULT) {
       onItemClicked(item)
     }
   }

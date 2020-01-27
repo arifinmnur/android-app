@@ -54,4 +54,8 @@ class PlaylistRepositoryImpl(
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }
+
+  override suspend fun getById(id: Int): Playlist? {
+    TODO("Not yet implemented")
+  }
 }
