@@ -7,8 +7,8 @@ import com.kelsos.mbrc.R
 import com.kelsos.mbrc.common.utilities.RemoteUtils.getVersionCode
 import com.kelsos.mbrc.logging.FileLoggingTree
 import com.kelsos.mbrc.preferences.SettingsManager.Companion.NONE
-import timber.log.Timber
 import java.util.Date
+import timber.log.Timber
 
 class SettingsManagerImpl(
   private val context: Application,

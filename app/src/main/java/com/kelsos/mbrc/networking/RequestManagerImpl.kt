@@ -9,11 +9,11 @@ import com.kelsos.mbrc.networking.connections.InetAddressMapper
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.networking.protocol.ProtocolPayload
 import com.kelsos.mbrc.preferences.ClientInformationStore
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.IOException
 import java.net.Socket
 import java.nio.charset.Charset
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class RequestManagerImpl(
   private val serializationAdapter: SerializationAdapter,

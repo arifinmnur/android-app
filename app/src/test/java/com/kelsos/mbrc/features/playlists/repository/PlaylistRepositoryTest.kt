@@ -19,6 +19,7 @@ import com.kelsos.mbrc.utils.observeOnce
 import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
+import java.net.SocketTimeoutException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.test.runBlockingTest
@@ -33,7 +34,6 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import java.net.SocketTimeoutException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

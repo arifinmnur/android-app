@@ -33,4 +33,7 @@ interface AlbumDao {
         """
   )
   fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, AlbumEntity>
+
+  @Query("select * from album where id = :id")
+  fun getById(id: Long): AlbumEntity?
 }

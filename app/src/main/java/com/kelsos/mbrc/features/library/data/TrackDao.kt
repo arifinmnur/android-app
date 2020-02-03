@@ -66,4 +66,7 @@ interface TrackDao {
 
   @Update
   fun update(data: List<TrackEntity>)
+
+  @Query("select * from track where id = :id")
+  fun getById(id: Long): TrackEntity?
 }

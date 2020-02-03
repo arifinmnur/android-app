@@ -21,21 +21,17 @@ class ArtistRepositoryImpl(
   private val dispatchers: AppCoroutineDispatchers
 ) : ArtistRepository {
 
-  private val mapper = ArtistDtoMapper()
-  private val entity2model = ArtistEntityMapper()
+  private val dtoMapper = ArtistDtoMapper()
+  private val entityMapper = ArtistEntityMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) {
     dao.count()
   }
 
   override fun getArtistByGenre(genre: String): DataSource.Factory<Int, Artist> =
-    dao.getArtistByGenre(genre).map {
-      entity2model.map(
-        it
-      )
-    }
+    dao.getArtistByGenre(genre).map { entityMapper.map(it) }
 
-  override fun getAll(): DataSource.Factory<Int, Artist> = dao.getAll().map { entity2model.map(it) }
+  override fun getAll(): DataSource.Factory<Int, Artist> = dao.getAll().map { entityMapper.map(it) }
 
   override suspend fun getRemote(): Try<Unit> = Try {
     withContext(dispatchers.network) {
@@ -47,7 +43,7 @@ class ArtistRepositoryImpl(
           }
         }
         .collect {
-          val items = it.map { mapper.map(it).apply { dateAdded = added } }
+          val items = it.map { dtoMapper.map(it).apply { dateAdded = added } }
           withContext(dispatchers.database) {
             dao.insertAll(items)
           }
@@ -56,16 +52,19 @@ class ArtistRepositoryImpl(
   }
 
   override fun search(term: String): DataSource.Factory<Int, Artist> =
-    dao.search(term).map { entity2model.map(it) }
+    dao.search(term).map { entityMapper.map(it) }
 
   override fun getAlbumArtistsOnly(): DataSource.Factory<Int, Artist> =
-    dao.getAlbumArtists().map { entity2model.map(it) }
+    dao.getAlbumArtists().map { entityMapper.map(it) }
 
   override suspend fun cacheIsEmpty(): Boolean = withContext(dispatchers.database) {
     dao.count() == 0L
   }
 
-  override suspend fun getById(id: Int): Artist? {
-    TODO("Not yet implemented")
+  override suspend fun getById(id: Long): Artist? {
+    return withContext(dispatchers.database) {
+      val entity = dao.getById(id) ?: return@withContext null
+      return@withContext entityMapper.map(entity)
+    }
   }
 }

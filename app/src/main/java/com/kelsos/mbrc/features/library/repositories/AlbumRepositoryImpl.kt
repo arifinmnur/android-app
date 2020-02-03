@@ -20,16 +20,16 @@ class AlbumRepositoryImpl(
   private val api: ApiBase,
   private val dispatchers: AppCoroutineDispatchers
 ) : AlbumRepository {
-  private val mapper = AlbumDtoMapper()
-  private val view2model = AlbumEntityMapper()
+  private val dtoMapper = AlbumDtoMapper()
+  private val entityMapper = AlbumEntityMapper()
 
   override suspend fun count(): Long = withContext(dispatchers.database) { dao.count() }
 
   override fun getAlbumsByArtist(artist: String): DataSource.Factory<Int, Album> =
-    dao.getAlbumsByArtist(artist).map { view2model.map(it) }
+    dao.getAlbumsByArtist(artist).map { entityMapper.map(it) }
 
   override fun getAll(): DataSource.Factory<Int, Album> =
-    dao.getAll().map { view2model.map(it) }
+    dao.getAll().map { entityMapper.map(it) }
 
   override suspend fun getRemote(): Try<Unit> = Try {
     val added = epoch()
@@ -42,19 +42,22 @@ class AlbumRepositoryImpl(
         }
         .collect {
           withContext(dispatchers.database) {
-            dao.insert(it.map { mapper.map(it) })
+            dao.insert(it.map { dtoMapper.map(it) })
           }
         }
     }
   }
 
   override fun search(term: String): DataSource.Factory<Int, Album> =
-    dao.search(term).map { view2model.map(it) }
+    dao.search(term).map { entityMapper.map(it) }
 
   override suspend fun cacheIsEmpty(): Boolean =
     withContext(dispatchers.database) { dao.count() == 0L }
 
-  override suspend fun getById(id: Int): Album? {
-    TODO("Not yet implemented")
+  override suspend fun getById(id: Long): Album? {
+    return withContext(dispatchers.database) {
+      val entity = dao.getById(id) ?: return@withContext null
+      return@withContext entityMapper.map(entity)
+    }
   }
 }

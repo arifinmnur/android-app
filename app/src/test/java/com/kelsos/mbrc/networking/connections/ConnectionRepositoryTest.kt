@@ -15,6 +15,7 @@ import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import java.util.ArrayList
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -27,7 +28,6 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import java.util.ArrayList
 
 @RunWith(AndroidJUnit4::class)
 class ConnectionRepositoryTest : KoinTest {
