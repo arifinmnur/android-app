@@ -60,13 +60,13 @@ class ConnectionManagerFragment : Fragment(),
     adapter = ConnectionAdapter()
     adapter.setChangeListener(this)
     recyclerView.adapter = adapter
-    connectionManagerViewModel.settings.nonNullObserver(this) {
+    connectionManagerViewModel.settings.nonNullObserver(viewLifecycleOwner) {
       adapter.submitList(it)
     }
-    connectionManagerViewModel.default.observe(this, Observer {
+    connectionManagerViewModel.default.observe(viewLifecycleOwner, Observer {
       adapter.setDefault(it)
     })
-    connectionManagerViewModel.discoveryStatus.nonNullObserver(this) {
+    connectionManagerViewModel.discoveryStatus.nonNullObserver(viewLifecycleOwner) {
       it.contentIfNotHandled?.let { status ->
         onDiscoveryStopped(status)
       }
