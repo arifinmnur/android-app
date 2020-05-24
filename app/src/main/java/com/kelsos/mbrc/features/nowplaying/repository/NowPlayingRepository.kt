@@ -1,7 +1,8 @@
 package com.kelsos.mbrc.features.nowplaying.repository
 
 import androidx.paging.DataSource
-import arrow.core.Try
+import arrow.core.Either
+import com.kelsos.mbrc.common.data.Progress
 import com.kelsos.mbrc.common.data.Repository
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.common.utilities.epoch
@@ -47,21 +48,22 @@ class NowPlayingRepositoryImpl(
     return dao.getAll().map { NowPlayingEntityMapper.map(it) }
   }
 
-  override suspend fun getRemote(): Try<Unit> = Try {
-    val added = epoch()
+  override suspend fun getRemote(progress: Progress): Either<Throwable, Unit> = Either.catch {
     withContext(dispatchers.network) {
+      val added = epoch()
       val cached = withContext(dispatchers.database) {
         dao.cached().associateBy { it.key() }
       }
-      api.getAllPages(
+      val allPages = api.getAllPages(
         Protocol.NowPlayingList,
-        NowPlayingDto::class
+        NowPlayingDto::class,
+        progress
       )
-        .onCompletion {
-          withContext(dispatchers.database) {
-            dao.removePreviousEntries(added)
-          }
+      allPages.onCompletion {
+        withContext(dispatchers.database) {
+          dao.removePreviousEntries(added)
         }
+      }
         .collect { item ->
           val list = item.map { NowPlayingDtoMapper.map(it).apply { dateAdded = added } }
 

@@ -2,6 +2,7 @@ package com.kelsos.mbrc.ui.dialogs
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import arrow.core.Either
 import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputResponse
@@ -50,9 +51,11 @@ class OutputSelectionViewModelTest {
   @Test
   fun `after reload it should return the output information`() {
     coEvery { outputApi.getOutputs() } answers {
-      OutputResponse(
-        devices = listOf("Output 1", "Output 2"),
-        active = "Output 2"
+      Either.right(
+        OutputResponse(
+          devices = listOf("Output 1", "Output 2"),
+          active = "Output 2"
+        )
       )
     }
 
@@ -104,9 +107,11 @@ class OutputSelectionViewModelTest {
   @Test
   fun `if the user changes the output the result should update the live data`() {
     coEvery { outputApi.setOutput(any()) } answers {
-      OutputResponse(
-        devices = listOf("Output 1", "Output 2"),
-        active = "Output 2"
+      Either.right(
+        OutputResponse(
+          devices = listOf("Output 1", "Output 2"),
+          active = "Output 2"
+        )
       )
     }
 

@@ -21,15 +21,6 @@ import com.kelsos.mbrc.preferences.ClientInformationStoreImpl
 import com.squareup.moshi.Moshi
 import io.mockk.coEvery
 import io.mockk.mockk
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.io.PrintWriter
-import java.net.ServerSocket
-import java.util.Random
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -42,6 +33,15 @@ import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.io.PrintWriter
+import java.net.ServerSocket
+import java.util.Random
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class ConnectivityVerifierImplTest : KoinTest {
@@ -134,7 +134,7 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.fromNullable(settings)
     }
 
-    runBlocking { assertThat(verifier.verify()).isTrue() }
+    runBlocking { assertThat(verifier.verify().isRight()).isTrue() }
   }
 
   @Test

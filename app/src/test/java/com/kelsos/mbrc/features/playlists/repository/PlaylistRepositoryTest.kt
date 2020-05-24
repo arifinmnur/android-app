@@ -78,7 +78,7 @@ class PlaylistRepositoryTest : KoinTest {
         PlaylistDto::class
       )
     } throws SocketTimeoutException()
-    assertThat(repository.getRemote().isFailure()).isTrue()
+    assertThat(repository.getRemote().isLeft()).isTrue()
   }
 
   @Test
@@ -97,7 +97,7 @@ class PlaylistRepositoryTest : KoinTest {
         TestDataFactories.playlist(it)
       }.asFlow()
     }
-    assertThat(repository.getRemote().isSuccess()).isTrue()
+    assertThat(repository.getRemote().isRight()).isTrue()
     assertThat(repository.count()).isEqualTo(20)
     repository.getAll().paged().observeOnce { result ->
       assertThat(result).hasSize(20)
@@ -113,7 +113,7 @@ class PlaylistRepositoryTest : KoinTest {
       }.asFlow()
     }
 
-    assertThat(repository.getRemote().isSuccess()).isTrue()
+    assertThat(repository.getRemote().isRight()).isTrue()
     repository.search("Metal").paged().observeOnce {
       assertThat(it).hasSize(1)
       assertThat(it).containsExactly(

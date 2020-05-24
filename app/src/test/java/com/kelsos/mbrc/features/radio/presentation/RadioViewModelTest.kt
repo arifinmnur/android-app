@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.features.radio.presentation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import arrow.core.Try
+import arrow.core.Either
 import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.events.Event
 import com.kelsos.mbrc.features.queue.QueueResult
@@ -45,7 +45,7 @@ class RadioViewModelTest {
 
   @Test
   fun `should notify the observer that refresh failed`() {
-    coEvery { repository.getRemote() } coAnswers { Try.raiseError(SocketTimeoutException()) }
+    coEvery { repository.getRemote() } coAnswers { Either.left(SocketTimeoutException()) }
     radioViewModel.emitter.observeOnce(observer)
     radioViewModel.reload()
     verify(exactly = 1) { observer(any()) }
@@ -54,7 +54,7 @@ class RadioViewModelTest {
 
   @Test
   fun `should notify the observer that refresh succeeded`() {
-    coEvery { repository.getRemote() } coAnswers { Try.invoke { } }
+    coEvery { repository.getRemote() } coAnswers { Either.right(Unit) }
     radioViewModel.emitter.observeOnce(observer)
     radioViewModel.reload()
     verify(exactly = 1) { observer(any()) }

@@ -45,10 +45,6 @@
       </intent-filter>
     </service>
 
-    <service
-        android:name=".platform.LibrarySyncService"
-        android:exported="false" />
-
     <receiver android:name=".platform.mediasession.MediaButtonReceiver">
       <intent-filter>
         <action android:name="android.intent.action.MEDIA_BUTTON" />

@@ -2,7 +2,6 @@ package com.kelsos.mbrc.features.radio.presentation
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
-import arrow.core.Try
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.common.utilities.paged
 import com.kelsos.mbrc.features.queue.QueueUseCase
@@ -22,7 +21,6 @@ class RadioViewModel(
   fun reload() {
     scope.launch(dispatchers.network) {
       val result = radioRepository.getRemote()
-        .toEither()
         .fold({
           RadioUiMessages.RefreshFailed
         }, {
@@ -34,19 +32,13 @@ class RadioViewModel(
 
   fun play(path: String) {
     scope.launch(dispatchers.network) {
-      val response = Try { queueUseCase.queuePath(path) }
-        .toEither()
-        .fold({
-          RadioUiMessages.NetworkError
-        }, { response ->
-          if (response.success) {
-            RadioUiMessages.QueueSuccess
-          } else {
-            RadioUiMessages.QueueFailed
-          }
-        })
-
-      emit(response)
+      val response = queueUseCase.queuePath(path)
+      val uiMessage = if (response.success) {
+        RadioUiMessages.QueueSuccess
+      } else {
+        RadioUiMessages.QueueFailed
+      }
+      emit(uiMessage)
     }
   }
 }

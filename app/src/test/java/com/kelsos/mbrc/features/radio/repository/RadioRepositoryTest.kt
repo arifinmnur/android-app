@@ -76,7 +76,7 @@ class RadioRepositoryTest : KoinTest {
       )
     } throws SocketTimeoutException()
     runBlocking {
-      assertThat(repository.getRemote().isFailure()).isTrue()
+      assertThat(repository.getRemote().isLeft()).isTrue()
     }
   }
 
@@ -90,7 +90,7 @@ class RadioRepositoryTest : KoinTest {
     }
 
     runBlocking {
-      assertThat(repository.getRemote().isSuccess()).isTrue()
+      assertThat(repository.getRemote().isRight()).isTrue()
       assertThat(repository.count()).isEqualTo(2)
       repository.getAll().paged().observeOnce { result ->
         assertThat(result).hasSize(2)
@@ -107,7 +107,7 @@ class RadioRepositoryTest : KoinTest {
     }
 
     runBlocking {
-      assertThat(repository.getRemote().isSuccess()).isTrue()
+      assertThat(repository.getRemote().isRight()).isTrue()
       repository.search("Metal").paged().observeOnce {
         assertThat(it).hasSize(1)
         assertThat(it).containsExactly(

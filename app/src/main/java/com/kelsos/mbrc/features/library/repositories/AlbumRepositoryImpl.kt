@@ -1,7 +1,8 @@
 package com.kelsos.mbrc.features.library.repositories
 
 import androidx.paging.DataSource
-import arrow.core.Try
+import arrow.core.Either
+import com.kelsos.mbrc.common.data.Progress
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.common.utilities.epoch
 import com.kelsos.mbrc.features.library.data.Album
@@ -31,11 +32,16 @@ class AlbumRepositoryImpl(
   override fun getAll(): DataSource.Factory<Int, Album> =
     dao.getAll().map { entityMapper.map(it) }
 
-  override suspend fun getRemote(): Try<Unit> = Try {
-    val added = epoch()
-    withContext(dispatchers.network) {
-      api.getAllPages(Protocol.LibraryBrowseAlbums, AlbumDto::class)
-        .onCompletion {
+  override suspend fun getRemote(progress: Progress): Either<Throwable, Unit> = Either.catch {
+    return@catch withContext(dispatchers.network) {
+      val added = epoch()
+      val allPages = api.getAllPages(
+        Protocol.LibraryBrowseAlbums,
+        AlbumDto::class,
+        progress
+      )
+
+      allPages.onCompletion {
           withContext(dispatchers.database) {
             dao.removePreviousEntries(added)
           }

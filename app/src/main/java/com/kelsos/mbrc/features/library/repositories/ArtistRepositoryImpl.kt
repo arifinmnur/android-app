@@ -1,7 +1,8 @@
 package com.kelsos.mbrc.features.library.repositories
 
 import androidx.paging.DataSource
-import arrow.core.Try
+import arrow.core.Either
+import com.kelsos.mbrc.common.data.Progress
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.common.utilities.epoch
 import com.kelsos.mbrc.features.library.data.Artist
@@ -33,15 +34,20 @@ class ArtistRepositoryImpl(
 
   override fun getAll(): DataSource.Factory<Int, Artist> = dao.getAll().map { entityMapper.map(it) }
 
-  override suspend fun getRemote(): Try<Unit> = Try {
+  override suspend fun getRemote(progress: Progress): Either<Throwable, Unit> = Either.catch {
     withContext(dispatchers.network) {
       val added = epoch()
-      api.getAllPages(Protocol.LibraryBrowseArtists, ArtistDto::class)
-        .onCompletion {
-          withContext(dispatchers.database) {
-            dao.removePreviousEntries(added)
-          }
+      val allPages = api.getAllPages(
+        Protocol.LibraryBrowseArtists,
+        ArtistDto::class,
+        progress
+      )
+
+      allPages.onCompletion {
+        withContext(dispatchers.database) {
+          dao.removePreviousEntries(added)
         }
+      }
         .collect {
           val items = it.map { dtoMapper.map(it).apply { dateAdded = added } }
           withContext(dispatchers.database) {

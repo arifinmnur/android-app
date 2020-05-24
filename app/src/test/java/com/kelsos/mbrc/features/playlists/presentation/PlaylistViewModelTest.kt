@@ -1,7 +1,7 @@
 package com.kelsos.mbrc.features.playlists.presentation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import arrow.core.Try
+import arrow.core.Either
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.events.Event
@@ -56,7 +56,7 @@ class PlaylistViewModelTest {
 
   @Test
   fun `should notify the observer that refresh failed`() {
-    coEvery { repository.getRemote() } coAnswers { Try.raiseError(SocketTimeoutException()) }
+    coEvery { repository.getRemote() } coAnswers { Either.left(SocketTimeoutException()) }
     viewModel.emitter.observeOnce(observer)
     viewModel.reload()
     verify(exactly = 1) { observer(any()) }
@@ -65,7 +65,7 @@ class PlaylistViewModelTest {
 
   @Test
   fun `should notify the observer that refresh succeeded`() {
-    coEvery { repository.getRemote() } coAnswers { Try.invoke { } }
+    coEvery { repository.getRemote() } coAnswers { Either.right(Unit) }
     viewModel.emitter.observeOnce(observer)
     viewModel.reload()
     verify(exactly = 1) { observer(any()) }

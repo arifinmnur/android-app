@@ -2,7 +2,6 @@ package com.kelsos.mbrc.features.output
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import arrow.core.Try
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.content.output.OutputApi
 import com.kelsos.mbrc.content.output.OutputResponse
@@ -20,8 +19,8 @@ class OutputSelectionViewModel(
   private val _selection: MutableLiveData<String> = MutableLiveData()
 
   init {
-      _outputs.postValue(emptyList())
-      _selection.postValue("")
+    _outputs.postValue(emptyList())
+    _selection.postValue("")
   }
 
   val outputs: LiveData<List<String>>
@@ -43,28 +42,28 @@ class OutputSelectionViewModel(
     }
   }
 
-  private fun Try<OutputResponse>.toResult(): OutputSelectionResult {
-    return toEither().fold({ code(it) }, { OutputSelectionResult.Success })
-  }
-
   fun reload() {
     scope.launch {
-      val result = Try {
-        outputApi.getOutputs().also {
+      val result = outputApi.getOutputs()
+        .fold({
+          code(it)
+        }, {
           updateState(it)
-        }
-      }.toResult()
+          OutputSelectionResult.Success
+        })
       emit(result)
     }
   }
 
   fun setOutput(output: String) {
     scope.launch {
-      val result = Try {
-        outputApi.setOutput(output).also {
+      val result = outputApi.setOutput(output)
+        .fold({
+          code(it)
+        }, {
           updateState(it)
-        }
-      }.toResult()
+          OutputSelectionResult.Success
+        })
       emit(result)
     }
   }
