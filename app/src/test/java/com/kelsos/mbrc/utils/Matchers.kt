@@ -46,8 +46,10 @@ fun ViewInteraction.doesNotExist() {
 
 fun swipeToRemove(): GeneralSwipeAction {
   return GeneralSwipeAction(
-    Swipe.SLOW, GeneralLocation.CENTER_LEFT,
-    GeneralLocation.CENTER_RIGHT, Press.FINGER
+    Swipe.SLOW,
+    GeneralLocation.CENTER_LEFT,
+    GeneralLocation.CENTER_RIGHT,
+    Press.FINGER
   )
 }
 

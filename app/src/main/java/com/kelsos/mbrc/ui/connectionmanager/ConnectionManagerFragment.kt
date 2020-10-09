@@ -20,7 +20,8 @@ import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
 import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
-class ConnectionManagerFragment : Fragment(),
+class ConnectionManagerFragment :
+  Fragment(),
   SettingsDialogFragment.SettingsSaveListener,
   ConnectionAdapter.ConnectionChangeListener {
 
@@ -63,9 +64,12 @@ class ConnectionManagerFragment : Fragment(),
     connectionManagerViewModel.settings.nonNullObserver(viewLifecycleOwner) {
       adapter.submitList(it)
     }
-    connectionManagerViewModel.default.observe(viewLifecycleOwner, Observer {
-      adapter.setDefault(it)
-    })
+    connectionManagerViewModel.default.observe(
+      viewLifecycleOwner,
+      Observer {
+        adapter.setDefault(it)
+      }
+    )
     connectionManagerViewModel.discoveryStatus.nonNullObserver(viewLifecycleOwner) {
       it.contentIfNotHandled?.let { status ->
         onDiscoveryStopped(status)

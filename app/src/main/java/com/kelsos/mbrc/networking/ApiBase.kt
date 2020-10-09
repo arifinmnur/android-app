@@ -6,10 +6,10 @@ import com.kelsos.mbrc.networking.client.SocketMessage
 import com.kelsos.mbrc.networking.protocol.Page
 import com.kelsos.mbrc.networking.protocol.PageRange
 import com.squareup.moshi.Types
-import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
+import kotlin.reflect.KClass
 
 class ApiBase(
   private val deserializationAdapter: DeserializationAdapter,
@@ -55,14 +55,15 @@ class ApiBase(
 
         Timber.v("duration ${now() - pageStart} ms")
         val page = socketMessage.data
-        progress(page.limit + page.offset, page.total)
+
+        progress(page.offset + page.data.size, page.total)
         emit(page.data)
-        if (page.offset > page.total) {
+        if (page.offset + page.limit > page.total) {
           break
         }
       }
       connection.close()
-      Timber.v("duration ${System.currentTimeMillis() - start} ms")
+      Timber.v("total duration ${System.currentTimeMillis() - start} ms")
     }
   }
 

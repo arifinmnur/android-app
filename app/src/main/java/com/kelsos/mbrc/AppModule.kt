@@ -144,8 +144,6 @@ import com.kelsos.mbrc.ui.navigation.player.VolumeDialogViewModel
 import com.squareup.moshi.Moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.koin.androidx.experimental.dsl.viewModel
@@ -155,6 +153,8 @@ import org.koin.experimental.builder.factory
 import org.koin.experimental.builder.factoryBy
 import org.koin.experimental.builder.single
 import org.koin.experimental.builder.singleBy
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 val appModule = module {
   single { Moshi.Builder().build() }
@@ -229,9 +229,11 @@ val appModule = module {
     AppRxSchedulers(
       AndroidSchedulers.mainThread(),
       Schedulers.io(),
-      Schedulers.from(Executors.newSingleThreadExecutor { runnable ->
-        Thread(runnable, "database")
-      }),
+      Schedulers.from(
+        Executors.newSingleThreadExecutor { runnable ->
+          Thread(runnable, "database")
+        }
+      ),
       Schedulers.io()
     )
   }

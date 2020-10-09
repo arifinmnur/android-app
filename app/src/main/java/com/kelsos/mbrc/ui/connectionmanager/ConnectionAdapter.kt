@@ -15,11 +15,9 @@ import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.ui.connectionmanager.ConnectionAdapter.ConnectionViewHolder
 import kotterknife.bindView
 
-class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity,
-  ConnectionViewHolder>(
+class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity, ConnectionViewHolder>(
   DIFF_CALLBACK
 ) {
-
   private var selectionId: Long = 0
   private var changeListener: ConnectionChangeListener? = null
 

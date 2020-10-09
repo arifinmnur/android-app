@@ -28,11 +28,14 @@ abstract class BaseState<T> : State<T> where T : Any {
   }
 
   override fun observe(owner: LifecycleOwner, observer: (T) -> Unit) {
-    return liveData.observe(owner, {
-      if (it != null) {
-        observer(it)
+    return liveData.observe(
+      owner,
+      {
+        if (it != null) {
+          observer(it)
+        }
       }
-    })
+    )
   }
 
   override fun removeObservers(owner: LifecycleOwner) {

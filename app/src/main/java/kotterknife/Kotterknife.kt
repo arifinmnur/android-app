@@ -102,7 +102,7 @@ private val RecyclerView.ViewHolder.viewFinder: RecyclerView.ViewHolder.(Int) ->
 
 private fun viewNotFound(id: Int, desc: KProperty<*>):
   Nothing =
-  throw IllegalStateException("View ID $id for '${desc.name}' not found.")
+    throw IllegalStateException("View ID $id for '${desc.name}' not found.")
 
 @Suppress("UNCHECKED_CAST")
 private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?) =
@@ -134,13 +134,13 @@ private class Lazy<in T, out V>(private val initializer: (T, KProperty<*>) -> V)
 
   override fun getValue(thisRef: T, property: KProperty<*>):
     V {
-    checkAddToLifecycleOwner(thisRef)
-    if (value == EMPTY) {
-      value = initializer(thisRef, property)
+      checkAddToLifecycleOwner(thisRef)
+      if (value == EMPTY) {
+        value = initializer(thisRef, property)
+      }
+      @Suppress("UNCHECKED_CAST")
+      return value as V
     }
-    @Suppress("UNCHECKED_CAST")
-    return value as V
-  }
 
   private fun checkAddToLifecycleOwner(thisRef: T) {
     if (!attachedToLifecycleOwner && thisRef is LifecycleOwner) {

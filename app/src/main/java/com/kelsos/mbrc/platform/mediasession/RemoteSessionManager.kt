@@ -36,7 +36,9 @@ class RemoteSessionManager(
     val mediaButtonIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
     mediaButtonIntent.component = myEventReceiver
     val mediaPendingIntent = PendingIntent.getBroadcast(
-      context.applicationContext, 0, mediaButtonIntent,
+      context.applicationContext,
+      0,
+      mediaButtonIntent,
       PendingIntent.FLAG_UPDATE_CURRENT
     )
 
@@ -46,36 +48,38 @@ class RemoteSessionManager(
       setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS)
     }
 
-    mediaSession.setCallback(object : MediaSessionCompat.Callback() {
-      override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
-        val success = handler.handleMediaIntent(mediaButtonEvent)
-        return success || super.onMediaButtonEvent(mediaButtonEvent)
-      }
+    mediaSession.setCallback(
+      object : MediaSessionCompat.Callback() {
+        override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+          val success = handler.handleMediaIntent(mediaButtonEvent)
+          return success || super.onMediaButtonEvent(mediaButtonEvent)
+        }
 
-      override fun onPlay() {
-        postAction(UserAction(Protocol.PlayerPlay, true))
-      }
+        override fun onPlay() {
+          postAction(UserAction(Protocol.PlayerPlay, true))
+        }
 
-      override fun onPause() {
-        postAction(UserAction(Protocol.PlayerPause, true))
-      }
+        override fun onPause() {
+          postAction(UserAction(Protocol.PlayerPause, true))
+        }
 
-      override fun onSkipToNext() {
-        postAction(UserAction(Protocol.PlayerNext, true))
-      }
+        override fun onSkipToNext() {
+          postAction(UserAction(Protocol.PlayerNext, true))
+        }
 
-      override fun onSkipToPrevious() {
-        postAction(UserAction(Protocol.PlayerPrevious, true))
-      }
+        override fun onSkipToPrevious() {
+          postAction(UserAction(Protocol.PlayerPrevious, true))
+        }
 
-      override fun onStop() {
-        postAction(UserAction(Protocol.PlayerStop, true))
-      }
+        override fun onStop() {
+          postAction(UserAction(Protocol.PlayerStop, true))
+        }
 
-      override fun onSeekTo(pos: Long) {
-        postAction(UserAction.create(Protocol.NowPlayingPosition, pos))
+        override fun onSeekTo(pos: Long) {
+          postAction(UserAction.create(Protocol.NowPlayingPosition, pos))
+        }
       }
-    })
+    )
   }
 
   private fun onConnectionStatusChanged(@Connection.Status status: Int) {
@@ -122,22 +126,28 @@ class RemoteSessionManager(
         when (state) {
           PlayerState.PLAYING -> {
             setState(
-              PlaybackStateCompat.STATE_PLAYING, -1
-              /**change.position**/, 1f
+              PlaybackStateCompat.STATE_PLAYING,
+              -1
+              /**change.position**/,
+              1f
             )
             mediaSession.isActive = true
           }
           PlayerState.PAUSED -> {
             setState(
-              PlaybackStateCompat.STATE_PAUSED, -1
-              /**change.position**/, 0f
+              PlaybackStateCompat.STATE_PAUSED,
+              -1
+              /**change.position**/,
+              0f
             )
             mediaSession.isActive = true
           }
           else -> {
             setState(
-              PlaybackStateCompat.STATE_STOPPED, -1
-              /**change.position**/, 0f
+              PlaybackStateCompat.STATE_STOPPED,
+              -1
+              /**change.position**/,
+              0f
             )
             mediaSession.isActive = false
           }
@@ -149,7 +159,8 @@ class RemoteSessionManager(
   private fun requestFocus(): Boolean {
     return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == manager.requestAudioFocus(
       this,
-      AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN
+      AudioManager.STREAM_MUSIC,
+      AudioManager.AUDIOFOCUS_GAIN
     )
   }
 

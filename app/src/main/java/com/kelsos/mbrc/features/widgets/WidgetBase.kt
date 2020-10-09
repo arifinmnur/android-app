@@ -82,7 +82,9 @@ abstract class WidgetBase : AppWidgetProvider() {
         extras.playingTrack()
       )
       extras.isState() -> updatePlayState(
-        context, widgetManager, widgetsIds,
+        context,
+        widgetManager,
+        widgetsIds,
         extras.state()
       )
     }

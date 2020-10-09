@@ -18,7 +18,6 @@ import com.kelsos.mbrc.utils.observeOnce
 import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
-import java.net.SocketTimeoutException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlow
 import org.junit.After
@@ -32,6 +31,7 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import java.net.SocketTimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class RadioRepositoryTest : KoinTest {
@@ -53,11 +53,16 @@ class RadioRepositoryTest : KoinTest {
     apiBase = mockk()
 
     startKoin {
-      modules(listOf(module {
-        single { dao }
-        singleBy<RadioRepository, RadioRepositoryImpl>()
-        single { apiBase }
-      }, testDispatcherModule))
+      modules(
+        listOf(
+          module {
+            single { dao }
+            singleBy<RadioRepository, RadioRepositoryImpl>()
+            single { apiBase }
+          },
+          testDispatcherModule
+        )
+      )
     }
   }
 

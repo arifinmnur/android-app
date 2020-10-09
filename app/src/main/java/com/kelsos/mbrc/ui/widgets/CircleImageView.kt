@@ -97,15 +97,15 @@ class CircleImageView : AppCompatImageView {
 
     mBorderWidth =
       a.getDimensionPixelSize(
-      R.styleable.CircleImageView_civ_border_width,
-      DEFAULT_BORDER_WIDTH
-    )
+        R.styleable.CircleImageView_civ_border_width,
+        DEFAULT_BORDER_WIDTH
+      )
     mBorderColor = a.getColor(R.styleable.CircleImageView_civ_border_color, DEFAULT_BORDER_COLOR)
     borderOverlay =
       a.getBoolean(
-      R.styleable.CircleImageView_civ_border_overlay,
-      DEFAULT_BORDER_OVERLAY
-    )
+        R.styleable.CircleImageView_civ_border_overlay,
+        DEFAULT_BORDER_OVERLAY
+      )
     mFillColor = a.getColor(R.styleable.CircleImageView_civ_fill_color, DEFAULT_FILL_COLOR)
 
     a.recycle()

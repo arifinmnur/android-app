@@ -3,10 +3,10 @@ package com.kelsos.mbrc.changelog
 import android.content.Context
 import android.util.Xml
 import androidx.annotation.RawRes
-import java.io.IOException
-import java.io.InputStream
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
+import java.io.IOException
+import java.io.InputStream
 
 class ChangelogParser(private val context: Context) {
   private val ns: String? = null

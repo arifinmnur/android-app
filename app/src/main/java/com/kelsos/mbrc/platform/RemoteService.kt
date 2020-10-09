@@ -74,12 +74,15 @@ class RemoteService : Service() {
     SERVICE_STOPPING = true
     stopForeground(true)
     this.unregisterReceiver(receiver)
-    handler.postDelayed({
-      core.stop()
-      SERVICE_STOPPING = false
-      SERVICE_RUNNING = false
-      Timber.d("Background Service::Destroyed")
-    }, 150)
+    handler.postDelayed(
+      {
+        core.stop()
+        SERVICE_STOPPING = false
+        SERVICE_RUNNING = false
+        Timber.d("Background Service::Destroyed")
+      },
+      150
+    )
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {

@@ -92,14 +92,16 @@ object ImageCreator {
 object TestDataFactories {
   fun playlist(num: Int): PlaylistDto = PlaylistDto(
     name = "Songs $num",
-    url = """C:\library\$num.m3u"""
+    url =
+      """C:\library\$num.m3u"""
   )
 
   fun nowPlayingList(index: Int): NowPlayingDto = NowPlayingDto(
     title = "Song ${index + 1}",
     artist = "Artist",
     position = index + 1,
-    path = """C:\library\album\${index + 1}.mp3"""
+    path =
+      """C:\library\album\${index + 1}.mp3"""
   )
 
   fun nowPlayingListEntities(total: Int): List<NowPlaying> {
@@ -109,7 +111,8 @@ object TestDataFactories {
         title = "Test title $it",
         id = it.toLong(),
         position = it,
-        path = """C:\library\album\$it.mp3"""
+        path =
+          """C:\library\album\$it.mp3"""
       )
     }
   }

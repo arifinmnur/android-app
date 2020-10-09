@@ -42,10 +42,10 @@ class AlbumRepositoryImpl(
       )
 
       allPages.onCompletion {
-          withContext(dispatchers.database) {
-            dao.removePreviousEntries(added)
-          }
+        withContext(dispatchers.database) {
+          dao.removePreviousEntries(added)
         }
+      }
         .collect {
           withContext(dispatchers.database) {
             dao.insert(it.map { dtoMapper.map(it) })

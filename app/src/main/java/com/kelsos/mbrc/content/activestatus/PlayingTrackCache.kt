@@ -8,12 +8,12 @@ import com.kelsos.mbrc.features.library.PlayingTrack
 import com.kelsos.mbrc.store.Store
 import com.kelsos.mbrc.store.StoreSerializer
 import com.kelsos.mbrc.store.Track
-import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.IOException
 
 class PlayingTrackCacheImpl(
   context: Application,

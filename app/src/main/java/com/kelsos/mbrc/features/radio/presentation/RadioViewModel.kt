@@ -21,11 +21,14 @@ class RadioViewModel(
   fun reload() {
     scope.launch(dispatchers.network) {
       val result = radioRepository.getRemote()
-        .fold({
-          RadioUiMessages.RefreshFailed
-        }, {
-          RadioUiMessages.RefreshSuccess
-        })
+        .fold(
+          {
+            RadioUiMessages.RefreshFailed
+          },
+          {
+            RadioUiMessages.RefreshSuccess
+          }
+        )
       emit(result)
     }
   }

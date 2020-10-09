@@ -9,11 +9,11 @@ import com.kelsos.mbrc.networking.connections.InetAddressMapper
 import com.kelsos.mbrc.networking.protocol.Protocol
 import com.kelsos.mbrc.networking.protocol.ProtocolPayload
 import com.kelsos.mbrc.preferences.ClientInformationStore
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.IOException
 import java.net.Socket
 import java.nio.charset.Charset
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class RequestManagerImpl(
   private val serializationAdapter: SerializationAdapter,
@@ -77,6 +77,7 @@ class RequestManagerImpl(
     val connectionSettings = checkNotNull(repository.getDefault().orNull())
 
     try {
+      Timber.v("Preparing connection to $connectionSettings")
       val socketAddress = mapper.map(connectionSettings)
       Timber.v("Creating new socket")
 
@@ -88,7 +89,7 @@ class RequestManagerImpl(
         }
       }
     } catch (e: IOException) {
-      Timber.v("failed to create socket")
+      Timber.v(e, "failed to create socket")
       throw e
     }
   }

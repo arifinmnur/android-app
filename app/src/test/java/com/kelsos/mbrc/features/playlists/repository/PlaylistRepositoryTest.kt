@@ -19,7 +19,6 @@ import com.kelsos.mbrc.utils.observeOnce
 import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
-import java.net.SocketTimeoutException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.test.runBlockingTest
@@ -34,6 +33,7 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import java.net.SocketTimeoutException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -56,11 +56,16 @@ class PlaylistRepositoryTest : KoinTest {
     apiBase = mockk()
 
     startKoin {
-      modules(listOf(module {
-        single { dao }
-        singleBy<PlaylistRepository, PlaylistRepositoryImpl>()
-        single { apiBase }
-      }, testDispatcherModule))
+      modules(
+        listOf(
+          module {
+            single { dao }
+            singleBy<PlaylistRepository, PlaylistRepositoryImpl>()
+            single { apiBase }
+          },
+          testDispatcherModule
+        )
+      )
     }
   }
 
@@ -106,7 +111,13 @@ class PlaylistRepositoryTest : KoinTest {
 
   @Test
   fun `it should filter the playlists when searching`() = runBlockingTest {
-    val extra = listOf(PlaylistDto(name = "Heavy Metal", url = """C:\library\metal.m3u"""))
+    val extra = listOf(
+      PlaylistDto(
+        name = "Heavy Metal",
+        url =
+"""C:\library\metal.m3u"""
+      )
+    )
     coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class) } answers {
       mockApi(5, extra) {
         TestDataFactories.playlist(it)
@@ -119,7 +130,8 @@ class PlaylistRepositoryTest : KoinTest {
       assertThat(it).containsExactly(
         Playlist(
           name = "Heavy Metal",
-          url = """C:\library\metal.m3u""",
+          url =
+            """C:\library\metal.m3u""",
           id = 6
         )
       )

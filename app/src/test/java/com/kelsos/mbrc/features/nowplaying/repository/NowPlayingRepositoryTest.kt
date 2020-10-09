@@ -53,11 +53,16 @@ class NowPlayingRepositoryTest : KoinTest {
     apiBase = mockk()
 
     startKoin {
-      modules(listOf(module {
-        single { dao }
-        singleBy<NowPlayingRepository, NowPlayingRepositoryImpl>()
-        single { apiBase }
-      }, testDispatcherModule))
+      modules(
+        listOf(
+          module {
+            single { dao }
+            singleBy<NowPlayingRepository, NowPlayingRepositoryImpl>()
+            single { apiBase }
+          },
+          testDispatcherModule
+        )
+      )
     }
   }
 

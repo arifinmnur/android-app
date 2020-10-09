@@ -97,7 +97,8 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val pagerAdapter = LibraryPagerAdapter(
-      viewLifecycleOwner).also {
+      viewLifecycleOwner
+    ).also {
       this.pagerAdapter = it
       pager.adapter = it
       it.submit(

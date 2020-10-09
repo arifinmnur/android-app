@@ -145,13 +145,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         Timber.v("Restarting service")
         stopService(Intent(this, RemoteService::class.java))
         val handler = Handler(Looper.getMainLooper())
-        HandlerCompat.postDelayed(handler, {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            requireActivity().startForegroundService(Intent(this, RemoteService::class.java))
-          } else {
-            requireActivity().startService(Intent(this, RemoteService::class.java))
-          }
-        }, null, 600)
+        HandlerCompat.postDelayed(
+          handler,
+          {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+              requireActivity().startForegroundService(
+                Intent(this, RemoteService::class.java)
+              )
+            } else {
+              requireActivity().startService(Intent(this, RemoteService::class.java))
+            }
+          },
+          null,
+          600
+        )
       }
     } else {
       super.onRequestPermissionsResult(requestCode, permissions, grantResults)

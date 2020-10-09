@@ -15,8 +15,9 @@ class NowPlayingAdapter(
   private val nowPlayingListener: NowPlayingListener,
   private val visibleRangeGetter: VisibleRangeGetter
 ) : PagedListAdapter<NowPlaying, NowPlayingTrackViewHolder>(
-    DIFF_CALLBACK
-  ), ItemTouchHelperAdapter {
+  DIFF_CALLBACK
+),
+  ItemTouchHelperAdapter {
   private var currentTrack = ""
   private var playingTrackIndex = -1
 
@@ -39,7 +40,8 @@ class NowPlayingAdapter(
         nowPlayingListener.onPress(position)
         playingTrackIndex = position
         currentTrack = getItem(position)?.path ?: ""
-      }) { start, holder -> dragStartListener.onStartDrag(start, holder) }
+      }
+    ) { start, holder -> dragStartListener.onStartDrag(start, holder) }
   }
 
   override fun onBindViewHolder(

@@ -2,8 +2,8 @@ package com.kelsos.mbrc.networking
 
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class SocketActivityChecker {
   private var disposable: Disposable? = null
@@ -15,10 +15,12 @@ class SocketActivityChecker {
   }
 
   private val subscribe: Disposable
-    get() = Completable.timer(DELAY.toLong(), TimeUnit.SECONDS).subscribe({
-      Timber.v("Ping was more than %d seconds ago", DELAY)
-      pingTimeoutListener?.onTimeout()
-    }) { Timber.v("Subscription failed") }
+    get() = Completable.timer(DELAY.toLong(), TimeUnit.SECONDS).subscribe(
+      {
+        Timber.v("Ping was more than %d seconds ago", DELAY)
+        pingTimeoutListener?.onTimeout()
+      }
+    ) { Timber.v("Subscription failed") }
 
   fun stop() {
     Timber.v("Stopping activity checker")

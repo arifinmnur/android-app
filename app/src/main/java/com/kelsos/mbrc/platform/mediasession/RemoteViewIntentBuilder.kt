@@ -27,11 +27,11 @@ object RemoteViewIntentBuilder {
   @SuppressLint("SwitchIntDef")
   fun getPendingIntent(@ButtonAction id: Int, context: Context): PendingIntent = when (id) {
     OPEN -> getActivity(
-        context,
-        OPEN,
-        Intent(context, PlayerFragment::class.java),
-        FLAG_UPDATE_CURRENT
-      )
+      context,
+      OPEN,
+      Intent(context, PlayerFragment::class.java),
+      FLAG_UPDATE_CURRENT
+    )
     PLAY -> getBroadcast(context, PLAY, Intent(PLAY_PRESSED), FLAG_UPDATE_CURRENT)
     NEXT -> getBroadcast(context, NEXT, Intent(NEXT_PRESSED), FLAG_UPDATE_CURRENT)
     CLOSE -> getBroadcast(context, CLOSE, Intent(CLOSE_PRESSED), FLAG_UPDATE_CURRENT)

@@ -33,13 +33,13 @@ import com.kelsos.mbrc.networking.protocol.responses.NowPlayingTrackRemoveRespon
 import com.kelsos.mbrc.networking.protocol.responses.Position
 import com.kelsos.mbrc.ui.navigation.player.LfmRating
 import com.squareup.moshi.Moshi
-import java.io.File
-import java.io.FileOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
+import java.io.FileOutputStream
 
 class UpdateLastFm(
   private val state: PlayerStatusState

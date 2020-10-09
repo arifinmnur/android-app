@@ -42,13 +42,13 @@ class GenreRepositoryImpl(
       )
 
       allPages.onCompletion {
-          withContext(dispatchers.database) {
-            dao.removePreviousEntries(added)
-          }
+        withContext(dispatchers.database) {
+          dao.removePreviousEntries(added)
         }
+      }
         .collect { genres ->
           val items = genres.map {
-          dtoMapper.map(it).apply {
+            dtoMapper.map(it).apply {
               dateAdded = added
 
               val id = stored[it.genre]

@@ -50,7 +50,8 @@ class PlaylistFragmentTest {
 
   private val playlist = Playlist(
     name = "Test",
-    url = """c:\playlists\playlist.m3u""",
+    url =
+      """c:\playlists\playlist.m3u""",
     id = 1
   )
 
@@ -61,11 +62,13 @@ class PlaylistFragmentTest {
     every { miniControlFactory.attach(any()) } just Runs
     startKoin {
       modules(
-        listOf(module {
-          single<PlaylistAdapter>()
-          single { viewModel }
-          single { miniControlFactory }
-        })
+        listOf(
+          module {
+            single<PlaylistAdapter>()
+            single { viewModel }
+            single { miniControlFactory }
+          }
+        )
       )
     }
   }

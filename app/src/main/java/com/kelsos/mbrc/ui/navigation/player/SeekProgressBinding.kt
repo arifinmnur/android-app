@@ -10,18 +10,20 @@ import androidx.databinding.BindingAdapter
 fun SeekBar.setOnSeekBarChangeListener(
   listener: OnProgressChangedByUserListener
 ) {
-  setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-      if (!fromUser) {
-        return
+  setOnSeekBarChangeListener(
+    object : OnSeekBarChangeListener {
+      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        if (!fromUser) {
+          return
+        }
+        listener.onProgressChanged(progress)
       }
-      listener.onProgressChanged(progress)
+
+      override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+
+      override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
     }
-
-    override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
-
-    override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
-  })
+  )
 }
 
 interface OnProgressChangedByUserListener {
