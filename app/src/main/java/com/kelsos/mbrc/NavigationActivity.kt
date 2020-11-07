@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import arrow.core.firstOrNone
 import com.google.android.material.navigation.NavigationView
@@ -45,6 +46,7 @@ class NavigationActivity : AppCompatActivity() {
   private lateinit var connect: ImageView
   private lateinit var drawerLayout: DrawerLayout
   private lateinit var drawerToggle: ActionBarDrawerToggle
+
   private fun onConnectLongClick(): Boolean {
     serviceChecker.startServiceIfNotRunning()
     clientConnectionUseCase.connect()
@@ -141,7 +143,10 @@ class NavigationActivity : AppCompatActivity() {
     )
     drawerLayout.addDrawerListener(drawerToggle)
 
-    val navController = findNavController(R.id.main_navigation_fragment)
+    val navHostFragment = supportFragmentManager.findFragmentById(
+      R.id.main_navigation_fragment
+    ) as NavHostFragment
+    val navController = navHostFragment.navController
     setupWithNavController(findViewById<NavigationView>(R.id.nav_view), navController)
     navController.addOnDestinationChangedListener(onNavigatedListener)
   }

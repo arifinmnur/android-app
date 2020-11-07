@@ -48,14 +48,12 @@ class LibraryViewHolder(
   }
 
   companion object {
-    fun create(
+    fun from(
       parent: ViewGroup
     ): LibraryViewHolder {
       val inflater: LayoutInflater = LayoutInflater.from(parent.context)
       val view = inflater.inflate(R.layout.fragment_browse, parent, false)
-      return LibraryViewHolder(
-        view
-      )
+      return LibraryViewHolder(view)
     }
   }
 }

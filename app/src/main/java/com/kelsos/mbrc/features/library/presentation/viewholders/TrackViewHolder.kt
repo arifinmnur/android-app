@@ -43,7 +43,7 @@ class TrackViewHolder(
       pressed: (view: View, position: Int) -> Unit
     ): TrackViewHolder {
       val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-      val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
+      val view = inflater.inflate(R.layout.listitem_dual, parent, false)
       return TrackViewHolder(
         view,
         indicatorPressed,

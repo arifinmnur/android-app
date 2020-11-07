@@ -2,27 +2,23 @@ package com.kelsos.mbrc.features.library.presentation.adapters
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.library.MenuItemSelectedListener
 import com.kelsos.mbrc.features.library.data.Artist
 import com.kelsos.mbrc.features.library.popup
 import com.kelsos.mbrc.features.library.presentation.viewholders.ArtistViewHolder
 
-class ArtistAdapter : PagedListAdapter<Artist, ArtistViewHolder>(DIFF_CALLBACK) {
-
-  private var listener: MenuItemSelectedListener<Artist>? = null
+class ArtistAdapter : LibraryAdapter<Artist, ArtistViewHolder>(DIFF_CALLBACK) {
 
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_artist) {
-      val listener = checkNotNull(listener)
+      val listener = requireListener()
       listener.onMenuItemSelected(it, checkNotNull(getItem(position)))
     }
   }
 
   private val pressed: (View, Int) -> Unit = { _, position ->
-    val listener = checkNotNull(listener)
+    val listener = requireListener()
     getItem(position)?.run {
       listener.onItemClicked(this)
     }
@@ -43,10 +39,6 @@ class ArtistAdapter : PagedListAdapter<Artist, ArtistViewHolder>(DIFF_CALLBACK) 
     } else {
       holder.clear()
     }
-  }
-
-  fun setMenuItemSelectedListener(listener: MenuItemSelectedListener<Artist>) {
-    this.listener = listener
   }
 
   companion object {

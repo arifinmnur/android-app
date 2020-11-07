@@ -61,7 +61,7 @@ class OutputSelectionViewModelTest {
 
     viewmodel.reload()
     viewmodel.outputs.observeOnce {
-      assertThat(it).containsAllIn(listOf("Output 1", "Output 2"))
+      assertThat(it).containsExactlyElementsIn(listOf("Output 1", "Output 2"))
     }
     viewmodel.selection.observeOnce {
       assertThat(it).isEqualTo("Output 2")
@@ -118,7 +118,7 @@ class OutputSelectionViewModelTest {
     viewmodel.setOutput("Output 2")
 
     viewmodel.outputs.observeOnce {
-      assertThat(it).containsAllIn(listOf("Output 1", "Output 2"))
+      assertThat(it).containsExactlyElementsIn(listOf("Output 1", "Output 2"))
     }
     viewmodel.selection.observeOnce {
       assertThat(it).isEqualTo("Output 2")

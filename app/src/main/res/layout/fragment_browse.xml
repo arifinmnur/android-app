@@ -17,10 +17,8 @@
 
   <ProgressBar
       android:id="@+id/library_browser__progress_bar"
-      android:layout_width="60dp"
-      android:layout_height="60dp"
-      android:layout_marginBottom="16dp"
-      android:layout_marginTop="16dp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
       android:visibility="visible"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
@@ -48,14 +46,14 @@
   <ImageView
       android:id="@+id/library_browser__empty_icon"
       style="@style/empty_view_image"
-      android:layout_marginEnd="8dp"
       android:layout_marginStart="8dp"
-      app:tint="@color/light_gray"
+      android:layout_marginEnd="8dp"
+      android:src="@drawable/ic_music_note_black_80dp"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      app:srcCompat="@drawable/ic_music_note_black_80dp" />
+      app:tint="@color/light_gray" />
 
   <TextView
       android:id="@+id/library_browser__text_subtitle"

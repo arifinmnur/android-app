@@ -207,14 +207,14 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   fun showSyncProgress() {
     view?.apply {
       syncProgress.isGone = false
-      findViewById<TextView>(R.id.sync_progress_text).isGone = false
+      findViewById<TextView>(R.id.library_container__description).isGone = false
     }
   }
 
   fun hideSyncProgress() {
     view?.apply {
       syncProgress.isGone = true
-      findViewById<TextView>(R.id.sync_progress_text).isGone = true
+      findViewById<TextView>(R.id.library_container__description).isGone = true
     }
   }
 

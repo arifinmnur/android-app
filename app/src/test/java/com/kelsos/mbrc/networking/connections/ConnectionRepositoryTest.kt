@@ -117,7 +117,7 @@ class ConnectionRepositoryTest : KoinTest {
       assertThat(repository.count()).isEqualTo(3)
 
       repository.getAll().observeOnce {
-        assertThat(it).containsAllIn(settingsList)
+        assertThat(it).containsExactlyElementsIn(settingsList)
       }
     }
   }

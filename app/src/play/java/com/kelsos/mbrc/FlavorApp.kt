@@ -2,6 +2,8 @@ package com.kelsos.mbrc
 
 import com.kelsos.mbrc.metrics.SyncMetrics
 import com.kelsos.mbrc.metrics.SyncMetricsImpl
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import org.koin.dsl.module.Module
 
 open class FlavorApp : App() {
@@ -9,10 +11,10 @@ open class FlavorApp : App() {
     super.onCreate()
   }
 
-  override fun modules(): List<Module> {
-    val playModule = org.koin.dsl.module.applicationContext {
-      bean<SyncMetrics> { SyncMetricsImpl() }
+  override fun appModules(): List<Module> {
+    val playModule = module {
+      single<SyncMetrics> { SyncMetricsImpl() }
     }
-    return super.modules().plus(playModule)
+    return super.appModules().plus(playModule)
   }
 }

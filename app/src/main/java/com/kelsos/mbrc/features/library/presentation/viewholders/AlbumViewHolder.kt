@@ -46,7 +46,7 @@ class AlbumViewHolder(
       pressed: (View, Int) -> Unit
     ): AlbumViewHolder {
       val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-      val view = inflater.inflate(R.layout.ui_list_dual, parent, false)
+      val view = inflater.inflate(R.layout.listitem_dual, parent, false)
       return AlbumViewHolder(
         view,
         indicatorPressed,

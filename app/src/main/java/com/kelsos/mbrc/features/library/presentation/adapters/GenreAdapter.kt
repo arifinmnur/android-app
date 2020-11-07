@@ -2,21 +2,17 @@ package com.kelsos.mbrc.features.library.presentation.adapters
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.features.library.MenuItemSelectedListener
 import com.kelsos.mbrc.features.library.data.Genre
 import com.kelsos.mbrc.features.library.popup
 import com.kelsos.mbrc.features.library.presentation.viewholders.GenreViewHolder
 
-class GenreAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
-
-  private var listener: MenuItemSelectedListener<Genre>? = null
+class GenreAdapter : LibraryAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
 
   private val indicatorPressed: (View, Int) -> Unit = { view, position ->
     view.popup(R.menu.popup_genre) {
-      val listener = checkNotNull(listener)
+      val listener = requireListener()
       getItem(position)?.run {
         listener.onMenuItemSelected(it, this)
       }
@@ -24,7 +20,7 @@ class GenreAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
   }
 
   private val pressed: (View, Int) -> Unit = { _, position ->
-    val listener = checkNotNull(listener)
+    val listener = requireListener()
     getItem(position)?.let {
       listener.onItemClicked(it)
     }
@@ -45,10 +41,6 @@ class GenreAdapter : PagedListAdapter<Genre, GenreViewHolder>(DIFF_CALLBACK) {
     } else {
       holder.clear()
     }
-  }
-
-  fun setMenuItemSelectedListener(listener: MenuItemSelectedListener<Genre>) {
-    this.listener = listener
   }
 
   companion object {
