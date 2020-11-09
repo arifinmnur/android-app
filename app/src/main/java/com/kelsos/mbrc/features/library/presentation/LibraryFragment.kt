@@ -10,30 +10,29 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
-import androidx.core.view.isGone
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.common.utilities.nonNullObserver
+import com.kelsos.mbrc.databinding.FragmentLibraryBinding
 import com.kelsos.mbrc.features.library.presentation.screens.AlbumScreen
 import com.kelsos.mbrc.features.library.presentation.screens.ArtistScreen
 import com.kelsos.mbrc.features.library.presentation.screens.GenreScreen
 import com.kelsos.mbrc.features.library.presentation.screens.TrackScreen
 import com.kelsos.mbrc.features.library.sync.SyncResult
 import com.kelsos.mbrc.metrics.SyncedData
-import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class LibraryFragment : Fragment(), OnQueryTextListener {
 
-  private val pager: ViewPager2 by bindView(R.id.search_pager)
-  private val tabs: TabLayout by bindView(R.id.pager_tab_strip)
-  private val syncProgress: ProgressIndicator by bindView(R.id.library_container__progress)
+  private lateinit var pager: ViewPager2
+  private lateinit var tabs: TabLayout
+  private var dataBinding: FragmentLibraryBinding? = null
 
   private var searchView: SearchView? = null
   private var searchMenuItem: MenuItem? = null
@@ -44,8 +43,7 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   private val viewModel: LibraryViewModel by inject()
 
   override fun onQueryTextSubmit(query: String): Boolean {
-    val search = query.trim()
-    if (search.isNotEmpty()) {
+    if (query.isNotEmpty() && query.trim { it <= ' ' }.isNotEmpty()) {
       closeSearch()
       searchMenuItem?.isVisible = false
       searchClear?.isVisible = true
@@ -83,15 +81,26 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
     viewModel.emitter.nonNullObserver(viewLifecycleOwner) { event ->
       event.contentIfNotHandled?.let { onSyncResult(it) }
     }
+    dataBinding?.sync = viewModel.syncProgress
   }
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
+  ): View {
     setHasOptionsMenu(true)
-    return inflater.inflate(R.layout.fragment_library, container, false)
+    val dataBinding: FragmentLibraryBinding = DataBindingUtil.inflate(
+      inflater,
+      R.layout.fragment_library,
+      container,
+      false
+    )
+    this.dataBinding = dataBinding
+    dataBinding.lifecycleOwner = viewLifecycleOwner
+    pager = dataBinding.searchPager
+    tabs = dataBinding.pagerTabStrip
+    return dataBinding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -197,25 +206,8 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
 
   override fun onDestroy() {
     pagerAdapter = null
+    dataBinding = null
     super.onDestroy()
-  }
-
-  fun syncFailure() {
-    Snackbar.make(pager, R.string.library__sync_failed, Snackbar.LENGTH_LONG).show()
-  }
-
-  fun showSyncProgress() {
-    view?.apply {
-      syncProgress.isGone = false
-      findViewById<TextView>(R.id.library_container__description).isGone = false
-    }
-  }
-
-  fun hideSyncProgress() {
-    view?.apply {
-      syncProgress.isGone = true
-      findViewById<TextView>(R.id.library_container__description).isGone = true
-    }
   }
 
   companion object {
