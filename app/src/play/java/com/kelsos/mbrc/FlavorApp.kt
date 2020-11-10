@@ -7,10 +7,6 @@ import org.koin.dsl.module
 import org.koin.dsl.module.Module
 
 open class FlavorApp : App() {
-  override fun onCreate() {
-    super.onCreate()
-  }
-
   override fun appModules(): List<Module> {
     val playModule = module {
       single<SyncMetrics> { SyncMetricsImpl() }

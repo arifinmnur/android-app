@@ -56,6 +56,8 @@ class NowPlayingViewModelTest {
       moveManager = MoveManagerImpl(),
       trackState = state
     )
+
+    coEvery { repository.getRemote(any()) } answers { Either.right(Unit) }
   }
 
   @Test

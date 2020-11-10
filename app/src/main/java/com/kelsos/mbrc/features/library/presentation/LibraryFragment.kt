@@ -18,17 +18,16 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
-import com.kelsos.mbrc.common.utilities.nonNullObserver
 import com.kelsos.mbrc.databinding.FragmentLibraryBinding
 import com.kelsos.mbrc.features.library.presentation.screens.AlbumScreen
 import com.kelsos.mbrc.features.library.presentation.screens.ArtistScreen
 import com.kelsos.mbrc.features.library.presentation.screens.GenreScreen
 import com.kelsos.mbrc.features.library.presentation.screens.TrackScreen
-import com.kelsos.mbrc.features.library.sync.SyncResult
+import com.kelsos.mbrc.features.library.sync.SyncCategory
 import com.kelsos.mbrc.metrics.SyncedData
 import org.koin.android.ext.android.inject
 
-class LibraryFragment : Fragment(), OnQueryTextListener {
+class LibraryFragment : Fragment(), OnQueryTextListener, CategoryRetriever {
 
   private lateinit var pager: ViewPager2
   private lateinit var tabs: TabLayout
@@ -52,14 +51,6 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
     return true
   }
 
-  private fun onSyncResult(result: SyncResult) {
-    when (result) {
-      SyncResult.NOOP -> Unit
-      SyncResult.FAILED -> Unit
-      SyncResult.SUCCESS -> Unit
-    }
-  }
-
   private fun closeSearch(): Boolean {
     searchView?.let {
       if (it.isShown) {
@@ -73,15 +64,23 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
     return false
   }
 
+  override fun getCategory(category: Int): String {
+    return when (category) {
+      SyncCategory.GENRES -> getString(R.string.library__category_genres)
+      SyncCategory.ARTISTS -> getString(R.string.library__category_artists)
+      SyncCategory.ALBUMS -> getString(R.string.library__category_albums)
+      SyncCategory.TRACKS -> getString(R.string.library__category_tracks)
+      SyncCategory.PLAYLISTS -> getString(R.string.library__category_playlists)
+      else -> ""
+    }
+  }
+
   override fun onQueryTextChange(newText: String): Boolean = false
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-
-    viewModel.emitter.nonNullObserver(viewLifecycleOwner) { event ->
-      event.contentIfNotHandled?.let { onSyncResult(it) }
-    }
     dataBinding?.sync = viewModel.syncProgress
+    dataBinding?.category = this
   }
 
   override fun onCreateView(
@@ -98,8 +97,8 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
     )
     this.dataBinding = dataBinding
     dataBinding.lifecycleOwner = viewLifecycleOwner
-    pager = dataBinding.searchPager
-    tabs = dataBinding.pagerTabStrip
+    pager = dataBinding.libraryContainerPager
+    tabs = dataBinding.libraryContainerTabs
     return dataBinding.root
   }
 
@@ -138,7 +137,7 @@ class LibraryFragment : Fragment(), OnQueryTextListener {
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     inflater.inflate(R.menu.library_search, menu)
-    searchMenuItem = menu.findItem(R.id.library_screen__action_search)?.apply {
+    searchMenuItem = menu.findItem(R.id.library_screen__action_search).apply {
       searchView = actionView as SearchView
     }
 

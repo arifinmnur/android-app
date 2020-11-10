@@ -34,7 +34,6 @@ class SettingsManagerImpl(
   }
 
   @SettingsManager.CallAction
-
   override fun getCallAction(): String = preferences.getString(
     getKey(R.string.settings_key_incoming_call_action),
     NONE

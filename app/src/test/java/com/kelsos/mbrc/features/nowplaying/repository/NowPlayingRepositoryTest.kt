@@ -19,7 +19,6 @@ import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
@@ -85,7 +84,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(20) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -107,7 +106,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(20) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -130,7 +129,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(20) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -151,7 +150,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(20) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -176,7 +175,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(5) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -198,7 +197,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(5) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()
@@ -210,7 +209,7 @@ class NowPlayingRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.NowPlayingList, NowPlayingDto::class) } answers {
       TestData.mockApi(5) {
         TestDataFactories.nowPlayingList(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()

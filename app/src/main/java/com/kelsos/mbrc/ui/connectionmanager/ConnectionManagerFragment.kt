@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.ProgressIndicator
@@ -66,7 +65,7 @@ class ConnectionManagerFragment :
     }
     connectionManagerViewModel.default.observe(
       viewLifecycleOwner,
-      Observer {
+      {
         adapter.setDefault(it)
       }
     )

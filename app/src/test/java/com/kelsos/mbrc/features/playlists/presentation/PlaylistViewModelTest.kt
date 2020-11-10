@@ -2,7 +2,6 @@ package com.kelsos.mbrc.features.playlists.presentation
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import arrow.core.Either
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.events.Event
 import com.kelsos.mbrc.events.UserAction
@@ -60,7 +59,7 @@ class PlaylistViewModelTest {
     viewModel.emitter.observeOnce(observer)
     viewModel.reload()
     verify(exactly = 1) { observer(any()) }
-    Truth.assertThat(slot.captured.peekContent()).isEqualTo(PlaylistUiMessages.RefreshFailed)
+    assertThat(slot.captured.peekContent()).isEqualTo(PlaylistUiMessages.RefreshFailed)
   }
 
   @Test
@@ -69,7 +68,7 @@ class PlaylistViewModelTest {
     viewModel.emitter.observeOnce(observer)
     viewModel.reload()
     verify(exactly = 1) { observer(any()) }
-    Truth.assertThat(slot.captured.peekContent()).isEqualTo(PlaylistUiMessages.RefreshSuccess)
+    assertThat(slot.captured.peekContent()).isEqualTo(PlaylistUiMessages.RefreshSuccess)
   }
 
   @Test

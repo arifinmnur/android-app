@@ -20,7 +20,6 @@ import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
@@ -100,7 +99,7 @@ class PlaylistRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class) } answers {
       mockApi(20) {
         TestDataFactories.playlist(it)
-      }.asFlow()
+      }
     }
     assertThat(repository.getRemote().isRight()).isTrue()
     assertThat(repository.count()).isEqualTo(20)
@@ -121,7 +120,7 @@ class PlaylistRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class) } answers {
       mockApi(5, extra) {
         TestDataFactories.playlist(it)
-      }.asFlow()
+      }
     }
 
     assertThat(repository.getRemote().isRight()).isTrue()

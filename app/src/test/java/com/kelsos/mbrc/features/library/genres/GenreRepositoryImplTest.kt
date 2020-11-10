@@ -73,14 +73,14 @@ class GenreRepositoryImplTest : KoinTest {
     }
   }
 
-  val testModule = module {
+  private val testModule = module {
     singleBy<GenreRepository, GenreRepositoryImpl>()
 
     val mockApi = mockk<ApiBase>()
 
     coEvery { mockApi.getAllPages(Protocol.LibraryBrowseGenres, GenreDto::class) } answers {
       flow {
-        emit((0 until 1200).map { GenreDto("Metal$it") })
+        emit((0..1200).map { GenreDto("Metal$it") })
       }
     }
     single { mockApi }

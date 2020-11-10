@@ -25,14 +25,14 @@ class OutputSelectionViewModelTest {
   @get:Rule
   val rule = InstantTaskExecutorRule()
 
-  private lateinit var viewmodel: OutputSelectionViewModel
+  private lateinit var viewModel: OutputSelectionViewModel
   private lateinit var outputApi: OutputApi
 
   @Before
   fun setUp() {
     outputApi = mockk()
 
-    viewmodel = OutputSelectionViewModel(
+    viewModel = OutputSelectionViewModel(
       outputApi = outputApi,
       dispatchers = TestDispatchers.dispatchers
     )
@@ -40,17 +40,17 @@ class OutputSelectionViewModelTest {
 
   @Test
   fun `originally view model should have empty values`() {
-    viewmodel.outputs.observeOnce {
+    viewModel.outputs.observeOnce {
       assertThat(it).isEmpty()
     }
-    viewmodel.selection.observeOnce {
+    viewModel.selection.observeOnce {
       assertThat(it).isEmpty()
     }
   }
 
   @Test
   fun `after reload it should return the output information`() {
-    coEvery { outputApi.getOutputs() } answers {
+    coEvery { outputApi.getOutputs() } coAnswers {
       Either.right(
         OutputResponse(
           devices = listOf("Output 1", "Output 2"),
@@ -59,54 +59,60 @@ class OutputSelectionViewModelTest {
       )
     }
 
-    viewmodel.reload()
-    viewmodel.outputs.observeOnce {
+    viewModel.reload()
+    viewModel.outputs.observeOnce {
       assertThat(it).containsExactlyElementsIn(listOf("Output 1", "Output 2"))
     }
-    viewmodel.selection.observeOnce {
+    viewModel.selection.observeOnce {
       assertThat(it).isEqualTo("Output 2")
     }
-    viewmodel.emitter.observeOnce {
+    viewModel.emitter.observeOnce {
       assertThat(it.peekContent()).isEqualTo(OutputSelectionResult.Success)
     }
   }
 
   @Test
   fun `if there is a socket timeout the emitter should have the proper result`() {
-    coEvery { outputApi.getOutputs() } throws SocketTimeoutException()
+    coEvery { outputApi.getOutputs() } coAnswers {
+      Either.left(SocketTimeoutException())
+    }
 
-    viewmodel.reload()
+    viewModel.reload()
 
-    viewmodel.emitter.observeOnce {
+    viewModel.emitter.observeOnce {
       assertThat(it.peekContent()).isEqualTo(OutputSelectionResult.ConnectionError)
     }
   }
 
   @Test
   fun `if there is a socket exception the emitter should have the proper result`() {
-    coEvery { outputApi.getOutputs() } throws SocketException()
+    coEvery { outputApi.getOutputs() } coAnswers {
+      Either.left(SocketException())
+    }
 
-    viewmodel.reload()
+    viewModel.reload()
 
-    viewmodel.emitter.observeOnce {
+    viewModel.emitter.observeOnce {
       assertThat(it.peekContent()).isEqualTo(OutputSelectionResult.ConnectionError)
     }
   }
 
   @Test
   fun `if there is an exception the emitter should have the proper result`() {
-    coEvery { outputApi.getOutputs() } throws IOException()
+    coEvery { outputApi.getOutputs() } coAnswers {
+      Either.left(IOException())
+    }
 
-    viewmodel.reload()
+    viewModel.reload()
 
-    viewmodel.emitter.observeOnce {
+    viewModel.emitter.observeOnce {
       assertThat(it.peekContent()).isEqualTo(OutputSelectionResult.UnknownError)
     }
   }
 
   @Test
   fun `if the user changes the output the result should update the live data`() {
-    coEvery { outputApi.setOutput(any()) } answers {
+    coEvery { outputApi.setOutput(any()) } coAnswers {
       Either.right(
         OutputResponse(
           devices = listOf("Output 1", "Output 2"),
@@ -115,15 +121,15 @@ class OutputSelectionViewModelTest {
       )
     }
 
-    viewmodel.setOutput("Output 2")
+    viewModel.setOutput("Output 2")
 
-    viewmodel.outputs.observeOnce {
+    viewModel.outputs.observeOnce {
       assertThat(it).containsExactlyElementsIn(listOf("Output 1", "Output 2"))
     }
-    viewmodel.selection.observeOnce {
+    viewModel.selection.observeOnce {
       assertThat(it).isEqualTo("Output 2")
     }
-    viewmodel.emitter.observeOnce {
+    viewModel.emitter.observeOnce {
       assertThat(it.peekContent()).isEqualTo(OutputSelectionResult.Success)
     }
   }

@@ -6,7 +6,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.kelsos.mbrc.common.SimpleLifecycle
 
-abstract class LifeCycleAwareService : SimpleLifecycle, LifecycleOwner {
+abstract class LifeCycleAwareService :
+  SimpleLifecycle,
+  LifecycleOwner {
 
   @Suppress("LeakingThis")
   private val lifecycleRegistry = LifecycleRegistry(this)

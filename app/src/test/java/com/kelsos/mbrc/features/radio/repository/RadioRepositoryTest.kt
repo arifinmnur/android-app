@@ -19,7 +19,6 @@ import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.asFlow
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -91,7 +90,7 @@ class RadioRepositoryTest : KoinTest {
     coEvery { apiBase.getAllPages(Protocol.RadioStations, RadioStationDto::class) } answers {
       mockApi(2) {
         RadioStationDto(name = "Radio $it", url = "http://radio.statio/$it")
-      }.asFlow()
+      }
     }
 
     runBlocking {
@@ -104,25 +103,23 @@ class RadioRepositoryTest : KoinTest {
   }
 
   @Test
-  fun `it should filter the stations when searching`() {
+  fun `it should filter the stations when searching`() = runBlocking {
     coEvery { apiBase.getAllPages(Protocol.RadioStations, RadioStationDto::class) } answers {
       mockApi(5, listOf(RadioStationDto(name = "Heavy Metal", url = "http://heavy.metal.ru"))) {
         RadioStationDto(name = "Radio $it", url = "http://radio.statio/$it")
-      }.asFlow()
+      }
     }
 
-    runBlocking {
-      assertThat(repository.getRemote().isRight()).isTrue()
-      repository.search("Metal").paged().observeOnce {
-        assertThat(it).hasSize(1)
-        assertThat(it).containsExactly(
-          RadioStation(
-            name = "Heavy Metal",
-            url = "http://heavy.metal.ru",
-            id = 6
-          )
+    assertThat(repository.getRemote().isRight()).isTrue()
+    repository.search("Metal").paged().observeOnce {
+      assertThat(it).hasSize(1)
+      assertThat(it).containsExactly(
+        RadioStation(
+          name = "Heavy Metal",
+          url = "http://heavy.metal.ru",
+          id = 6
         )
-      }
+      )
     }
   }
 }

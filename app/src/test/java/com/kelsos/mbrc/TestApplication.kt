@@ -20,7 +20,7 @@ class TestApplication : Application(), TestLifecycleApplication {
         }
 
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-          System.out.println("$tag: $message")
+          println("$tag: $message")
         }
       }
     )

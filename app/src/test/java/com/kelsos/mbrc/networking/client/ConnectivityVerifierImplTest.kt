@@ -4,6 +4,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import arrow.core.Option
+import arrow.core.orNull
 import com.google.common.truth.Truth.assertThat
 import com.kelsos.mbrc.data.DeserializationAdapter
 import com.kelsos.mbrc.data.DeserializationAdapterImpl
@@ -11,6 +12,7 @@ import com.kelsos.mbrc.data.SerializationAdapter
 import com.kelsos.mbrc.data.SerializationAdapterImpl
 import com.kelsos.mbrc.networking.RequestManager
 import com.kelsos.mbrc.networking.RequestManagerImpl
+import com.kelsos.mbrc.networking.client.ConnectivityVerifierImpl.NoValidPluginConnection
 import com.kelsos.mbrc.networking.connections.ConnectionRepository
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.protocol.Protocol
@@ -134,7 +136,9 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.fromNullable(settings)
     }
 
-    runBlocking { assertThat(verifier.verify().isRight()).isTrue() }
+    val result = runBlocking { verifier.verify() }
+    assertThat(result.isRight()).isTrue()
+    assertThat(result.orNull()).isTrue()
   }
 
   @Test
@@ -148,13 +152,9 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.fromNullable(settings)
     }
 
-    runBlocking {
-      try {
-        verifier.verify()
-      } catch (e: Exception) {
-        assertThat(e).isInstanceOf(RuntimeException::class.java)
-      }
-    }
+    val result = runBlocking { verifier.verify() }
+    assertThat(result.isLeft()).isTrue()
+    assertThat(result.swap().orNull()).isInstanceOf(RuntimeException::class.java)
   }
 
   @Test
@@ -168,13 +168,9 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.fromNullable(settings)
     }
 
-    runBlocking {
-      try {
-        verifier.verify()
-      } catch (e: Exception) {
-        assertThat(e).isInstanceOf(ConnectivityVerifierImpl.NoValidPluginConnection::class.java)
-      }
-    }
+    val result = runBlocking { verifier.verify() }
+    assertThat(result.isLeft()).isTrue()
+    assertThat(result.swap().orNull()).isInstanceOf(NoValidPluginConnection::class.java)
   }
 
   @Test
@@ -186,13 +182,9 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.empty<ConnectionSettingsEntity>()
     }
 
-    runBlocking {
-      try {
-        verifier.verify()
-      } catch (e: Exception) {
-        assertThat(e).isInstanceOf(RuntimeException::class.java)
-      }
-    }
+    val result = runBlocking { verifier.verify() }
+    assertThat(result.isLeft()).isTrue()
+    assertThat(result.swap().orNull()).isInstanceOf(RuntimeException::class.java)
   }
 
   @Test
@@ -204,13 +196,9 @@ class ConnectivityVerifierImplTest : KoinTest {
       return@answers Option.empty<ConnectionSettingsEntity>()
     }
 
-    runBlocking {
-      try {
-        verifier.verify()
-      } catch (e: Exception) {
-        assertThat(e).isInstanceOf(RuntimeException::class.java)
-      }
-    }
+    val result = runBlocking { verifier.verify() }
+    assertThat(result.isLeft()).isTrue()
+    assertThat(result.swap().orNull()).isInstanceOf(RuntimeException::class.java)
   }
 
   private val testModule = module {

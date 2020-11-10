@@ -36,11 +36,12 @@ class RadioViewModel(
   fun play(path: String) {
     scope.launch(dispatchers.network) {
       val response = queueUseCase.queuePath(path)
-      val uiMessage = if (response.success) {
-        RadioUiMessages.QueueSuccess
-      } else {
-        RadioUiMessages.QueueFailed
-      }
+      val uiMessage =
+        if (response.success) {
+          RadioUiMessages.QueueSuccess
+        } else {
+          RadioUiMessages.QueueFailed
+        }
       emit(uiMessage)
     }
   }
