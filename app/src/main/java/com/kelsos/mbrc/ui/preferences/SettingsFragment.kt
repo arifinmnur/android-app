@@ -77,17 +77,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
       Timber.d(e, "failed")
     }
 
-    val showNotification: CheckBoxPreference =
-      preference(R.string.settings_key_notification_control)
-
-    showNotification.setOnPreferenceChangeListener { _, newValue ->
-      val value = newValue as Boolean
-      if (!value) {
-        // todo remove notification
-      }
-      true
-    }
-
     val license: Preference = preference(R.string.settings_key_license)
     license.setOnPreferenceClickListener {
       showLicenseDialog()

@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Action
-import arrow.core.Option
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.common.utilities.AppCoroutineDispatchers
 import com.kelsos.mbrc.common.utilities.RemoteUtils
@@ -36,7 +35,7 @@ class SessionNotificationManager(
 
   private val sessionJob: Job = Job()
   private val uiScope: CoroutineScope = CoroutineScope(dispatchers.main + sessionJob)
-  private val diskScope: CoroutineScope = CoroutineScope(dispatchers.disk + sessionJob)
+  private val diskScope: CoroutineScope = CoroutineScope(dispatchers.io + sessionJob)
 
   private val previous: String by lazy { context.getString(R.string.notification_action_previous) }
   private val play: String by lazy { context.getString(R.string.notification_action_play) }
@@ -130,12 +129,12 @@ class SessionNotificationManager(
     diskScope.launch {
       notificationData = with(playingTrack.coverUrl) {
         val cover = if (isNotEmpty()) {
-          RemoteUtils.loadBitmap(this)
+          RemoteUtils.loadBitmap(this).fold({ null }) { bitmap -> bitmap }
         } else {
-          Option.empty()
+          null
         }
 
-        notificationData.copy(track = playingTrack, cover = cover.orNull())
+        notificationData.copy(track = playingTrack, cover = cover)
       }
 
       update(notificationData)

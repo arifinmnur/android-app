@@ -57,10 +57,10 @@ class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         }
       }
       RemoteViewIntentBuilder.PLAY_PRESSED -> {
-        postAction(UserAction(Protocol.PlayerPlayPause, true))
+        performAction(Protocol.PlayerPlayPause, true)
       }
       RemoteViewIntentBuilder.NEXT_PRESSED -> {
-        postAction(UserAction(Protocol.PlayerNext, true))
+        performAction(Protocol.PlayerNext, true)
       }
       RemoteViewIntentBuilder.CLOSE_PRESSED -> {
         if (!RemoteService.SERVICE_STOPPING) {
@@ -68,7 +68,7 @@ class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
         }
       }
       RemoteViewIntentBuilder.PREVIOUS_PRESSED -> {
-        postAction(UserAction(Protocol.PlayerPrevious, true))
+        performAction(Protocol.PlayerPrevious, true)
       }
       RemoteViewIntentBuilder.CANCELLED_NOTIFICATION -> {
         if (!RemoteService.SERVICE_STOPPING) {
@@ -80,13 +80,13 @@ class RemoteBroadcastReceiver : BroadcastReceiver(), KoinComponent {
 
   private fun handleRinging() {
     when (settingsManager.getCallAction()) {
-      SettingsManager.PAUSE -> postAction(UserAction(Protocol.PlayerPause, true))
-      SettingsManager.STOP -> postAction(UserAction(Protocol.PlayerStop, true))
+      SettingsManager.PAUSE -> performAction(Protocol.PlayerPause, true)
+      SettingsManager.STOP -> performAction(Protocol.PlayerStop, true)
       SettingsManager.REDUCE -> volumeModifyUseCase.reduceVolume()
     }
   }
 
-  private fun postAction(data: UserAction) {
-    userActionUseCase.perform(data)
+  private fun performAction(@Protocol.Context context: String, data: Any) {
+    userActionUseCase.perform(UserAction.create(context, data))
   }
 }

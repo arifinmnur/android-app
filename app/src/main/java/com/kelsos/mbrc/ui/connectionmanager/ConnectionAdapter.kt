@@ -86,7 +86,11 @@ class ConnectionAdapter : ListAdapter<ConnectionSettingsEntity, ConnectionViewHo
 
     fun bind(entity: ConnectionSettingsEntity, selectionId: Long) {
       computerName.text = entity.name
-      hostname.text = "${entity.address} : ${entity.port}"
+      hostname.text = itemView.context.getString(
+        R.string.connection_manager__host,
+        entity.address,
+        entity.port
+      )
 
       defaultSettings.isVisible = entity.id == selectionId
     }

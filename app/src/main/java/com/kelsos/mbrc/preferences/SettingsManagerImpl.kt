@@ -72,7 +72,7 @@ class SettingsManagerImpl(
 
     if (lastVersionCode < currentVersion) {
       preferences.edit()
-        .putInt(getKey(R.string.settings_key_last_version_run), currentVersion)
+        .putLong(getKey(R.string.settings_key_last_version_run), currentVersion.toLong())
         .apply()
       Timber.d("Update or fresh install")
 

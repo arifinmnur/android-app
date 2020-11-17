@@ -36,7 +36,7 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val dataBinding: FragmentPlayerBinding = DataBindingUtil.inflate<FragmentPlayerBinding>(
+    val dataBinding = DataBindingUtil.inflate<FragmentPlayerBinding>(
       inflater,
       R.layout.fragment_player,
       container,
@@ -51,22 +51,32 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    viewModel.playerStatus.observe(this) {
+    viewModel.playerStatus.observe(viewLifecycleOwner) {
       // dataBinding.status = it
       menu?.findItem(R.id.player_screen__action_scrobbling)?.isChecked = it.scrobbling
     }
 
-    viewModel.playingTrack.observe(this) {
+    viewModel.playingTrack.observe(viewLifecycleOwner) {
       // dataBinding.track = it
       shareActionProvider?.setShareIntent(getShareIntent())
     }
 
-    viewModel.trackPosition.observe(this) {
+    viewModel.trackPosition.observe(viewLifecycleOwner) {
       // dataBinding.position = it
     }
 
-    viewModel.trackRating.observe(this) {
+    viewModel.trackRating.observe(viewLifecycleOwner) {
       updateRating(it)
+    }
+
+    viewModel.emitter.observe(viewLifecycleOwner) { message ->
+      if (message.hasBeenHandled) {
+        return@observe
+      }
+      when (message.contentIfNotHandled) {
+        is PlayerUiMessage.ShowChangelog -> ChangelogDialog.show(requireActivity(), R.raw.changelog)
+        is PlayerUiMessage.ShowPluginUpdate -> Unit
+      }
     }
   }
 

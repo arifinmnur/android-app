@@ -20,6 +20,7 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/application_name"
       android:logo="@mipmap/ic_launcher"
+      android:supportsRtl="false"
       android:theme="@style/Theme.App"
       tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
     <activity

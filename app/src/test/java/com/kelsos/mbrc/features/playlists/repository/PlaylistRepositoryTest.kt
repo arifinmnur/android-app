@@ -16,6 +16,7 @@ import com.kelsos.mbrc.utils.TestData
 import com.kelsos.mbrc.utils.TestData.mockApi
 import com.kelsos.mbrc.utils.TestDataFactories
 import com.kelsos.mbrc.utils.observeOnce
+import com.kelsos.mbrc.utils.result
 import com.kelsos.mbrc.utils.testDispatcherModule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -79,10 +80,11 @@ class PlaylistRepositoryTest : KoinTest {
     coEvery {
       apiBase.getAllPages(
         Protocol.PlaylistList,
-        PlaylistDto::class
+        PlaylistDto::class,
+        any()
       )
     } throws SocketTimeoutException()
-    assertThat(repository.getRemote().isLeft()).isTrue()
+    assertThat(repository.getRemote().result()).isInstanceOf(SocketTimeoutException::class.java)
   }
 
   @Test
@@ -96,12 +98,12 @@ class PlaylistRepositoryTest : KoinTest {
 
   @Test
   fun `sync remote playlists and update database`() = runBlockingTest {
-    coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class) } answers {
+    coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class, any()) } answers {
       mockApi(20) {
         TestDataFactories.playlist(it)
       }
     }
-    assertThat(repository.getRemote().isRight()).isTrue()
+    assertThat(repository.getRemote().result()).isInstanceOf(Unit::class.java)
     assertThat(repository.count()).isEqualTo(20)
     repository.getAll().paged().observeOnce { result ->
       assertThat(result).hasSize(20)
@@ -113,24 +115,22 @@ class PlaylistRepositoryTest : KoinTest {
     val extra = listOf(
       PlaylistDto(
         name = "Heavy Metal",
-        url =
-"""C:\library\metal.m3u"""
+        url = """C:\library\metal.m3u"""
       )
     )
-    coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class) } answers {
+    coEvery { apiBase.getAllPages(Protocol.PlaylistList, PlaylistDto::class, any()) } answers {
       mockApi(5, extra) {
         TestDataFactories.playlist(it)
       }
     }
 
-    assertThat(repository.getRemote().isRight()).isTrue()
+    assertThat(repository.getRemote().result()).isInstanceOf(Unit::class.java)
     repository.search("Metal").paged().observeOnce {
       assertThat(it).hasSize(1)
       assertThat(it).containsExactly(
         Playlist(
           name = "Heavy Metal",
-          url =
-            """C:\library\metal.m3u""",
+          url = """C:\library\metal.m3u""",
           id = 6
         )
       )

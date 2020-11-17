@@ -4,19 +4,20 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
+import android.media.AudioAttributes
 import android.media.AudioManager
-import android.media.session.PlaybackState
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-import android.support.v4.media.session.MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media.AudioAttributesCompat
+import androidx.media.AudioFocusRequestCompat
+import androidx.media.AudioManagerCompat
 import com.kelsos.mbrc.common.utilities.RemoteUtils
 import com.kelsos.mbrc.content.activestatus.PlayerState
 import com.kelsos.mbrc.content.activestatus.PlayerState.State
-import com.kelsos.mbrc.events.UserAction
 import com.kelsos.mbrc.features.library.PlayingTrack
 import com.kelsos.mbrc.networking.client.UserActionUseCase
+import com.kelsos.mbrc.networking.client.performUserAction
 import com.kelsos.mbrc.networking.connections.Connection
 import com.kelsos.mbrc.networking.protocol.Protocol
 import timber.log.Timber
@@ -30,6 +31,13 @@ class RemoteSessionManager(
   private val mediaSession: MediaSessionCompat
 
   lateinit var handler: MediaIntentHandler
+  private val focusLock = Any()
+  private val attributes = audioAttributes()
+  private val request = AudioFocusRequestCompat.Builder(AudioManager.AUDIOFOCUS_GAIN)
+    .setAudioAttributes(attributes)
+    .setOnAudioFocusChangeListener(this)
+    .setWillPauseWhenDucked(true)
+    .build()
 
   init {
     val myEventReceiver = ComponentName(context.packageName, MediaButtonReceiver::class.java.name)
@@ -45,7 +53,6 @@ class RemoteSessionManager(
     mediaSession = MediaSessionCompat(context, "Session").apply {
       setMediaButtonReceiver(mediaPendingIntent)
       setPlaybackToRemote(volumeProvider)
-      setFlags(FLAG_HANDLES_MEDIA_BUTTONS or FLAG_HANDLES_TRANSPORT_CONTROLS)
     }
 
     mediaSession.setCallback(
@@ -56,27 +63,27 @@ class RemoteSessionManager(
         }
 
         override fun onPlay() {
-          postAction(UserAction(Protocol.PlayerPlay, true))
+          userActionUseCase.performUserAction(Protocol.PlayerPlay, true)
         }
 
         override fun onPause() {
-          postAction(UserAction(Protocol.PlayerPause, true))
+          userActionUseCase.performUserAction(Protocol.PlayerPause, true)
         }
 
         override fun onSkipToNext() {
-          postAction(UserAction(Protocol.PlayerNext, true))
+          userActionUseCase.performUserAction(Protocol.PlayerNext, true)
         }
 
         override fun onSkipToPrevious() {
-          postAction(UserAction(Protocol.PlayerPrevious, true))
+          userActionUseCase.performUserAction(Protocol.PlayerPrevious, true)
         }
 
         override fun onStop() {
-          postAction(UserAction(Protocol.PlayerStop, true))
+          userActionUseCase.performUserAction(Protocol.PlayerStop, true)
         }
 
         override fun onSeekTo(pos: Long) {
-          postAction(UserAction.create(Protocol.NowPlayingPosition, pos))
+          userActionUseCase.performUserAction(Protocol.NowPlayingPosition, pos)
         }
       }
     )
@@ -88,7 +95,7 @@ class RemoteSessionManager(
     }
 
     val playbackState = PlaybackStateCompat.Builder()
-      .setState(PlaybackState.STATE_STOPPED, -1, 0f)
+      .setState(PlaybackStateCompat.STATE_STOPPED, -1, 0f)
       .build()
 
     with(mediaSession) {
@@ -99,15 +106,11 @@ class RemoteSessionManager(
     abandonFocus()
   }
 
-  private fun postAction(action: UserAction) {
-    userActionUseCase.perform(action)
-  }
-
   val mediaSessionToken: MediaSessionCompat.Token
     get() = mediaSession.sessionToken
 
-  private fun metadataUpdate(track: PlayingTrack) {
-    val bitmap = RemoteUtils.coverBitmapSync(track.coverUrl)
+  private suspend fun metadataUpdate(track: PlayingTrack) {
+    val bitmap = RemoteUtils.coverBitmap(track.coverUrl)
 
     val builder = MediaMetadataCompat.Builder()
       .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, track.album)
@@ -119,6 +122,11 @@ class RemoteSessionManager(
   }
 
   private fun updateState(@State state: String) {
+
+    when (state) {
+      PlayerState.PLAYING -> isGranted(AudioManagerCompat.requestAudioFocus(manager, request))
+      else -> abandonFocus()
+    }
 
     val playbackState = PlaybackStateCompat.Builder()
       .setActions(PLAYBACK_ACTIONS)
@@ -156,16 +164,25 @@ class RemoteSessionManager(
     mediaSession.setPlaybackState(playbackState)
   }
 
-  private fun requestFocus(): Boolean {
-    return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == manager.requestAudioFocus(
-      this,
-      AudioManager.STREAM_MUSIC,
-      AudioManager.AUDIOFOCUS_GAIN
-    )
+  private fun isGranted(result: Int): Boolean {
+    synchronized(focusLock) {
+      return when (result) {
+        AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> true
+        AudioManager.AUDIOFOCUS_REQUEST_FAILED,
+        AudioManager.AUDIOFOCUS_REQUEST_DELAYED -> false
+        else -> false
+      }
+    }
   }
 
+  private fun audioAttributes(): AudioAttributesCompat = AudioAttributesCompat.Builder()
+    .setUsage(AudioAttributes.USAGE_MEDIA)
+    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+    .build()
+
   private fun abandonFocus(): Boolean {
-    return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == manager.abandonAudioFocus(this)
+    return isGranted(AudioManagerCompat.abandonAudioFocusRequest(manager, request))
   }
 
   override fun onAudioFocusChange(focusChange: Int) {

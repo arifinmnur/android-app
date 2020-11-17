@@ -19,7 +19,7 @@ class ConnectivityVerifierImpl(
       val verifyMessage = SocketMessage.create(Protocol.VerifyConnection)
       val response = requestManager.request(connection, verifyMessage)
       connection.close()
-      val (context, data) = deserializationAdapter.objectify(
+      val (context, _) = deserializationAdapter.objectify(
         response,
         SocketMessage::class
       )

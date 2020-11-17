@@ -1,6 +1,5 @@
 package com.kelsos.mbrc.networking.client
 
-import arrow.core.Some
 import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusState
 import com.kelsos.mbrc.networking.SocketActivityChecker
 import com.kelsos.mbrc.networking.SocketActivityChecker.PingTimeoutListener
@@ -37,7 +36,6 @@ class ClientConnectionManager(
 ) : IClientConnectionManager, PingTimeoutListener {
 
   private val adapter by lazy { moshi.adapter(SocketMessage::class.java) }
-
   private var executor = getExecutor()
 
   private fun getExecutor() = Executors.newSingleThreadExecutor { Thread(it, "socket-thread") }
@@ -74,14 +72,8 @@ class ClientConnectionManager(
     scope.launch {
       delay(2000)
 
-      val default = connectionRepository.getDefault()
-      if (default.isEmpty()) {
-        Timber.v("no connection settings aborting")
-        return@launch
-      }
-      val settings = (default as Some).t
-
-      Timber.v("Attempting connection on $settings")
+      val default = connectionRepository.getDefault() ?: return@launch
+      Timber.v("Attempting connection on $default")
       val onConnection: (Boolean) -> Unit = { connected ->
         if (!connected) {
           activityChecker.stop()
@@ -93,7 +85,7 @@ class ClientConnectionManager(
       }
 
       connection = SocketConnection(
-        settings,
+        default,
         messageHandler,
         onConnection
       ) {

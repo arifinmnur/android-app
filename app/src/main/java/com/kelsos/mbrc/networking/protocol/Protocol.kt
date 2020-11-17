@@ -55,15 +55,12 @@ object Protocol {
 
   const val CommandUnavailable = "commandunavailable"
 
-  const val PlayerOutput = "playeroutput"
-  const val PlayerOutputSwitch = "playeroutputswitch"
-
-  // Protocol Constants
-  const val CLIENT_PLATFORM = "Android"
-
   // Repeat Constants
   const val ONE = "one"
   const val ALL = "All"
+
+  const val PlayerOutput = "playeroutput"
+  const val PlayerOutputSwitch = "playeroutputswitch"
 
   /**
    * Toggle action in protocol. This should be send to the functions with multiple states
@@ -73,6 +70,7 @@ object Protocol {
 
   const val ProtocolVersionNumber = 5
 
+  @Retention(AnnotationRetention.SOURCE)
   @StringDef(
     Player,
     ProtocolTag,
@@ -119,6 +117,5 @@ object Protocol {
     PlayerOutput,
     PlayerOutputSwitch
   )
-  @Retention(AnnotationRetention.SOURCE)
   annotation class Context
 }

@@ -1,20 +1,9 @@
 package com.kelsos.mbrc.content.activestatus
 
 data class PlayingPosition(val current: Duration = 0, val total: Duration = 0) {
-  fun totalMinutes(): String {
-    return total.toMinutes()
-  }
-
-  fun currentMinutes(): String {
-    return current.toMinutes()
-  }
-
-  val currentInt get() = current.toInt()
-  val totalInt get() = total.toInt()
-
-  fun progress(): String {
-    return "${currentMinutes()} / ${totalMinutes()}"
-  }
+  fun progress(): String = "${current.toMinutes()} / ${total.toMinutes()}"
+  val currentInt: Int = current.toInt()
+  val totalInt: Int = total.toInt()
 }
 
 typealias Duration = Long
