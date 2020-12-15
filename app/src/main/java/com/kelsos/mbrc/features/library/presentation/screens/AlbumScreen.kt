@@ -12,18 +12,14 @@ import com.kelsos.mbrc.features.library.presentation.adapters.AlbumAdapter
 import com.kelsos.mbrc.features.library.presentation.viewmodels.AlbumViewModel
 import com.kelsos.mbrc.features.queue.Queue
 import com.kelsos.mbrc.features.work.WorkHandler
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 
-class AlbumScreen :
-  LibraryScreen,
-  KoinComponent,
+class AlbumScreen(
+  private val adapter: AlbumAdapter,
+  private val workHandler: WorkHandler,
+  private val viewModel: AlbumViewModel,
+  private val actionHandler: PopupActionHandler
+) : LibraryScreen,
   MenuItemSelectedListener<Album> {
-
-  private val adapter: AlbumAdapter by inject()
-  private val workHandler: WorkHandler by inject()
-  private val actionHandler: PopupActionHandler by inject()
-  private val viewModel: AlbumViewModel by inject()
 
   private lateinit var viewHolder: LibraryViewHolder
 
