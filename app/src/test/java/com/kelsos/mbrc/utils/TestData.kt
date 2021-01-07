@@ -95,7 +95,7 @@ object TestDataFactories {
   fun playlist(num: Int): PlaylistDto = PlaylistDto(
     name = "Songs $num",
     url =
-      """C:\library\$num.m3u"""
+    """C:\library\$num.m3u"""
   )
 
   fun nowPlayingList(index: Int): NowPlayingDto = NowPlayingDto(
@@ -103,7 +103,7 @@ object TestDataFactories {
     artist = "Artist",
     position = index + 1,
     path =
-      """C:\library\album\${index + 1}.mp3"""
+    """C:\library\album\${index + 1}.mp3"""
   )
 
   fun nowPlayingListEntities(total: Int): List<NowPlaying> {
@@ -114,7 +114,7 @@ object TestDataFactories {
         id = it.toLong(),
         position = it,
         path =
-          """C:\library\album\$it.mp3"""
+        """C:\library\album\$it.mp3"""
       )
     }
   }

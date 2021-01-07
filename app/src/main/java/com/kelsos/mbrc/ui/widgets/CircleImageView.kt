@@ -348,7 +348,7 @@ class CircleImageView : AppCompatImageView {
     if (!borderOverlay) {
       drawableRect.inset(mBorderWidth.toFloat(), mBorderWidth.toFloat())
     }
-    drawableRadius = Math.min(drawableRect.height() / 2.0f, drawableRect.width() / 2.0f)
+    drawableRadius = (drawableRect.height() / 2.0f).coerceAtMost(drawableRect.width() / 2.0f)
 
     applyColorFilter()
     updateShaderMatrix()

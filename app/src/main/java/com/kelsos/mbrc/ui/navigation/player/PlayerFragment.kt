@@ -21,7 +21,6 @@ import com.kelsos.mbrc.features.library.PlayingTrack
 import org.koin.android.ext.android.inject
 
 class PlayerFragment : Fragment(), VolumeDialogProvider {
-
   private val viewModel: PlayerViewModel by inject()
   private var menu: Menu? = null
   private var shareActionProvider: ShareActionProvider? = null
@@ -36,39 +35,28 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val dataBinding = DataBindingUtil.inflate<FragmentPlayerBinding>(
+    val binding: FragmentPlayerBinding = DataBindingUtil.inflate(
       inflater,
       R.layout.fragment_player,
       container,
       false
-    ).apply {
-      volumeProvider = this@PlayerFragment
-      track = PlayingTrack()
-      this.viewModel = viewModel
-    }
-    return dataBinding.root
-  }
+    )
+    binding.viewModel = viewModel
+    binding.volumeProvider = this@PlayerFragment
+    binding.track = PlayingTrack()
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
     viewModel.playerStatus.observe(viewLifecycleOwner) {
-      // dataBinding.status = it
+      binding.status = it
       menu?.findItem(R.id.player_screen__action_scrobbling)?.isChecked = it.scrobbling
     }
 
     viewModel.playingTrack.observe(viewLifecycleOwner) {
-      // dataBinding.track = it
-      shareActionProvider?.setShareIntent(getShareIntent())
+      binding.track = it
+      shareActionProvider?.setShareIntent(getShareIntent(it))
     }
 
-    viewModel.trackPosition.observe(viewLifecycleOwner) {
-      // dataBinding.position = it
-    }
-
-    viewModel.trackRating.observe(viewLifecycleOwner) {
-      updateRating(it)
-    }
-
+    viewModel.trackPosition.observe(viewLifecycleOwner) { binding.position = it }
+    viewModel.trackRating.observe(viewLifecycleOwner) { updateRating(it) }
     viewModel.emitter.observe(viewLifecycleOwner) { message ->
       if (message.hasBeenHandled) {
         return@observe
@@ -78,6 +66,7 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
         is PlayerUiMessage.ShowPluginUpdate -> Unit
       }
     }
+    return binding.root
   }
 
   fun showChangeLog() {
@@ -119,10 +108,9 @@ class PlayerFragment : Fragment(), VolumeDialogProvider {
     }
   }
 
-  private fun getShareIntent(): Intent {
+  private fun getShareIntent(track: PlayingTrack): Intent {
     return Intent(Intent.ACTION_SEND).apply {
-      val track = viewModel.playingTrack.getValue()
-      val payload = "Now Playing: ${track?.artist} - ${track?.title}"
+      val payload = "Now Playing: ${track.artist} - ${track.title}"
       type = "text/plain"
       putExtra(Intent.EXTRA_TEXT, payload)
     }

@@ -13,8 +13,8 @@ class NowPlayingAdapter(
   private val nowPlayingListener: NowPlayingListener,
   private val visibleRangeGetter: VisibleRangeGetter
 ) : PagedListAdapter<NowPlaying, NowPlayingTrackViewHolder>(
-  DIFF_CALLBACK
-),
+    DIFF_CALLBACK
+  ),
   ItemTouchHelperAdapter {
   private var currentTrack = ""
   private var playingTrackIndex = -1

@@ -1,31 +1,14 @@
 package com.kelsos.mbrc.preferences
 
-import androidx.annotation.StringDef
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 
 interface SettingsManager {
-  @CallAction
-  fun getCallAction(): String
-  suspend fun shouldDisplayOnlyAlbumArtists(): Boolean
+  fun onlyAlbumArtists(): StateFlow<Boolean>
   fun setShouldDisplayOnlyAlbumArtist(onlyAlbumArtist: Boolean)
   fun shouldShowChangeLog(): Boolean
   fun isPluginUpdateCheckEnabled(): Boolean
+  fun getCallAction(): CallAction
   fun getLastUpdated(): Date
   fun setLastUpdated(lastChecked: Date)
-
-  @StringDef(
-    NONE,
-    PAUSE,
-    STOP,
-    REDUCE
-  )
-  @Retention(AnnotationRetention.SOURCE)
-  annotation class CallAction
-
-  companion object {
-    const val NONE = "none"
-    const val PAUSE = "pause"
-    const val STOP = "stop"
-    const val REDUCE = "reduce"
-  }
 }

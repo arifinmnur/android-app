@@ -73,6 +73,7 @@ class RadioViewModelTest {
 
     radioViewModel.emitter.observeOnce(observer)
     radioViewModel.play("http://radio.station")
+    idle()
     assertThat(playArguments.captured).contains("http://radio.station")
     assertThat(slot.captured.peekContent()).isEqualTo(RadioUiMessages.QueueSuccess)
   }

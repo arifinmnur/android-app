@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Intent
-import android.media.AudioAttributes
 import android.media.AudioManager
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -14,11 +13,10 @@ import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import com.kelsos.mbrc.common.utilities.RemoteUtils
 import com.kelsos.mbrc.content.activestatus.PlayerState
-import com.kelsos.mbrc.content.activestatus.PlayerState.State
 import com.kelsos.mbrc.features.library.PlayingTrack
 import com.kelsos.mbrc.networking.client.UserActionUseCase
 import com.kelsos.mbrc.networking.client.performUserAction
-import com.kelsos.mbrc.networking.connections.Connection
+import com.kelsos.mbrc.networking.connections.ConnectionStatus
 import com.kelsos.mbrc.networking.protocol.Protocol
 import timber.log.Timber
 
@@ -33,7 +31,7 @@ class RemoteSessionManager(
   lateinit var handler: MediaIntentHandler
   private val focusLock = Any()
   private val attributes = audioAttributes()
-  private val request = AudioFocusRequestCompat.Builder(AudioManager.AUDIOFOCUS_GAIN)
+  private val request = AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN)
     .setAudioAttributes(attributes)
     .setOnAudioFocusChangeListener(this)
     .setWillPauseWhenDucked(true)
@@ -89,8 +87,8 @@ class RemoteSessionManager(
     )
   }
 
-  private fun onConnectionStatusChanged(@Connection.Status status: Int) {
-    if (status != Connection.OFF) {
+  private fun onConnectionStatusChanged(status: ConnectionStatus) {
+    if (status != ConnectionStatus.Off) {
       return
     }
 
@@ -121,10 +119,10 @@ class RemoteSessionManager(
     mediaSession.setMetadata(builder.build())
   }
 
-  private fun updateState(@State state: String) {
+  private fun updateState(state: PlayerState) {
 
     when (state) {
-      PlayerState.PLAYING -> isGranted(AudioManagerCompat.requestAudioFocus(manager, request))
+      PlayerState.Playing -> isGranted(AudioManagerCompat.requestAudioFocus(manager, request))
       else -> abandonFocus()
     }
 
@@ -132,7 +130,7 @@ class RemoteSessionManager(
       .setActions(PLAYBACK_ACTIONS)
       .apply {
         when (state) {
-          PlayerState.PLAYING -> {
+          PlayerState.Playing -> {
             setState(
               PlaybackStateCompat.STATE_PLAYING,
               -1
@@ -141,7 +139,7 @@ class RemoteSessionManager(
             )
             mediaSession.isActive = true
           }
-          PlayerState.PAUSED -> {
+          PlayerState.Paused -> {
             setState(
               PlaybackStateCompat.STATE_PAUSED,
               -1
@@ -176,8 +174,8 @@ class RemoteSessionManager(
   }
 
   private fun audioAttributes(): AudioAttributesCompat = AudioAttributesCompat.Builder()
-    .setUsage(AudioAttributes.USAGE_MEDIA)
-    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+    .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+    .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
     .setLegacyStreamType(AudioManager.STREAM_MUSIC)
     .build()
 

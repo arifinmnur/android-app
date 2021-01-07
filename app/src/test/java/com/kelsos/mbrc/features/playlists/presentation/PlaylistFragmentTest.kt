@@ -3,7 +3,6 @@ package com.kelsos.mbrc.features.playlists.presentation
 import androidx.annotation.StringRes
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.FragmentScenario.launchInContainer
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -51,7 +50,7 @@ class PlaylistFragmentTest {
   private val playlist = Playlist(
     name = "Test",
     url =
-      """c:\playlists\playlist.m3u""",
+    """c:\playlists\playlist.m3u""",
     id = 1
   )
 
@@ -83,15 +82,13 @@ class PlaylistFragmentTest {
     val liveData = MockFactory<Playlist>(emptyList()).paged()
     every { viewModel.playlists } answers { liveData }
     every { viewModel.emitter } answers { MutableLiveData() }
-    val scenario = launchInContainer(PlaylistFragment::class.java)
+    launchInContainer(PlaylistFragment::class.java)
 
     PlaylistRobot()
       .done()
       .emptyGroupVisible()
       .loadingGone()
       .emptyText(R.string.playlists_list_empty)
-
-    scenario.moveToState(Lifecycle.State.DESTROYED)
   }
 
   @Test

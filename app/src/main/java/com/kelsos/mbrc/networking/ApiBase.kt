@@ -5,6 +5,7 @@ import com.kelsos.mbrc.networking.client.GenericSocketMessage
 import com.kelsos.mbrc.networking.client.SocketMessage
 import com.kelsos.mbrc.networking.protocol.Page
 import com.kelsos.mbrc.networking.protocol.PageRange
+import com.kelsos.mbrc.networking.protocol.Protocol
 import com.squareup.moshi.Types
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,7 +18,7 @@ class ApiBase(
 ) {
 
   suspend fun <T> getItem(
-    request: String,
+    request: Protocol,
     kClazz: KClass<T>,
     payload: Any = ""
   ): T where T : Any {
@@ -29,7 +30,7 @@ class ApiBase(
   }
 
   suspend fun <T : Any> getAllPages(
-    request: String,
+    request: Protocol,
     clazz: KClass<T>,
     progress: suspend (current: Int, total: Int) -> Unit = { _, _ -> }
   ): Flow<List<T>> {
