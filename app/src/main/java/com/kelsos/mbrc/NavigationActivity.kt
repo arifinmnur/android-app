@@ -27,7 +27,6 @@ import com.kelsos.mbrc.content.activestatus.livedata.ConnectionStatusState
 import com.kelsos.mbrc.networking.ClientConnectionUseCase
 import com.kelsos.mbrc.networking.connections.ConnectionStatus
 import com.kelsos.mbrc.networking.protocol.VolumeModifyUseCase
-import kotterknife.bindView
 import org.koin.android.ext.android.inject
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 import org.koin.core.KoinExperimentalAPI
@@ -38,8 +37,7 @@ class NavigationActivity : AppCompatActivity() {
   private val connectionStatusLiveDataProvider: ConnectionStatusState by inject()
   private val clientConnectionUseCase: ClientConnectionUseCase by inject()
 
-  private val navigationView: NavigationView by bindView(R.id.nav_view)
-
+  private lateinit var navigationView: NavigationView
   private lateinit var connectText: TextView
   private lateinit var connect: ImageView
   private lateinit var drawerLayout: DrawerLayout
@@ -164,6 +162,7 @@ class NavigationActivity : AppCompatActivity() {
     setupKoinFragmentFactory()
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_navigation)
+    navigationView = findViewById(R.id.nav_view)
     setupToolbar()
     setupNavigationDrawer()
     setupConnectionIndicator()

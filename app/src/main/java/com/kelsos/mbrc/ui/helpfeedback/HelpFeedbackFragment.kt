@@ -4,35 +4,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.kelsos.mbrc.R
-import kotterknife.bindView
+import com.kelsos.mbrc.databinding.FragmentHelpFeedbackBinding
 
 class HelpFeedbackFragment : Fragment() {
-
-  private val tabLayout: TabLayout by bindView(R.id.feedback_tab_layout)
-  private val viewPager: ViewPager2 by bindView(R.id.pager_help_feedback)
-
-  private lateinit var pagerAdapter: HelpFeedbackPagerAdapter
-
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_help_feedback, container, false)
-  }
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    pagerAdapter = HelpFeedbackPagerAdapter(requireActivity())
-    viewPager.apply {
-      adapter = pagerAdapter
-    }
+  ): View {
+    val binding: FragmentHelpFeedbackBinding = DataBindingUtil.inflate(
+      inflater,
+      R.layout.fragment_help_feedback,
+      container,
+      false
+    )
+    val viewPager = binding.pagerHelpFeedback
+    val tabLayout = binding.feedbackTabLayout
+    viewPager.adapter = HelpFeedbackPagerAdapter(requireActivity())
     TabLayoutMediator(tabLayout, viewPager) { currentTab, currentPosition ->
       currentTab.text = when (currentPosition) {
         HelpFeedbackPagerAdapter.HELP -> getString(R.string.tab_help)
@@ -40,5 +32,6 @@ class HelpFeedbackFragment : Fragment() {
         else -> throw IllegalArgumentException("invalid position")
       }
     }.attach()
+    return binding.root
   }
 }

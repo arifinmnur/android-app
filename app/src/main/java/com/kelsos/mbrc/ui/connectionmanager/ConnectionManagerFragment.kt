@@ -4,19 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.view.isGone
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.kelsos.mbrc.R
 import com.kelsos.mbrc.common.utilities.nonNullObserver
+import com.kelsos.mbrc.databinding.FragmentConnectionManagerBinding
 import com.kelsos.mbrc.networking.connections.ConnectionSettingsEntity
 import com.kelsos.mbrc.networking.discovery.DiscoveryStop
 import com.kelsos.mbrc.ui.dialogs.SettingsDialogFragment
-import kotterknife.bindView
 import org.koin.android.ext.android.inject
 
 class ConnectionManagerFragment :
@@ -25,35 +23,28 @@ class ConnectionManagerFragment :
   ConnectionAdapter.ConnectionChangeListener {
 
   private val connectionManagerViewModel: ConnectionManagerViewModel by inject()
-
-  private val recyclerView: RecyclerView by bindView(R.id.connection_manager__connections)
-
   private lateinit var adapter: ConnectionAdapter
-
-  private val addButton: Button by bindView(R.id.connection_manager__add)
-  private val scanButton: Button by bindView(R.id.connection_manager__scan)
-
-  private fun onAddButtonClick() {
-    SettingsDialogFragment.create(parentFragmentManager).show(this)
-  }
-
-  private fun onScanButtonClick() {
-    view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = false
-    connectionManagerViewModel.startDiscovery()
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.fragment_connection_manager, container, false)
-  }
+  ): View {
+    val binding: FragmentConnectionManagerBinding = DataBindingUtil.inflate(
+      inflater,
+      R.layout.fragment_connection_manager,
+      container,
+      false
+    )
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    addButton.setOnClickListener { onAddButtonClick() }
-    scanButton.setOnClickListener { onScanButtonClick() }
+    val recyclerView = binding.connectionManagerConnections
+    binding.connectionManagerAdd.setOnClickListener {
+      SettingsDialogFragment.create(parentFragmentManager).show(this)
+    }
+    binding.connectionManagerScan.setOnClickListener {
+      binding.connectionManagerProgress.isGone = false
+      connectionManagerViewModel.startDiscovery()
+    }
 
     recyclerView.setHasFixedSize(true)
     recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -67,31 +58,29 @@ class ConnectionManagerFragment :
       viewLifecycleOwner,
       {
         adapter.setDefault(it)
+        if (it !== null) {
+          adapter.setSelectionId(it.id)
+        }
       }
     )
     connectionManagerViewModel.discoveryStatus.nonNullObserver(viewLifecycleOwner) {
       it.contentIfNotHandled?.let { status ->
-        onDiscoveryStopped(status)
+        binding.connectionManagerProgress.isGone = true
+        val message: String = when (status) {
+          DiscoveryStop.NoWifi -> getString(R.string.con_man_no_wifi)
+          DiscoveryStop.NotFound -> getString(R.string.con_man_not_found)
+          DiscoveryStop.Complete -> {
+            getString(R.string.con_man_success)
+          }
+        }
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
       }
     }
+    return binding.root
   }
 
   override fun onSave(settings: ConnectionSettingsEntity) {
     connectionManagerViewModel.save(settings)
-  }
-
-  fun onDiscoveryStopped(status: DiscoveryStop) {
-    view?.findViewById<ProgressIndicator>(R.id.connection_manager__progress)?.isGone = true
-
-    val message: String = when (status) {
-      DiscoveryStop.NoWifi -> getString(R.string.con_man_no_wifi)
-      DiscoveryStop.NotFound -> getString(R.string.con_man_not_found)
-      DiscoveryStop.Complete -> {
-        getString(R.string.con_man_success)
-      }
-    }
-
-    Snackbar.make(recyclerView, message, Snackbar.LENGTH_SHORT).show()
   }
 
   override fun onDelete(settings: ConnectionSettingsEntity) {
@@ -105,9 +94,5 @@ class ConnectionManagerFragment :
 
   override fun onDefault(settings: ConnectionSettingsEntity) {
     connectionManagerViewModel.setDefault(settings)
-  }
-
-  fun updateDefault(defaultId: Long) {
-    adapter.setSelectionId(defaultId)
   }
 }

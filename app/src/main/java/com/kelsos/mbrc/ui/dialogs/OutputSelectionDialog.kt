@@ -73,8 +73,6 @@ class OutputSelectionDialog : DialogFragment(), View.OnTouchListener {
     loadingProgress = view.findViewById(R.id.output_selection__loading_outputs)
     errorMessage = view.findViewById(R.id.output_selection__error_message)
 
-    // viewModel = obtainViewModel(OutputSelectionViewModel::class.java)
-
     dialog = MaterialAlertDialogBuilder(context)
       .setTitle(R.string.output_selection__select_output)
       .setView(view)

@@ -202,4 +202,6 @@
   <string name="library_album_tracks__title">%1$s by %2$s</string>
   <string name="library__action_only_album_artists">Display only album artists</string>
   <string name="library_details__empty_content">Placeholder image for an empty list</string>
+  <string name="now_playing_empty_icon_description">No tracks in the playlist</string>
+  <string name="playlists__empty_icon_description">No playlists available</string>
 </resources>
