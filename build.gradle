@@ -1,20 +1,19 @@
 apply plugin: 'com.github.ben-manes.versions'
 
 buildscript {
-  ext.kotlin_version = '1.4.10'
+  ext.kotlin_version = '1.4.30'
   repositories {
     jcenter()
     google()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.1'
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.33.0'
+    classpath 'com.android.tools.build:gradle:4.1.2'
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.36.0'
 
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-    classpath 'com.google.gms:google-services:4.3.4'
-    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+    classpath 'com.google.gms:google-services:4.3.5'
+    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.0'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
@@ -31,4 +30,17 @@ allprojects {
 
 task clean(type: Delete) {
   delete rootProject.buildDir
+}
+
+dependencyUpdates.resolutionStrategy = {
+  componentSelection { rules ->
+    rules.all { selection ->
+      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'pr', 'preview', 'dev'].any { qualifier ->
+        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+      }
+      if (rejected) {
+        selection.reject('Release candidate')
+      }
+    }
+  }
 }
